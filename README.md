@@ -11,9 +11,9 @@ Bounce Lite 是一个面向轻量休闲桌面用户的放松型数字玩具。Ph
 
 ## 当前状态
 
-- 当前阶段：`V0.1 - Core Gameplay Design Review`
+- 当前阶段：`V0.1 - Core Gameplay Implementation`
 - Phase 0 规格日期：`2026-09-08`
-- V0.1 状态：`Endless 技术方案已确认；书面设计复核后进入 TDD 实现`
+- V0.1 状态：`Endless 书面设计已确认；进入 TDD 实现`
 - Godot 工程状态：`已初始化；无 main scene`
 - Git 状态：`本地仓库，main 分支，不设置远端`
 
@@ -40,6 +40,7 @@ Bounce Lite 是一个面向轻量休闲桌面用户的放松型数字玩具。Ph
 - [`docs/asset_registry.md`](docs/asset_registry.md)：完整资产树与逐项登记
 - [`docs/development_notes.md`](docs/development_notes.md)：环境证据、决策、风险和待确认事项
 - [`docs/superpowers/specs/2026-09-08-v0.1-core-gameplay-design.md`](docs/superpowers/specs/2026-09-08-v0.1-core-gameplay-design.md)：Endless 能量循环、组件职责、接口与测试设计
+- [`docs/superpowers/plans/2026-09-08-v0.1-core-gameplay.md`](docs/superpowers/plans/2026-09-08-v0.1-core-gameplay.md)：逐项 TDD 实施计划与机器验收命令
 
 ## 概念图
 
@@ -71,4 +72,4 @@ docs/
 
 ## 下一步
 
-下一步是复核 V0.1 Endless 书面技术设计，然后编写 TDD 实施计划。设计复核通过前不创建场景或脚本。
+当前按已确认的 V0.1 Endless 设计执行 TDD 实施计划。完成机器验证后停止，等待人工试玩。

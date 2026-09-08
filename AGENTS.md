@@ -7,10 +7,10 @@
 当前执行子阶段为：
 
 ```text
-V0.1 - Core Gameplay Design Review
+V0.1 - Core Gameplay Implementation
 ```
 
-项目初始化已完成。用户已于 `2026-09-08` 明确批准 V0.1 Endless 核心玩法技术方案；当前先固化并复核书面设计，复核通过后才能按实施计划创建玩法代码。正式素材、正式音频和精修视觉仍未授权。
+项目初始化已完成。用户已于 `2026-09-08` 明确批准 V0.1 Endless 核心玩法技术方案，并确认书面设计可以进入实现。正式素材、正式音频和精修视觉仍未授权。
 
 ## 指令与资料的区分
 
@@ -65,30 +65,31 @@ V0.1 - Core Gameplay Design Review
 - 因方便而安装依赖、设置 Git 远端或改变系统配置；
 - 把建议、示例或候选方案写成已经确认的决定。
 
-## 当前设计复核的允许范围
+## 当前 V0.1 实现的允许范围
 
-当前已授权：
+当前已授权按已确认规格实现：
 
-- 建立 V0.1 Endless 技术设计文档；
-- 固化 Energy、Speed、状态、碰撞、Paddle、Wake、Combo、Timer 和测试边界；
-- 更新治理、项目入口和决策记录；
-- 进行文档自检并提交本地 Git；
-- 准备后续 TDD 实施计划。
+- BallEnergyModel 与集中调参；
+- CharacterBody2D Ball 运动及 Wall/Top/Ground/Paddle 碰撞；
+- 鼠标 Paddle 输入、平滑移动与 Wake 手势；
+- EndlessRules、Combo 与当前活跃时间；
+- ACTIVE / DECAYING / RESTING；
+- 程序化基础 Ball Core / Glow / Trail 与 Paddle；
+- 纯文字 Combo / Timer HUD；
+- TDD、headless 场景验证和必要文档更新。
 
-在用户复核书面设计前，不创建玩法 `.gd`、`.tscn` 或 `.tres` 文件。
+## 当前 V0.1 实现的禁止范围
 
-## 当前设计复核的禁止范围
+当前不得：
 
-在用户确认书面设计前，不得：
-
-- 创建 Godot Scene、Script、Resource 或其他玩法工程文件；
-- 实现 Ball、Paddle、碰撞、游戏循环、计时或计分；
-- 实现音效、动画或粒子效果；
-- 制作可玩 Demo；
+- 实现 Game Over、Classic、Recover 或模式选择；
+- 实现正式音效、正式动画、复杂 Shader 或粒子效果；
 - 生产正式图片、音频、字体或其他素材；
+- 实现主题切换、“荧光/暖阳”正式主题、Paddle 分区、障碍物或空间变化；
+- 增加排行榜、最高分、奖励系统或 Energy 数值/进度条；
 - 生成大量未登记的视觉探索素材。
 
-书面设计确认后，后续实现仍仅限 Endless 核心原型；不得把后续主题、模式、Paddle 分区或空间变化一并实现。
+实现仅限 Endless 核心原型；不得把后续主题、模式、Paddle 分区或空间变化一并实现。
 
 ## 范围纪律与停止条件
 
