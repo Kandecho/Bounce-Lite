@@ -1,6 +1,6 @@
 # Bounce Lite
 
-Bounce Lite 是一个面向轻量休闲桌面用户的放松型数字玩具。当前已完成 V0.1.2 Vitality–Physics Separation 核心重构，正在完成最终机器验证；正式素材、正式音频和精修视觉仍未制作。
+Bounce Lite 是一个面向轻量休闲桌面用户的放松型数字玩具。当前已完成 V0.1.2 Vitality–Physics Separation 核心重构与机器验证，正在等待人工试玩；正式素材、正式音频和精修视觉仍未制作。
 
 ## 名称
 
@@ -13,7 +13,7 @@ Bounce Lite 是一个面向轻量休闲桌面用户的放松型数字玩具。�
 
 - 当前阶段：`V0.1.2 - Vitality–Physics Separation`
 - Phase 0 规格日期：`2026-09-08`
-- V0.1.2 状态：`Physics/Vitality、Surface Response 与视觉数据边界已实现；最终机器验证进行中`
+- V0.1.2 状态：`Physics/Vitality、Surface Response 与视觉数据边界已实现并通过机器验证；等待人工试玩`
 - Godot 工程状态：`main scene 可运行`
 - Git 状态：`本地仓库，main 分支，不设置远端`
 
@@ -88,7 +88,7 @@ Bounce Lite 是一个面向轻量休闲桌面用户的放松型数字玩具。�
 & 'D:\Apps\Godot_v4.7-stable_win64\Godot_v4.7-stable_win64_console.exe' --headless --path 'D:\hangk\Documents\Bounce Lite' --script res://tests/test_runner.gd
 ```
 
-当前重构测试基线：`TEST PASS: 166 checks`；主场景短时 headless smoke 已通过。最终 editor import、600 帧运行和变异验证尚待本轮完成。
+当前重构测试基线：`TEST PASS: 167 checks`；fresh headless editor import 与主场景 600 帧运行均退出 `0`。碰撞前 Vitality、Paddle impulse、Velocity 独立性和 Velocity-only Trail 四项变异均被测试捕获并已恢复。
 
 主要目录：
 
@@ -101,4 +101,4 @@ docs/
 
 ## 下一步
 
-完成最终机器验证后停止在 V0.1.2 人工试玩门。试玩重点是 Ground 小跳/滚动后的自然休眠、Paddle 重新注入运动、Trail/Glow 信息分工、Wake 可靠性，以及是否存在空中冻结、接球减速或速度失控；未获得反馈前不进入后续功能或主题制作。
+停止在 V0.1.2 人工试玩门。试玩重点是 Ground 小跳/滚动后的自然休眠、Paddle 重新注入运动、Trail/Glow 信息分工、Wake 可靠性，以及是否存在空中冻结、接球减速或速度失控；未获得反馈前不进入后续功能或主题制作。

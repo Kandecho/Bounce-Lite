@@ -50,12 +50,15 @@ func run(suite: RefCounted) -> void:
 	for index in range(30):
 		visuals.record_ball_position(Vector2(index * 10.0, 0.0))
 	var fast_trail_size: int = visuals.trail_points.size()
+	var fast_trail_capacity: int = visuals._trail_capacity()
 	suite.expect_equal(fast_trail_size, 16,
 		"fast motion keeps the full light-trail history")
 
 	visuals.set_vitality(0.20, vitality_script.ActivityState.DECAYING)
 	suite.expect_equal(visuals.trail_points.size(), fast_trail_size,
 		"changing Vitality at equal Velocity does not alter Trail")
+	suite.expect_equal(visuals._trail_capacity(), fast_trail_capacity,
+		"Trail capacity is mathematically independent of Vitality")
 	suite.expect_float(visuals.vitality_ratio, 0.20, 0.0001,
 		"Glow state receives low Vitality independently")
 

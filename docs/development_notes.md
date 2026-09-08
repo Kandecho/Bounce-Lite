@@ -16,7 +16,7 @@
 | 初始文件 | `AGENTS.md`、`phase-0-plan.md`、`day-raw.png`、`night-raw.png` |
 | Git | 本地仓库；`main` 分支；不设置远端 |
 | Git 操作 | 用户已批准 `git init`；不创建 worktree、不推送 |
-| 项目状态 | V0.1.2 Physics/Vitality 核心重构已完成；最终机器验证进行中 |
+| 项目状态 | V0.1.2 Physics/Vitality 重构与机器验证已完成；等待人工试玩 |
 
 ## 3. Engine 与辅助环境证据
 
@@ -208,6 +208,7 @@ Liquid Glass 只作为材质语言参考，不要求实现折射或复杂动态�
 | 2026-09-08 | V0.1.2 技术设计与 TDD 计划 | 完成；设计 `58dcf50`，计划 `35db446`，均经用户确认 |
 | 2026-09-08 | V0.1.2 纯模型与 Controller 迁移 | 完成；Vitality、Surface Response、Velocity 结算与 Wake 分离 |
 | 2026-09-08 | V0.1.2 Visual/Rules 迁移 | 完成；Trail/Glow 数据源分离，旧 BallEnergyModel 运行时引用清零 |
+| 2026-09-08 | V0.1.2 最终机器验证 | 完成；fresh import、167 checks、600 帧及四项变异检查通过 |
 
 ## 11. Phase 0 启动判断
 
@@ -246,8 +247,8 @@ Phase 0 结束时的结果（历史快照）：
 - 技术方案：已由用户确认；
 - 书面规格：`docs/superpowers/specs/2026-09-08-v0.1.2-vitality-physics-separation-design.md`；
 - 实施计划：`docs/superpowers/plans/2026-09-08-v0.1.2-vitality-physics-separation.md`；
-- 代码状态：核心 TDD 迁移完成，最终 import、600 帧与变异验证进行中；
-- 当前门槛：完成机器验证后等待用户进行 V0.1.2 人工试玩；
+- 代码状态：核心 TDD 迁移、fresh import、600 帧与变异验证完成；
+- 当前门槛：等待用户进行 V0.1.2 人工试玩；
 - 当前没有正式素材、正式音频、主题切换、Game Over 或后续玩法规则。
 
 ## 14. V0.1.1 Endless 原型实现证据（历史快照）
@@ -345,11 +346,12 @@ Phase 0 结束时的结果（历史快照）：
 
 | 检查 | 当前结果 |
 | --- | --- |
-| 确定性测试 | `TEST PASS: 166 checks`，退出 `0` |
-| Main Scene 短时 smoke | headless 运行 180 帧，退出 `0` |
+| Godot headless editor import | 退出 `0`；注册 BallVitalityModel、SurfaceResponseModel 等 14 个脚本类，无解析错误 |
+| 确定性测试 | `TEST PASS: 167 checks`，退出 `0` |
+| Main Scene | headless 运行 600 帧，退出 `0`，无脚本或运行期错误 |
 | 旧模型引用 | `scripts/tests/scenes/project.godot` 中 BallEnergyModel、旧映射与同步方法引用为零 |
 | Vitality 领域边界 | BallVitalityModel 中 SurfaceKind、Wall/Ground/Paddle、restitution、impulse 引用为零 |
-| 最终验证 | editor import、600 帧与变异检查待执行 |
+| 变异检查 | 错用损耗后 Vitality、遗漏 Paddle impulse、Vitality 重建 Velocity、Trail 乘 Vitality 均产生预期失败并恢复 GREEN |
 
 ### V0.1.2 人工试玩待确认
 
