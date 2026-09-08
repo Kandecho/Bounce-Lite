@@ -1,6 +1,6 @@
 # Bounce Lite
 
-Bounce Lite 是一个面向轻量休闲桌面用户的放松型数字玩具。当前已完成 V0.1 Endless 核心原型的代码与机器验证，正在等待人工试玩；正式素材、正式音频和精修视觉仍未制作。
+Bounce Lite 是一个面向轻量休闲桌面用户的放松型数字玩具。当前已完成 V0.1.1 重力衰弱调整的代码与机器验证，正在等待人工试玩；正式素材、正式音频和精修视觉仍未制作。
 
 ## 名称
 
@@ -11,9 +11,9 @@ Bounce Lite 是一个面向轻量休闲桌面用户的放松型数字玩具。�
 
 ## 当前状态
 
-- 当前阶段：`V0.1 - Core Gameplay Implementation`
+- 当前阶段：`V0.1.1 - Gravity Decay Tuning`
 - Phase 0 规格日期：`2026-09-08`
-- V0.1 状态：`Endless 原型已实现并通过机器验证；等待人工试玩`
+- V0.1.1 状态：`固定重力、Ground 损耗和视觉反馈已实现；等待人工试玩`
 - Godot 工程状态：`main scene 可运行`
 - Git 状态：`本地仓库，main 分支，不设置远端`
 
@@ -55,12 +55,14 @@ Bounce Lite 是一个面向轻量休闲桌面用户的放松型数字玩具。�
 
 已实现：
 
-- 无重力、封闭矩形中的确定性反弹；
+- 固定重力、封闭矩形中的确定性碰撞响应；
 - Wall/Top 轻微耗能、Ground 明显耗能；
 - Paddle 命中恢复到正常活跃能量，不叠加加速；
 - Ground 清零 Combo 但继续游戏；
 - ACTIVE / DECAYING / RESTING 与 Paddle Wake；
 - 随活跃程度变化的程序化 Glow / Trail；
+- Paddle / Wall / Ground squash/stretch、Ground 短暂变暗与 Wake 亮起；
+- 宽度接近球直径、由 Energy 与实际速度共同控制的连续双层光迹；
 - 纯文字 `COMBO N` 与 `TIME MM:SS`。
 
 未实现且仍不属于当前范围：Game Over、Classic/Recover、排行榜、主题切换、Paddle 分区、障碍物、正式素材、正式音频和复杂视觉精修。
@@ -83,7 +85,7 @@ Bounce Lite 是一个面向轻量休闲桌面用户的放松型数字玩具。�
 & 'D:\Apps\Godot_v4.7-stable_win64\Godot_v4.7-stable_win64_console.exe' --headless --path 'D:\hangk\Documents\Bounce Lite' --script res://tests/test_runner.gd
 ```
 
-当前机器基线：`TEST PASS: 86 checks`；主场景已无头运行 180 帧且没有脚本或运行期错误。
+当前机器基线：`TEST PASS: 112 checks`；主场景已无头运行 600 帧且没有脚本或运行期错误。
 
 主要目录：
 
@@ -96,4 +98,4 @@ docs/
 
 ## 下一步
 
-停止在人工试玩门。试玩后重点判断补能感、衰减是否自然、Wake 触发质量、无失败条件时的接球动机、Combo 清零反馈、是否出现不可控加速，以及最需要调整的物理参数；未获得反馈前不进入后续功能或主题制作。
+停止在 V0.1.1 人工试玩门。试玩后重点判断自然衰弱与休眠、接球恢复活力、Ground 损耗感、速度变化，以及是否愿意主动接球维持运动；未获得反馈前不进入后续功能或主题制作。

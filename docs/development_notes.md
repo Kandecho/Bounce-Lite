@@ -96,8 +96,11 @@ Python 的当前环境未安装 Pillow；Phase 0 没有安装依赖，而是使�
 | 2026-09-08 | Energy 是维持模型，不是积累模型 | 用户直接确认 | 环境只耗能；Paddle 把 `current_energy` 恢复到 `max_energy`，不无限叠加 |
 | 2026-09-08 | 状态从 Energy 导出 | 用户直接确认 | ACTIVE / DECAYING / RESTING 不直接控制任意速度 |
 | 2026-09-08 | RESTING 时由有效 Paddle 运动 Wake | 用户直接确认 | 速度阈值需持续约 80 ms，避免微小抖动误触 |
-| 2026-09-08 | V0.1 采用无重力、封闭矩形、确定性反弹 | 用户直接确认 | 用于隔离并验证核心能量循环 |
+| 2026-09-08 | V0.1 初始原型采用无重力、封闭矩形、确定性反弹 | 用户直接确认；已被 V0.1.1 部分取代 | 初始机器验证基线；V0.1.1 改为固定重力 |
 | 2026-09-08 | TDD 只覆盖确定性规则 | 用户直接确认 | 美感、布局和声音体验留给人工试玩 |
+| 2026-09-08 | V0.1.1 加入固定重力 `520 px/s²` | 用户确认短设计 | 重力独立于 Energy；Ball 自然倾向落地 |
+| 2026-09-08 | V0.1.1 Ground Energy Retention 调整为 `0.65` | 用户确认短设计 | 反弹高度随落地次数明显衰减 |
+| 2026-09-08 | V0.1.1 增加差异化碰撞与 Wake 视觉反馈 | 用户直接确认 | 只动画 Ball；不增加正式动画系统、Shader 或粒子 |
 
 ## 6. 视觉分析记录
 
@@ -191,6 +194,9 @@ Liquid Glass 只作为材质语言参考，不要求实现折射或复杂动态�
 | 2026-09-08 | 确定性规则实现 | 完成；Energy、Speed Mapping、State、Rules、Wake、Ball 碰撞测试通过 |
 | 2026-09-08 | Endless 主场景整合 | 完成；Ball、Paddle、边界、HUD 与程序化视觉已连接 |
 | 2026-09-08 | V0.1 机器验收 | 完成；86 checks；主场景 180 帧无错误；等待人工试玩 |
+| 2026-09-08 | 用户确认 V0.1.1 调整设计 | 完成；固定重力、Ground 损耗、碰撞反馈与宽光迹 |
+| 2026-09-08 | V0.1.1 TDD 与变异检查 | 完成；去重力、0.75 Ground、Trail 忽略速度均被测试捕获 |
+| 2026-09-08 | V0.1.1 离线视觉 QA | 完成；120 帧两轮复核；分段 Trail 修正为连续双层渐变光迹 |
 
 ## 11. Phase 0 启动判断
 
@@ -224,16 +230,16 @@ Phase 0 结束时的结果（历史快照）：
 
 说明：表中“无 main scene / 无脚本”仅描述初始化完成当时。当前工程保持 Project Name 为 `Bounce Lite`，并由 `scripts/main.gd` 将实际窗口标题显式设置为 `Bouncing Ball`。
 
-## 13. V0.1 核心玩法设计状态
+## 13. V0.1.1 核心玩法设计状态
 
 - 技术方案：已由用户确认；
 - 书面规格：`docs/superpowers/specs/2026-09-08-v0.1-core-gameplay-design.md`；
 - 实施计划：`docs/superpowers/plans/2026-09-08-v0.1-core-gameplay.md`；
-- 代码状态：已按 Red → Green → mutation check 实现；
-- 当前门槛：等待用户人工试玩；
+- 代码状态：V0.1 与 V0.1.1 均按 Red → Green → mutation check 实现；
+- 当前门槛：等待用户进行 V0.1.1 人工试玩；
 - 当前没有正式素材、正式音频、主题切换、Game Over 或后续玩法规则。
 
-## 14. V0.1 Endless 原型实现证据
+## 14. V0.1.1 Endless 原型实现证据
 
 ### 组件与职责
 
@@ -241,10 +247,10 @@ Phase 0 结束时的结果（历史快照）：
 | --- | --- | --- |
 | PrototypeTuning | `scripts/config/prototype_tuning.gd` | 集中保存速度、能量损耗、Wake、Paddle 与 Trail 参数 |
 | BallEnergyModel | `scripts/ball/ball_energy_model.gd` | Energy 约束、平方速度映射、环境耗散、Paddle 恢复、状态导出 |
-| BallController | `scripts/ball/ball_controller.gd` | CharacterBody2D 移动、碰撞分类、确定性反射 |
+| BallController | `scripts/ball/ball_controller.gd` | CharacterBody2D 移动、固定重力积分、碰撞分类与 Energy 驱动反弹 |
 | PaddleController | `scripts/paddle/paddle_controller.gd` | 鼠标 X、平滑与边界、Wake 手势检测 |
 | EndlessRules | `scripts/rules/endless_rules.gd` | Combo、Ground 清零、当前活跃时间、Rest/Wake 规则事件 |
-| BallVisuals | `scripts/ball/ball_visuals.gd` | 程序化 Core、能量关联 Glow、历史位置 Trail |
+| BallVisuals | `scripts/ball/ball_visuals.gd` | 程序化 Core/Glow、连续双层光迹、碰撞形变与 Wake 亮度反馈 |
 | PrototypeHUD | `scripts/ui/prototype_hud.gd` | 纯文字 Combo 与 `TIME MM:SS` |
 | Main | `scenes/main.tscn`、`scripts/main.gd` | 组装边界与组件、连接信号、设置 UI Title |
 
@@ -254,8 +260,9 @@ Phase 0 结束时的结果（历史快照）：
 | --- | ---: |
 | Active Speed | `360 px/s` |
 | Max Speed 安全上限 | `520 px/s` |
+| Gravity Acceleration | `520 px/s²` |
 | Wall / Top Energy Retention | `0.985` |
-| Ground Energy Retention | `0.75` |
+| Ground Energy Retention | `0.65` |
 | Active Threshold | `300 px/s` |
 | Rest Threshold | `35 px/s` |
 | Wake Speed | `330 px/s` |
@@ -273,20 +280,19 @@ Phase 0 结束时的结果（历史快照）：
 | 检查 | 结果 |
 | --- | --- |
 | Godot headless editor 导入 / 加载 | 退出 `0`，无错误日志 |
-| 确定性测试 | `TEST PASS: 86 checks`，退出 `0` |
-| Main Scene | headless 运行 180 帧，退出 `0`，无 `SCRIPT ERROR` / `ERROR:` |
+| 确定性测试 | `TEST PASS: 112 checks`，退出 `0` |
+| Main Scene | headless 运行 600 帧，退出 `0`，无 `SCRIPT ERROR` / `ERROR:` |
+| 离线视觉 QA | Compatibility Renderer 输出 120 帧；确认 Ground squash/darken 与连续宽光迹；临时帧已清理 |
 | Git Remote | 空 |
 | 正式资产 / 音频 | 未新增；概念目录以 `.gdignore` 排除运行时导入 |
 | `git diff --check` | 退出 `0` |
 
 ### 人工试玩待确认
 
-1. 接球是否有明显的重新注入能量感；
-2. ACTIVE → DECAYING → RESTING 是否自然；
-3. Wake 是否容易触发且不会误触；
-4. 无失败条件时是否仍有主动接球欲望；
-5. Combo 清零是否足以形成失误反馈；
-6. 是否出现越玩越快、最终不可控的问题；
-7. 最需要调整的物理参数。
+1. 不接球时，球是否自然从运动 → 衰弱 → 休眠；
+2. 接球是否有恢复活力的感觉；
+3. Ground 是否像损耗而非普通碰撞；
+4. 速度变化是否自然；
+5. 是否会主动想接球维持运动。
 
-以上七项均为 `待确认`，机器验证不代替体验判断。
+以上五项均为 `待确认`，机器验证与离线帧检查不代替体验判断。

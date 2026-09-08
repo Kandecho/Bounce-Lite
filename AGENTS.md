@@ -7,10 +7,10 @@
 当前执行子阶段为：
 
 ```text
-V0.1 - Core Gameplay Implementation
+V0.1.1 - Gravity Decay Tuning
 ```
 
-项目初始化及 V0.1 Endless 核心原型实现已经完成机器验证。当前停在人工试玩门；在用户提供试玩反馈或明确批准下一步前，不继续调参、扩展功能或进入主题制作。正式素材、正式音频和精修视觉仍未授权。
+用户已提供首轮试玩方向并批准 V0.1.1：加入固定重力、加强 Ground 损耗、改善碰撞反馈与 Trail。V0.1.1 实现已完成，当前等待新一轮人工试玩；在用户提供反馈或明确批准下一步前，不继续调参、扩展功能或进入主题制作。正式素材、正式音频和精修视觉仍未授权。
 
 ## 指令与资料的区分
 
@@ -75,6 +75,9 @@ V0.1 - Core Gameplay Implementation
 - EndlessRules、Combo 与当前活跃时间；
 - ACTIVE / DECAYING / RESTING；
 - 程序化基础 Ball Core / Glow / Trail 与 Paddle；
+- 固定重力与 Energy 驱动的完整二维反弹速度；
+- Paddle / Wall / Ground squash/stretch、Glow/Darken 与 Wake 反馈；
+- Energy × 实际速度共同控制的连续双层光迹；
 - 纯文字 Combo / Timer HUD；
 - TDD、headless 场景验证和必要文档更新。
 
@@ -190,8 +193,9 @@ V0.1 - Core Gameplay Implementation
 - 主题：V0.1 不实现 Light/Dark 切换，只保留两套设计规格；
 - Glow / Trail：技术路线在获批的开发任务中确定，不在初始化阶段选择。
 - 玩法：V0.1 只实现 Endless；无 Game Over；Ground 只清零 Combo 并明显耗能；
-- 运动：CharacterBody2D、无重力、封闭矩形、确定性反弹；不使用 RigidBody2D 或完全手写碰撞；
+- 运动：CharacterBody2D、固定重力 `520 px/s²`、封闭矩形、确定性碰撞响应；不使用 RigidBody2D 或完全手写碰撞；
 - 能量：`0 <= current_energy <= max_energy`，环境碰撞不增能，Paddle 接球恢复到 `max_energy`；
+- Ground：能量保留率 `0.65`；碰撞后反弹速度由损耗后的 Energy 重新映射；
 - 状态：ACTIVE / DECAYING / RESTING 从 Energy 导出；状态不直接设置任意速度；
 - Wake：RESTING 时由持续约 80 ms 的有效 Paddle 水平运动触发；
 - UI：只显示 Combo 与可独立移除的当前活跃时间；不显示 Energy 数值或 Energy Bar；
@@ -201,14 +205,12 @@ V0.1 - Core Gameplay Implementation
 
 机器验证只证明工程可加载、确定性规则符合断言且主场景可持续运行，不代表主观体验已经通过。
 
-下一次开发前必须取得用户对以下观察的反馈：
+下一次开发前必须取得用户对 V0.1.1 以下观察的反馈：
 
-1. 接球是否能明显感觉到球被重新注入能量；
-2. ACTIVE → DECAYING → RESTING 是否自然；
-3. Wake 是否容易触发且不会误触；
-4. 不存在失败条件时是否仍有主动接球欲望；
-5. Combo 清零是否足以形成失误反馈；
-6. 是否出现越玩越快、最终不可控的问题；
-7. 当前最需要调整的物理参数。
+1. 不接球时，球是否自然从运动 → 衰弱 → 休眠；
+2. 接球是否有恢复活力的感觉；
+3. Ground 是否像损耗而非普通碰撞；
+4. 速度变化是否自然；
+5. 是否会主动想接球维持运动。
 
 未取得反馈前，不得把机器验证描述为体验验收通过。
