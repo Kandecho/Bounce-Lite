@@ -7,10 +7,10 @@
 当前执行子阶段为：
 
 ```text
-V0.1.2 - Vitality–Physics Separation
+V0.1.3 - Resting Wake Impulse
 ```
 
-用户已明确批准 V0.1.2：将 Energy-driven Motion 重构为独立 Physics 与 Vitality 领域，并统一通过 Surface Response 结算碰撞。核心代码与最终机器验证已完成，当前停在 V0.1.2 人工试玩门；在用户提供反馈或明确批准下一步前，不继续调参或扩展范围。正式素材、正式音频和精修视觉仍未授权。
+用户已明确批准 V0.1.3：保留 ACTIVE / DECAYING / RESTING，以短暂 Rest 窗口和连续强度 Wake Impulse 替代旧的固定速度 Wake 阈值。核心代码与机器验证已完成，当前停在 V0.1.3 人工试玩门；在用户提供反馈或明确批准下一步前，不继续调参或扩展范围。正式素材、正式音频和精修视觉仍未授权。
 
 ## 指令与资料的区分
 
@@ -71,11 +71,12 @@ V0.1.2 - Vitality–Physics Separation
 
 - BallVitalityModel、SurfaceResponseModel、SurfaceCollisionResult 与集中调参；
 - CharacterBody2D Ball 运动及 Wall/Top/Ground/Paddle 碰撞；
-- 鼠标 Paddle 输入、平滑移动与 Wake 手势；
+- 鼠标 Paddle 输入、平滑移动与连续运动采样；
 - EndlessRules、Combo 与当前活跃时间；
 - ACTIVE / DECAYING / RESTING；
 - 程序化基础 Ball Core / Glow / Trail 与 Paddle；
 - 独立 Velocity、固定重力、统一 Surface Response 与 Vitality 碰撞损耗；
+- RESTING 短暂休息窗口、横向邻近判定与连续强度 Wake Impulse；
 - Paddle / Wall / Ground squash/stretch、Glow/Darken 与 Wake 反馈；
 - 只表达 Velocity 的连续双层光迹与只表达 Vitality 的基础 Glow；
 - 纯文字 Combo / Timer HUD；
@@ -198,8 +199,8 @@ V0.1.2 - Vitality–Physics Separation
 - Surface：响应先使用碰撞前 Velocity/Vitality 计算，再应用 Velocity、Vitality delta 与状态；
 - Ground：Vitality retention `0.65`，恢复系数随碰撞前 Vitality 变化，并通过切向损耗形成小跳/滚动；
 - 状态：ACTIVE / DECAYING 由 Vitality 范围决定；低 Vitality 只有在 Ground 响应后速度足够低时才进入 RESTING；
-- Wake：RESTING 时由持续约 80 ms 的有效 Paddle 水平运动触发；
-- 视觉：Trail 只表达 Velocity，Glow 只表达 Vitality；二者不得重新组合为单一 activity 值；
+- Wake：RESTING 后先等待约 `0.12 s`；横向邻近的 Paddle 运动产生以向上为主、少量继承水平速度的单次冲量；弱冲量保持 RESTING，强冲量恢复约 `0.15` 最大 Vitality 并进入 DECAYING；
+- 视觉：三通道分离已冻结（`2026-09-08`）。Ball Glow 只表达 Vitality，Trail 只表达 Velocity，Paddle Feedback 只表达玩家 Interaction；三者不得重新组合为任何单一 activity 值。Paddle Feedback 不得留下长期视觉状态：不使用常驻 Glow、常驻 edge line 或任何常驻装饰层，反馈须在约 `140 ms` 内退回基础色。完整规格见 `docs/visual_spec.md` §1.1、§8.5、§11.4、§11.5；
 - UI：只显示 Combo 与可独立移除的当前活跃时间；不显示 Vitality/Energy 数值或进度条；
 - 当前仍不制作正式素材、正式音频或精修视觉效果。
 
@@ -207,12 +208,12 @@ V0.1.2 - Vitality–Physics Separation
 
 机器验证只证明工程可加载、确定性规则符合断言且主场景可持续运行，不代表主观体验已经通过。
 
-机器验证已经完成。下一次开发前必须取得用户对 V0.1.2 以下观察的反馈：
+机器验证已经完成。下一次开发前必须取得用户对 V0.1.3 以下观察的反馈：
 
-1. Ground 是否形成自然的小跳、滚动和休眠；
-2. Paddle 是否同时带来运动注入与 Vitality 恢复感；
-3. Trail 是否只读作运动残影，Glow 是否只读作自身活力；
-4. Wake 是否仍然有意图明确且可靠；
-5. 是否存在空中冻结、接球减速、突然停止或速度失控。
+1. 进入 RESTING 后是否有清楚但不拖沓的短暂停顿；
+2. 轻微 Paddle 输入是否只产生滚动或小幅移动，不会突然弹飞；
+3. 快速 Paddle 输入是否有明确的“救活”感；
+4. 横向作用窗口是否自然，既不会隔空唤醒，也不会过难触发；
+5. 强 Wake 进入 DECAYING 后，是否自然衔接正常 Paddle Collision 恢复循环。
 
 未取得反馈前，不得把机器验证描述为体验验收通过。

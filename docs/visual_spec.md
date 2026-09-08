@@ -10,6 +10,31 @@ Project Name：`Bounce Lite`
 
 UI Title：`Bouncing Ball`
 
+### 1.1 核心视觉原则：反馈通道分离（已冻结）
+
+冻结日期：`2026-09-08`
+
+Bounce Lite 使用三个互相独立的视觉反馈通道。每个通道只表达一个变量，**不得重新组合为任何单一合并值**：
+
+| 通道 | 表达 | 驱动变量 |
+| --- | --- | --- |
+| Ball Glow | 球自身状态 | Vitality |
+| Trail | 球当前运动 | Velocity |
+| Paddle Feedback | 玩家刚刚输入 | Interaction 事件 |
+
+附加约束：
+
+- **Paddle Feedback 不得留下长期视觉状态。** Paddle 是玩家介入系统的位置接口，不是第二个生命体；它表达“刚刚发生了一次输入”，不表达自身处于什么状态。因此不使用独立 Glow 层、不使用常驻 edge line 或任何常驻装饰层；反馈必须在约 `140 ms` 内退回基础色。Paddle 的可见性问题优先通过调整基础色解决，不通过增加图层解决。
+- **明度分级规则。** 任何叠加在另一层之上的效果层，必须在明度上高于它所叠加对象在该时刻的状态值，否则会在峰值帧消失。当前两处分级：Ball Glow `S 0.95` 高于 Core `S 0.58`；Paddle 边缘扰动 `16.30:1` 高于本体闪光 `10.75:1`。
+
+该原则具有**否决效力**，直接排除以下改动：
+
+- 低 Vitality 时削弱或缩短 Trail —— 禁止，Trail 不感知 Vitality；
+- 残影颜色跟随球体当前颜色 —— 禁止，会使 Physics 通道间接携带 Vitality；
+- 给 Paddle 任何随状态缓变的光 —— 禁止。
+
+本原则同时记录于 `AGENTS.md` 已确认基线。文档中与本节冲突的历史描述一律以本节为准。
+
 ## 2. 视觉方向
 
 ### 2.1 采用方向
@@ -22,8 +47,8 @@ UI Title：`Bouncing Ball`
 - Light/Dark 对称主题；
 - 细边框和柔和多层阴影；
 - 大面积留白或深色负空间；
-- 单一高亮交互色用于 Paddle；
-- 白色 Ball 作为视觉焦点；
+- Paddle 常态为低明度基础色，仅在接触瞬间短暂亮起；
+- 荧光青系 Ball 作为视觉焦点（V0.1.3 起；概念图中的白球已由 §8.5 的色彩模型取代）；
 - Timer 是唯一持续可见的 HUD；
 - 背景有景深模糊，内容层保持清晰。
 
@@ -131,10 +156,15 @@ UI Title：`Bouncing Ball`
 | Light | 明亮天空/湖面、近白窗口、蓝灰文字、薄蓝 Ball 效果、薄荷 Paddle |
 | Dark | 深蓝灰环境、深色窗口和 Game Area、白色文字、白色 Ball、浅绿 Paddle |
 
-| Motion State | Ball Core | Glow | Trail | Particles |
-| --- | --- | --- | --- | --- |
-| Idle | 显示 | 可保留静态低强度 | 不显示 | 不显示 |
-| Moving | 显示 | 随速度或碰撞反馈变化的候选 | 显示候选 | 可选；尚未批准 |
+| 通道 | 表达变量 | Idle / RESTING | Moving |
+| --- | --- | --- | --- |
+| Ball Core | Vitality（色彩） | 低饱和、低明度 | 随 Vitality 连续变化 |
+| Ball Glow | Vitality（强度） | 状态地板，不为零 | 随 Vitality 连续变化 |
+| Trail | Velocity | 不显示（速度为零） | 残影数量 / 间距 / 透明度随速度 |
+| Paddle Feedback | Interaction | 不显示 | 仅接触瞬间出现，约 `140 ms` 内消失 |
+| Particles | 不适用 | 不使用 | 不使用；三通道模型中没有它的位置 |
+
+Motion State 不再作为 Glow 的驱动来源。Glow 只由 Vitality 驱动，Trail 只由 Velocity 驱动，两者不共享任何合并的“活跃比例”。
 
 ### 7.2 证据矩阵
 
@@ -171,11 +201,11 @@ V0.1 不实现 Light/Dark 主题切换。两套 Theme Token 和四种 Theme × M
 | `light.text-secondary` | `#5E7190` | Derived | Version；按可读性要求从概念色加深，对 `#F5F9FE` 约 4.68:1 |
 | `light.text-hud` | `#536A93` | Sampled | Timer；约 5.19:1 |
 | `light.text-footer` | `#5E7190` | Derived | Footer；按可读性要求加深，对 `#FEFEFF` 约 4.91:1 |
-| `light.ball-core` | `#FEFEFE` | Sampled | Ball 主体 |
-| `light.ball-glow` | `#7CB8FF @ 20–45%` | Candidate | 合成边缘采样 `#D3E6FD` |
-| `light.ball-trail` | `#8EC2FF @ 10–30%` | Candidate | 合成节点从 `#EDF5FD` 过渡到 `#CAE3FD` |
-| `light.paddle-core` | `#60F1BF` | Sampled | Paddle 核心 |
-| `light.paddle-glow` | `#60F1BF @ 18–35%` | Candidate | Paddle 外发光 |
+| `light.ball-core` | `#FEFEFE` | Sampled | 概念采样证据；玩法对象实现色见 §8.5 |
+| `light.ball-glow` | `#7CB8FF @ 20–45%` | Candidate | 概念采样证据；实现见 §8.5 |
+| `light.ball-trail` | `#8EC2FF @ 10–30%` | Candidate | 概念采样证据；实现见 §8.5 |
+| `light.paddle-core` | `#60F1BF` | Sampled | 概念采样证据；已不作为实现目标，见 §8.5 |
+| `light.paddle-glow` | `#60F1BF @ 18–35%` | Candidate | **已废止**：Paddle 不使用常驻 Glow，见 §1.1 |
 | `light.hud-surface` | `#F5FAFE` | Sampled | Timer Container |
 | `light.hud-icon` | `#536A93` | Derived | Clock Icon 与 Timer 同色族 |
 | `light.focus-ring` | `#2E75C7` | Candidate | 键盘焦点；必须与相邻表面有清晰差异 |
@@ -194,11 +224,11 @@ V0.1 不实现 Light/Dark 主题切换。两套 Theme Token 和四种 Theme × M
 | `dark.text-secondary` | `#AAAFBB` | Sampled | Version；约 6.48:1 |
 | `dark.text-hud` | `#FFFFFF` | Sampled | Timer；对 HUD 约 14.23:1 |
 | `dark.text-footer` | `#A4A9B2` | Sampled | Footer；约 5.85:1 |
-| `dark.ball-core` | `#FDFDFD` | Sampled | Ball 主体 |
-| `dark.ball-glow` | `#FFFFFF @ 14–28%` | Candidate | Dark 概念图为低强度中性 Glow |
-| `dark.ball-trail` | `#CFE3FF @ 12–28%` | Candidate | Moving 状态候选；图中未显示 |
-| `dark.paddle-core` | `#A5EBB4` | Sampled | Paddle 核心 |
-| `dark.paddle-glow` | `#A5EBB4 @ 15–30%` | Candidate | Paddle 外发光 |
+| `dark.ball-core` | `#FDFDFD` | Sampled | 概念采样证据；玩法对象实现色见 §8.5 |
+| `dark.ball-glow` | `#FFFFFF @ 14–28%` | Candidate | 概念采样证据；实现见 §8.5 |
+| `dark.ball-trail` | `#CFE3FF @ 12–28%` | Candidate | 概念采样证据；实现见 §8.5 |
+| `dark.paddle-core` | `#A5EBB4` | Sampled | 概念采样证据；已不作为实现目标，见 §8.5 |
+| `dark.paddle-glow` | `#A5EBB4 @ 15–30%` | Candidate | **已废止**：Paddle 不使用常驻 Glow，见 §1.1 |
 | `dark.hud-surface` | `#252B35` | Sampled | Timer Container |
 | `dark.hud-icon` | `#FFFFFF` | Derived | Clock Icon |
 | `dark.focus-ring` | `#A5EBB4` | Candidate | 键盘焦点 |
@@ -213,6 +243,37 @@ V0.1 不实现 Light/Dark 主题切换。两套 Theme Token 和四种 Theme × M
 | `traffic.green` | `#4BC856` | `#58BE52` | 无状态语义 |
 
 Traffic Light 不能用颜色表达应用状态，因为它们已经被定义为纯装饰。
+
+### 8.5 V0.1.3 玩法对象色彩模型（已冻结）
+
+`2026-09-08` 起，Ball 与 Paddle 的实现色不再取自概念图采样。§8.2 与 §8.3 中的 `*.ball-*` 与 `*.paddle-*` 条目继续作为**概念图采样证据**保留，但不再是玩法对象的实现目标。
+
+Ball —— 色相恒定 `H = 189°`，只有饱和度与明度随 Vitality 变化：
+
+```text
+Core   S = lerp(0.42, 0.58, v)    V = lerp(0.42, 1.00, v)
+Glow   S = lerp(0.60, 0.95, v)    V = lerp(0.55, 1.00, v)
+```
+
+| Vitality | Core | 对 `dark.panel` 实测 |
+| --- | --- | ---: |
+| 1.00 | `#6BE9FF` | 11.97 : 1 |
+| 0.40 | `#569AA6` | 5.34 : 1 |
+| RESTING | `#3E646B` | 2.63 : 1 |
+
+Paddle：
+
+| 用途 | 值 | 对 `dark.panel` 实测 |
+| --- | --- | ---: |
+| `paddle.idle` | `#45786E` | 3.38 : 1 |
+| `paddle.flash` | `#6FE0BE` | 10.75 : 1 |
+| `paddle.disturbance` | `#E6FFF6` | 16.30 : 1 |
+
+Trail：固定使用满 Vitality 的 Ball Glow 色，不随当前 Vitality 变化。
+
+**校准底色必须为 `dark.panel #171C26`。** 当前运行时使用 `#090B0F` / `#11151C`，比目标 token 暗约三倍；在其上校准的光效强度无法迁移到正式主题。状态：`待修正`。
+
+Light Theme 的玩法对象色彩不在本次冻结范围内。用户已确认 Light 不作为当前优先项，且它需要单独设计而不是换色——实测概念图 `day-raw.png` 中白球对近白面板仅 `1.03:1`，最强光晕处 `1.76:1`，Paddle `1.35:1`，均低于非文字 UI 的 `3:1` 参考下限。状态：`待设计`。
 
 ## 9. 对比度与可访问性
 
@@ -298,21 +359,86 @@ Timer 当前只显示 `00:12`，不能据此决定正计时、倒计时或格式
 
 ### 11.4 Ball
 
-- Core 目标直径约 32 design px；
-- 白色实心圆，边缘抗锯齿；
-- Glow 独立于 Core；
-- Trail 独立于 Theme，只由 Moving 候选状态触发；
-- Light 图拖尾约四段，透明度向历史位置递减；
-- Particles 在概念图中未形成可确认图层，保持待设计；
-- 候选实现：程序化圆形/Texture + Shader；Trail 可用历史位置节点或轻量粒子评估。
+已冻结（`2026-09-08`）。Core 与 Glow 共同表达 Vitality；Trail 属于 Velocity 通道，规格见本节末尾。
+
+**Core 与 Glow（Vitality 通道）**
+
+- Core 直径 `32 design px`，实心圆，**必须开启抗锯齿**（当前 `draw_circle` 默认关闭，边缘可见锯齿）；
+- 色相恒定 `H = 189°`。改变色相会读作“变成了另一个东西”，只降饱和与明度才读作“同一个东西没力气了”；
+- 色彩模型见 §8.5。**Glow 必须比 Core 更饱和**，否则球缘没有轮廓，光晕消失在核心里（§1.1 明度分级规则）；
+- Glow 峰值位于 `d = 1.0 r`，即球体轮廓线上；峰值 alpha：`RESTING = 0.25`（状态地板），否则 `lerp(0.25, 0.85, v)`；
+- Glow 衰减 `alpha(d) = peak × (1 − t)^1.6`，`t = (d − 1) / 0.75`，`d = 1.75 r` 归零；包络直径 `56 px`，落在 A014 登记的 `55–60 px` 区间内；
+- **RESTING 的 Glow 地板必须实现为状态常量，不得由 Vitality 推导。** 休眠期间球在地面做亚像素微跳，每次吃 Ground 的 Vitality 损耗，实测 2 秒内从 `0.074` 衰减到 `0.0002`；任何由 Vitality 推导的下限都守不住；
+- 不绘制高光点。高光暗示球体感，与平面语言冲突，且在浅色核心上几乎不可见；
+- 实现路径：运行时生成径向渐变贴图（`Gradient` + `GradientTexture2D`，`FILL_RADIAL`）配 `draw_texture_rect`，**不需要 Shader**；Ball Glow 与 Trail 残影共用同一张贴图。
+
+实测径向剖面（对 `dark.panel #171C26`）：
+
+| Vitality | r=0 | r=17 | r=20 | r=24 | r=28 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 1.00 | 11.97 | 5.38 | 2.64 | 1.25 | 1.00 |
+| 0.40 | 5.34 | 1.98 | 1.44 | 1.09 | 1.00 |
+| RESTING | 2.63 | 1.25 | 1.12 | 1.03 | 1.00 |
+
+> RESTING 时真正承担“仍然存在”的是 Core 的 `2.63:1`，Glow 地板贡献有限（`0.25` 与 `0.30` 之间边缘对比仅 `1.25` 对 `1.32`）。若试玩认为感觉不足，有效杠杆依次为：提高 RESTING Core 明度、把地板提到 `0.45` 以上、呼吸式调制。见 `VL001`。
+
+**Trail（Velocity 通道）**
+
+离散残影，不是连续能量尾迹。目标是让玩家看到“球正在运动”，而不是高速飞行特效。
+
+- 采样：**固定时间间隔 `0.085 s`**，不是固定距离。距离采样会让残影间距恒定、速度只能通过数量表达；时间采样使间距天然正比于速度，这是频闪照片编码速度的方式；
+- 残影数 `n = clamp(round(lerp(0, 4, speed / max_speed)), 0, 4)`；
+- 间距 `spacing = max(speed × 0.085, 18 px)`；
+- alpha：最新 `0.34` → 最旧 `0.05`，整组再乘 `lerp(0.30, 1.0, speed / max_speed)`；
+- 直径：`1.00 → 0.82 ×` 球直径；
+- **颜色固定为满 Vitality 的 Glow 色**；取当前球色会使 Physics 通道间接携带 Vitality；
+- Trail 不因低 Vitality 而削弱。高速运动即使发生在球即将耗尽 Vitality 之前，也应产生明显 Trail。
+
+| 速度 | n | 间距 | 间距 / 球直径 |
+| ---: | ---: | ---: | ---: |
+| 160 px/s | 1 | 18.0 px | 0.56 |
+| 330 px/s | 3 | 28.1 px | 0.88 |
+| 490 px/s | 4 | 41.7 px | 1.30 |
+
+**Particles**
+
+不使用。三通道模型中没有它的位置。
 
 ### 11.5 Paddle
 
-- 目标核心尺寸取 Light/Dark 中位方向：约 `150×18 design px`；
-- 胶囊形，圆角约为高度一半；
-- Light 与 Dark 使用不同核心 Token，但几何统一；
-- Glow 置于 Core 后方，不改变碰撞或输入尺寸；
-- 候选实现：`Control/StyleBox`、程序化矩形或简洁 Sprite；不要求位图素材。
+已冻结（`2026-09-08`）。Paddle 表达玩家输入事件，**不表达自身状态**，不留下长期视觉状态。
+
+- 几何：`150 × 18 design px`，胶囊形，圆角 `9`（高度一半）；
+- 固定高度是空间语义的一部分，Paddle 只负责水平移动；
+- **无 Glow 层、无常驻 edge line、无任何常驻装饰层。**
+
+组成：
+
+| 层 | 必需性 | 作用 |
+| --- | --- | --- |
+| `idle` 基础色 | 必需 | 形态，不表达状态 |
+| `interaction` 本体亮度变化 | 必需 | 主要信息：发生了输入 |
+| `contact` 局部边缘扰动 | 必需 | 定位：打在哪里 |
+| `squash` 轻微形变 | 可选 | 手感补充，不作为必要表达 |
+
+三级明度见 §8.5。基础色取去饱和方向，理由是需要与 Ball 的青色区分：Paddle 是输入工具，不是第二个生命体。参照 Ball Core `11.97:1`、Glow 边缘 `5.38:1`，Paddle `idle` 必须明显低于此，否则与焦点对象争夺注意力。
+
+时间曲线：攻击 1 帧（瞬时），衰减 `τ = 55 ms`，即 `1.00 / 0.34 / 0.08 / 0.02` 对应 `0 / 60 / 140 / 220 ms`。**必须严格快于 Ball 的 Vitality 结算**，使画面读作“输入闪一下就过去了，结果留在球上”。
+
+事件强度按两个来源分组，不在视觉层固定事件枚举，避免未来增加 Surface 时 Paddle 视觉规则膨胀：
+
+| 来源 | 子类 | 强度 | 衰减 |
+| --- | --- | ---: | ---: |
+| Collision Feedback | 有效接球 | 1.00 | 220 ms |
+| Collision Feedback | 无效接触 | 0.28（本体色去饱和） | 120 ms |
+| Wake Feedback | 弱输入 | 0.15–0.45 连续 | 150 ms |
+| Wake Feedback | 强输入 | 0.85 | 260 ms |
+
+- Wake 强度应连续映射冲量大小，并在激活阈值处保留可见跳变。该跳变是教学装置：玩家能在几次尝试内自行学会“多快才算够”，不需要任何 UI 提示；
+- 区分有效 / 无效接触不可省略。未来将增加“下侧接触不恢复 Vitality”的规则，若两种接触亮得一样，光就在说谎；
+- 边缘扰动几何：两段长 `22 px` 亮段从接触点向两侧移动 `14 px → 60 px`，`alpha = k × (1 − progress)^1.3 × 0.95`；另加接触点上方 `7 px` 冲击刻度，`alpha = k × (1 − progress)^2.6 × 0.85`；
+- `squash` 为可选层：全局 transform `(1.09 x, 0.80 y)`，在 18 px 高的条上仅约 `3.6 px`，实测几乎不可见。真正承担表达的是亮度跃迁与边缘扰动。真正的**局部**凹陷需要把 Paddle 从 `StyleBoxFlat` 改为多边形绘制，见 `VL006`；
+- 实现：本体 `StyleBoxFlat`，边缘扰动 `draw_line` 覆盖绘制，`squash` 用 `draw_set_transform`。
 
 ### 11.6 HUD Timer
 
@@ -349,8 +475,9 @@ Start、Pause、Game Over 采用极简文字 UI。状态层保持透明，不新
 
 - Phase 0 不实现动画；
 - Ball 移动是核心运动，其他持续动画应保持最少；
-- Trail 节点数量、采样间隔、生命周期和透明曲线必须在 V0.1 用实际速度验证；
-- Particles 不是必需项，只有当 Trail/Glow 无法表达反馈时再启用；
+- Trail 采样间隔、残影数量与透明曲线已在 §11.4 冻结；实现后需用实际速度复测；
+- Particles 不使用；V0.1 未授权，且三通道模型中没有它的位置；
+- Paddle 反馈必须在约 `140 ms` 内完全退回基础色，不得留下任何残余；
 - 不统一套用单一动画时长；时长应由距离、状态和反馈目的决定；
 - 窗口阴影、背景 Blur、Ball Glow、Paddle Glow 和 Trail 是主要 overdraw 风险；
 - Compatibility Renderer 下至少测试 640×480、960×720、1280×960、1440×1080；
@@ -367,8 +494,41 @@ Start、Pause、Game Over 采用极简文字 UI。状态层保持透明，不新
 | V004 | Start/Pause/Game Over | 极简文字 UI，无边框/卡片/复杂面板 | 用户 | 已确认；不阻塞 |
 | V005 | Footer 最终文案 | 保留概念文案 | 用户 | 否 |
 | V006 | `v0.1` 版本绑定规则 | 与正式构建版本同步 | 用户 | 否 |
-| V007 | Glow/Trail/Particles 技术路线 | 在开发阶段进行技术验证后选择 | 用户 + V0.1 技术验证 | 决策时点已确认；不阻塞初始化 |
+| V007 | Glow/Trail/Particles 技术路线 | 已确认：程序化径向渐变贴图，无 Shader；Particles 不使用 | 用户 | 已确认；见 §11.4 |
+| VL001 | RESTING Glow 地板值 | 首选 `0.25`；建议实测 `0.25 / 0.40 / 0.55` 三档 | 用户 | 待确认；不阻塞实现 |
+| VL002 | `squash` 是否保留 | 可选层；18 px 上仅 `3.6 px`，实测几乎不可见 | 用户 + Codex | 待确认 |
+| VL003 | Ball `z_index` 高于 Paddle | 用于处理残留绘制层级问题 | 用户 | 待确认；另见 V0.1.3 冻结记录 |
+| VL004 | 运行时校准底色改为 `#171C26` | 当前 `#090B0F` / `#11151C` 暗约三倍，调参结论无法迁移 | Codex | 待修正 |
+| VL005 | RESTING 呼吸式调制 | 后续可选，非 V0.1.3 必需 | 用户 | 待设计 |
+| VL006 | 局部凹陷是否值得多边形改造 | 影响 §11.5 的 `squash` 层 | Codex | 待确认 |
+| VL007 | Light Theme 玩法对象色彩 | 需单独设计，不是换色；实测概念图本身低于 `3:1` | 用户 | 待设计；已降级为非当前优先项 |
 
 ## 15. Phase 0 结论
 
-概念图中的现有元素已经转化为布局、主题、Token、状态和实现候选。状态界面、字体方向、V0.1 主题策略和 Light 可读性已经获得用户确认；具体字体文件、Glow/Trail 技术路线及未授权的玩法交互继续保留到对应开发任务处理。
+概念图中的现有元素已经转化为布局、主题、Token、状态和实现候选。状态界面、字体方向、V0.1 主题策略和 Light 可读性已经获得用户确认；具体字体文件及未授权的玩法交互继续保留到对应开发任务处理。
+
+## 16. 概念图的适用范围（`2026-09-08` 更新）
+
+截至本次更新，玩法对象已有三处刻意偏离概念图，且均由用户逐项确认：
+
+| 项 | 概念图 | 当前规格 |
+| --- | --- | --- |
+| Ball Core | 白色 `#FEFEFE` / `#FDFDFD` | 荧光青系，随 Vitality 变化（§8.5） |
+| Paddle Glow | 常驻发光 | 不使用常驻 Glow，仅接触瞬间反馈（§1.1、§11.5） |
+| Paddle Core | `#60F1BF` 高亮薄荷 | `#45786E` 低明度基础色（§8.5） |
+
+因此：**`day-raw.png` 与 `night-raw.png` 对玩法对象的视觉基准地位已经结束。** 它们现在的适用范围是布局、窗口框架、Header / Footer、HUD 版式与排版方向。
+
+后续视觉审查不得再以概念图作为 Ball、Paddle、Trail、Glow 的比对基准；这三类对象一律以 §1.1、§8.5、§11.4、§11.5 为准。
+
+## 17. 视觉语言 v1 冻结记录
+
+| 项 | 值 |
+| --- | --- |
+| 冻结日期 | `2026-09-08` |
+| 冻结范围 | 三通道原则、Ball 色彩与 Glow 分布、Trail 离散残影参数、Paddle 反馈三层 |
+| 验证方式 | Godot `4.7.stable.official.5b4e0cb0f` 独立沙箱工程实机渲染，1:1 设计尺度，底色 `dark.panel #171C26` |
+| 验证结论 | 所有数值均可由程序化径向渐变贴图实现，不需要 Shader 或位图素材 |
+| 不在冻结范围 | Light Theme 玩法对象色彩；`VL001`–`VL007` 各项 |
+
+机器渲染只证明数值可实现且可测量，不代表主观体验已经通过。所有手感相关判断仍需人工试玩。

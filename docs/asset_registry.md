@@ -21,6 +21,7 @@
 | `已确认` | Phase 0 规格事实或用户明确决定已经记录 |
 | `原型实现` | 已有程序化验证实现，但不是正式素材或最终视觉 |
 | `阻塞` | 未决事项会阻止完整 V0.1 状态或资产工作 |
+| `已废止` | 该元素已被设计决定移除；编号保留不复用 |
 
 尺寸格式：`Source BBox → 960×720 Design BBox`。`≈` 表示合成图测量，容限为 ±4 source px。
 
@@ -49,14 +50,18 @@ Window
 ├── Game Area
 │   ├── Surface
 │   └── Border
-├── Ball
+├── Ball                          (Vitality 通道 + Velocity 通道)
 │   ├── Core
 │   ├── Glow
+│   ├── Resting State
 │   ├── Trail
-│   └── Particles
-├── Paddle
+│   ├── Squash / Stretch
+│   └── Particles                 (不使用)
+├── Paddle                        (Interaction 通道)
 │   ├── Core
-│   └── Glow
+│   ├── Interaction Flash
+│   ├── Contact Disturbance
+│   └── Glow                      (已废止)
 ├── HUD
 │   ├── Combo Text
 │   └── Timer
@@ -104,12 +109,17 @@ Window
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | A011 | Game Area Surface | 承载玩法对象和 HUD | REF001/REF002 | Not Produced | Yes | Light/Dark | Not Applicable | `≈(258,197,933,682) → (171,131,619,452)` | `light.panel` / `dark.panel` | Control/Panel + StyleBox | 已确认 | 统一几何；8–10 design px 圆角 |
 | A012 | Game Area Border | 标记玩法内容安全区 | REF001/REF002 | Not Produced | Yes | Light/Dark | Not Applicable | 同 A011；目标 1–2 design px | `light.panel-border` / `dark.panel-border` | StyleBox border | 已确认 | 对象效果默认不溢出到 Header/Footer |
-| A013 | Ball Core | 核心运动对象视觉 | REF001/REF002 | Not Produced | Yes | Shared core | Both | Light `≈50×50 → 33×33`；Dark `≈46×46 → 31×31`；目标直径约 32 | `light.ball-core` / `dark.ball-core` | 程序化圆形、Texture 或 Sprite2D | 已确认 | 图中位置是快照，不是固定出生位置 |
-| A014 | Ball Glow | 将 Ball 与背景分离并提供反馈 | REF001/REF002 合成效果 | Not Produced | Yes | Light/Dark | Both | Light 视觉包络约 55–60 design px；Dark 更低强度 | `light.ball-glow` / `dark.ball-glow` | V0.1：程序化多层圆；后续可评估 Shader/预制 Glow | 原型实现 | 强度随活跃比例连续变化；RESTING 保留微弱 Glow；不是正式主题效果 |
-| A015 | Ball Trail | 表达移动方向和速度 | REF001 明确；REF002 未显示 | Not Produced | Yes | Light/Dark | Moving | Light Envelope `≈(602,359,134,111) → (399,238,89,74)`；约四段 | `light.ball-trail` / `dark.ball-trail` | V0.1：最多 16 个历史位置采样的程序化线段 | 原型实现 | 长度与透明度随活跃比例变化；RESTING 清空；不按 Theme 禁用 |
-| A016 | Ball Particles | 可选碰撞/运动强调 | 概念图没有可确认独立层 | Not Produced | No | Light/Dark | Moving candidate | 未出现；尺寸由未来事件规格决定 | 引用 Ball Effect Token | GPUParticles2D 或不使用 | 待设计 | 问题：是否需要；影响：性能与视觉密度；确认人：用户；当前不阻塞基础视觉 |
-| A017 | Paddle Core | 玩家控制对象视觉 | REF001/REF002 | Not Produced | Yes | Light/Dark | Both | Light `232×28 → 154×19`；Dark `220×26 → 146×17`；统一目标约 `150×18` | `light.paddle-core` / `dark.paddle-core` | Control/StyleBox、程序化矩形或 Sprite | 已确认 | 胶囊形；视觉 Glow 不改变未来碰撞尺寸 |
-| A018 | Paddle Glow | 强调 Paddle 和可控性 | REF001/REF002 合成效果 | Not Produced | Yes | Light/Dark | Both | 包络大于 Core；具体 Blur 无法反解 | `light.paddle-glow` / `dark.paddle-glow` | V0.1：程序化 StyleBox 外层；后续可评估 Shader | 原型实现 | 当前只验证可控对象辨识度，不代表正式效果 |
+| A013 | Ball Core | 核心运动对象视觉 | REF001/REF002 | Not Produced | Yes | Shared core | Both | Light `≈50×50 → 33×33`；Dark `≈46×46 → 31×31`；目标直径约 32 | 见 `visual_spec.md` §8.5 | 程序化抗锯齿圆形 | 已确认 | 荧光青系，H 189 恒定，S/V 随 Vitality；概念图白球已被取代。图中位置是快照，不是固定出生位置 |
+| A014 | Ball Glow | 将 Ball 与背景分离并提供反馈 | REF001/REF002 合成效果 | Not Produced | Yes | Light/Dark | Both | Light 视觉包络约 55–60 design px；Dark 更低强度 | 见 `visual_spec.md` §8.5 | 运行时径向渐变贴图 + `draw_texture_rect`，无 Shader | 已确认 | **只表达 Vitality**。峰值在 `d=1.0r`，`(1-t)^1.6` 衰减至 `1.75r`，包络 56 px。当前实现为 73 px 四段硬边环，`待修正` |
+| A015 | Ball Trail | 表达移动方向和速度 | REF001 明确；REF002 未显示 | Not Produced | Yes | Light/Dark | Moving | Light Envelope `≈(602,359,134,111) → (399,238,89,74)`；约四段 | 固定为满 Vitality 的 Glow 色 | 离散残影，与 Glow 共用同一张径向渐变贴图 | 已确认 | **只表达 Velocity**。固定时间采样 `0.085 s`，`n ≤ 4`，间距 `max(speed × 0.085, 18)`。当前实现为连续双层折线，`待修正` |
+| A016 | Ball Particles | 可选碰撞/运动强调 | 概念图没有可确认独立层 | Not Produced | No | Light/Dark | Moving candidate | 未出现；尺寸由未来事件规格决定 | 引用 Ball Effect Token | 不使用 | 已确认 | 三通道模型中没有 Particles 的位置；不实现 |
+| A017 | Paddle Core | 玩家控制对象视觉 | REF001/REF002 | Not Produced | Yes | Light/Dark | Both | Light `232×28 → 154×19`；Dark `220×26 → 146×17`；统一目标约 `150×18` | `paddle.idle` 见 `visual_spec.md` §8.5 | `Control/StyleBox` 或程序化矩形 | 已确认 | 胶囊形，圆角 9。常态为低明度基础色 `#45786E`，**不表达任何状态**；概念图 `#60F1BF` 已被取代 |
+| A018 | Paddle Glow | ~~强调 Paddle 和可控性~~ | REF001/REF002 合成效果 | Not Produced | No | 不适用 | 不适用 | 不生产 | 不适用 | 不实现 | 已废止 | `2026-09-08` 用户决定：Paddle 不使用常驻 Glow。Paddle 表达输入事件而非自身状态，常驻发光层会把它从轻交互接口推成独立 UI。替代项见 A035 / A036；编号保留不复用 |
+| A035 | Paddle Interaction Flash | 表达“刚刚发生了一次输入” | 用户 V0.1.3 决定 | Not Produced | No | Neutral | 仅事件瞬间 | 覆盖 Paddle 本体 `150×18` | `paddle.flash` 见 `visual_spec.md` §8.5 | 本体色 lerp，`τ = 55 ms` 衰减 | 待设计 | 有效接球 1.00 / 无效接触 0.28 / Wake 弱 0.15–0.45 / Wake 强 0.85。必须在约 140 ms 内完全退回基础色 |
+| A036 | Paddle Contact Disturbance | 定位“打在哪里” | 用户 V0.1.3 决定 | Not Produced | No | Neutral | 仅事件瞬间 | 两段 `22 px` 亮段，行程 `14 → 60 px`；冲击刻度 `7 px` | `paddle.disturbance` 见 `visual_spec.md` §8.5 | `draw_line` 覆盖绘制 | 待设计 | 明度必须高于 A035 的本体闪光，否则峰值帧不可见 |
+
+| A037 | Ball Resting State | 表达“仍然存在，但进入等待状态” | 用户 V0.1.3 决定 | Not Produced | No | Neutral | RESTING | 同 A013 / A014 几何 | 见 `visual_spec.md` §8.5 RESTING 行 | Core 低饱和低明度 + Glow 状态地板 | 待设计 | Glow 地板 `0.25` **必须是状态常量，不得由 Vitality 推导**；休眠期 Vitality 会衰减趋近于零。呼吸式调制为后续可选项，非 V0.1.3 必需。见 `VL001` |
+| A038 | Ball / Paddle Squash Stretch | 碰撞瞬间的形变手感 | V0.1.1 起已存在于实现，本次补登记 | Not Produced | No | Neutral | 仅事件瞬间 | Ball 按法线方向压缩；Paddle 全局 `(1.09 x, 0.80 y)` | 不引用颜色 Token | `draw_set_transform` | 待确认 | 自 V0.1.1 起实现但一直未登记。Paddle 的形变在 18 px 高的条上仅约 `3.6 px`，实测几乎不可见；是否保留见 `VL002` |
 
 ### 4.3 HUD Timer
 
@@ -160,8 +170,9 @@ Window
 | --- | --- |
 | Window | `background-*`、`window`、`panel-border` |
 | Text | `text-primary`、`text-secondary`、`text-hud`、`text-footer` |
-| Ball | `ball-core`、`ball-glow`、`ball-trail` |
-| Paddle | `paddle-core`、`paddle-glow` |
+| Ball | `visual_spec.md` §8.5 Ball 色彩模型（H 189 恒定，S/V 随 Vitality） |
+| Trail | 固定使用满 Vitality 的 Ball Glow 色；**不得引用当前 Vitality 派生色** |
+| Paddle | `paddle.idle`、`paddle.flash`、`paddle.disturbance`（§8.5） |
 | HUD | `hud-surface`、`hud-icon`、`text-hud` |
 | States | 主题文字 Token；当前极简状态层不使用可见 Overlay、卡片或按钮表面 |
 
@@ -192,11 +203,39 @@ Particles 是可选项，不是 V0.1 默认必需。
 - 正式素材：均未生产；
 - 状态视觉与字体方向：已由用户确认；具体字体文件授权归档和玩法交互映射在对应开发任务处理。
 
-## 8. V0.1 原型资产边界
+## 8. V0.1.3 资产边界（`2026-09-08` 更新）
 
 - 当前视觉全部由 Godot 节点和程序绘制生成，没有新增 Sprite、Texture、字体或音频资产；
+- Ball Glow 与 Trail 残影使用**运行时生成**的径向渐变贴图（`GradientTexture2D`，`FILL_RADIAL`），属于程序化资产，不是位图素材，不需要 Shader；
 - `assets/concept/` 包含 `.gdignore`，两张参考图不参与运行时导入；
-- V0.1 使用单套中性暗色校准外观，只为检验 Core / Glow / Trail 与可读性，不代表“荧光”正式主题；
-- Light/Dark 规格仍然保留，Theme 与 Motion State 继续分离；
-- A014、A015、A018、A021、A034 的 `原型实现` 只说明验证实现存在，不代表正式资产验收；
-- A019 Timer Container 与 A020 Clock Icon 未进入当前极简 HUD；Particles 未实现。
+- A019 Timer Container 与 A020 Clock Icon 未进入当前极简 HUD；
+- A016 Particles 已确认不使用；A018 Paddle Glow 已废止。
+
+### 8.1 三通道归属
+
+每个视觉资产只属于一个反馈通道，**不得跨通道取值**（原则见 `visual_spec.md` §1.1）：
+
+| 通道 | 驱动变量 | 资产 |
+| --- | --- | --- |
+| Vitality | 球自身状态 | A013 Core、A014 Glow、A037 Resting State |
+| Velocity | 球当前运动 | A015 Trail |
+| Interaction | 玩家刚刚输入 | A035 Interaction Flash、A036 Contact Disturbance |
+| 不属于通道 | 事件瞬时装饰 | A038 Squash / Stretch |
+
+A017 Paddle Core 不属于任何通道：它是形态，不表达状态。
+
+### 8.2 与当前实现的差距
+
+下列条目的规格已冻结，但当前运行时实现仍是旧版本，状态为 `待修正`：
+
+| Asset ID | 规格 | 当前实现 |
+| --- | --- | --- |
+| A013 | 荧光青系，随 Vitality 变化 | 白色 `#F7FCFF` 固定 |
+| A014 | 连续衰减，包络 56 px | 四段硬边同心环，包络 73 px，无抗锯齿 |
+| A015 | 离散残影，时间采样 `0.085 s` | 连续双层折线，距离采样 `8 px` |
+| A017 | `#45786E` 低明度 | `#60F1BF` 高亮薄荷 |
+| A035 / A036 | 接触瞬间反馈 | 未实现 |
+| A018 | 已废止 | 仍绘制 5 px 常驻外扩层 |
+| A037 | Glow 状态地板 `0.25` | 由 Vitality 推导，休眠后趋近于零 |
+
+另：运行时校准底色为 `#090B0F` / `#11151C`，比 `dark.panel #171C26` 暗约三倍，光效强度结论无法迁移（`VL004`）。

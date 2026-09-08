@@ -16,7 +16,7 @@
 | 初始文件 | `AGENTS.md`、`phase-0-plan.md`、`day-raw.png`、`night-raw.png` |
 | Git | 本地仓库；`main` 分支；不设置远端 |
 | Git 操作 | 用户已批准 `git init`；不创建 worktree、不推送 |
-| 项目状态 | V0.1.2 Physics/Vitality 重构与机器验证已完成；等待人工试玩 |
+| 项目状态 | V0.1.3 Resting Wake Impulse 实现与机器验证已完成；等待人工试玩 |
 
 ## 3. Engine 与辅助环境证据
 
@@ -95,7 +95,7 @@ Python 的当前环境未安装 Pillow；Phase 0 没有安装依赖，而是使�
 | 2026-09-08 | 采用 CharacterBody2D + 独立 BallEnergyModel | 用户直接确认 | 运动碰撞与能量规则解耦；不采用 RigidBody2D 或完全手写碰撞 |
 | 2026-09-08 | Energy 是维持模型，不是积累模型 | 用户直接确认 | 环境只耗能；Paddle 把 `current_energy` 恢复到 `max_energy`，不无限叠加 |
 | 2026-09-08 | 状态从 Energy 导出 | 用户直接确认 | ACTIVE / DECAYING / RESTING 不直接控制任意速度 |
-| 2026-09-08 | RESTING 时由有效 Paddle 运动 Wake | 用户直接确认 | 速度阈值需持续约 80 ms，避免微小抖动误触 |
+| 2026-09-08 | RESTING 时由有效 Paddle 运动 Wake | 用户直接确认；已被 V0.1.3 取代 | 历史实现使用速度阈值持续约 80 ms |
 | 2026-09-08 | V0.1 初始原型采用无重力、封闭矩形、确定性反弹 | 用户直接确认；已被 V0.1.1 部分取代 | 初始机器验证基线；V0.1.1 改为固定重力 |
 | 2026-09-08 | TDD 只覆盖确定性规则 | 用户直接确认 | 美感、布局和声音体验留给人工试玩 |
 | 2026-09-08 | V0.1.1 加入固定重力 `520 px/s²` | 用户确认短设计 | 重力独立于 Energy；Ball 自然倾向落地 |
@@ -106,6 +106,16 @@ Python 的当前环境未安装 Pillow；Phase 0 没有安装依赖，而是使�
 | 2026-09-08 | 所有碰撞统一由 SurfaceResponseModel 纯计算 | 用户直接确认 | 使用碰撞前 Velocity/Vitality；先应用 Velocity，再应用 Vitality delta |
 | 2026-09-08 | Resting 使用低 Vitality + Ground 低速联合门槛 | 用户确认设计文档 | 避免 Wall 损耗导致空中冻结，保留小跳/滚动阶段 |
 | 2026-09-08 | Trail 只表达 Velocity，Glow 只表达 Vitality | 用户直接确认 | 两类视觉信息不再共享单一 activity 乘积 |
+| 2026-09-08 | V0.1.3 使用 Resting Wake Impulse | 用户直接确认 | 不新增状态；DECAYING 仍可由正常 Paddle Collision 救回 |
+| 2026-09-08 | RESTING 使用短暂休息窗口 | 用户直接确认 | 默认 `0.12 s` 内拒绝 Wake，避免刚停稳即被旧输入弹起 |
+| 2026-09-08 | Wake 保持二元状态判断与连续冲量强度 | 用户直接确认 | 弱冲量保持 RESTING；强冲量恢复约 15% 最大 Vitality 并进入 DECAYING |
+| 2026-09-08 | 三通道原则冻结为核心视觉原则 | 用户直接确认 | Ball Glow = Vitality，Trail = Velocity，Paddle Feedback = Interaction；三者不得合并 |
+| 2026-09-08 | Paddle Feedback 不留长期视觉状态 | 用户直接确认 | 取消常驻 Glow 与常驻 edge line；可见性问题优先调基础色，不加图层 |
+| 2026-09-08 | Ball 核心改为荧光青系 | 用户直接确认 | H 189 恒定，`S = lerp(0.42, 0.58, v)`，`V = lerp(0.42, 1.00, v)`；概念图白球被取代 |
+| 2026-09-08 | Trail 改为离散残影，固定时间采样 | 用户直接确认 | 采样间隔 `0.085 s`；速度决定数量、间距与透明度；不加入 Vitality 权重 |
+| 2026-09-08 | Paddle 基础色 `#45786E` | 用户直接确认 | 去饱和方向，与 Ball 青色区分；Paddle 是输入工具，不是第二个生命体 |
+| 2026-09-08 | RESTING Glow 使用状态地板 `0.25` | 用户直接确认 | 必须是状态常量；休眠期 Vitality 衰减趋近于零，推导值守不住 |
+| 2026-09-08 | 概念图对玩法对象的基准地位终止 | 由上述三项决定推出并经用户确认 | 概念图适用范围收窄为布局、窗口框架与排版 |
 
 ## 6. 视觉分析记录
 
@@ -179,7 +189,7 @@ Liquid Glass 只作为材质语言参考，不要求实现折射或复杂动态�
 ### 后续开发风险
 
 - Timer 已实现为最近一次 Wake/Active 到进入 Rest 的正计时；它不参与失败或难度，仍应保持可独立移除。
-- Ball 初始参数已集中，但补能感、衰减节奏、Wake 阈值与接球动机仍需人工试玩，不得仅凭机器测试定稿。
+- Ball 初始参数已集中，但补能感、衰减节奏、Rest 窗口、Wake Impulse 与接球动机仍需人工试玩，不得仅凭机器测试定稿。
 - 字体家族方向已批准，但具体字体文件、版本和许可证尚未归档，标题、Timer 和 Footer 的最终宽度仍需实测。
 - 随机或低强度动态变化若没有概率上限、冷却或可读性约束，仍可能意外形成不可处理阶段；玩法规格需建立约束与验证指标。
 
@@ -209,6 +219,12 @@ Liquid Glass 只作为材质语言参考，不要求实现折射或复杂动态�
 | 2026-09-08 | V0.1.2 纯模型与 Controller 迁移 | 完成；Vitality、Surface Response、Velocity 结算与 Wake 分离 |
 | 2026-09-08 | V0.1.2 Visual/Rules 迁移 | 完成；Trail/Glow 数据源分离，旧 BallEnergyModel 运行时引用清零 |
 | 2026-09-08 | V0.1.2 最终机器验证 | 完成；fresh import、173 checks、600 帧及四项变异检查通过 |
+| 2026-09-08 | V0.1.2 运行时调参面板 | 完成；F1 切换、共享 PrototypeTuning、205 checks 与 600 帧验证 |
+| 2026-09-08 | V0.1.3 Wake Impulse TDD | 完成；Rest 窗口、邻近判定、弱/强冲量、连续输入防叠加与正常碰撞隔离 |
+| 2026-09-08 | V0.1.3 场景级验证 | 完成；fresh import、235 checks 与主场景 1200 帧运行通过 |
+| 2026-09-08 | 视觉独立审计（实机截帧） | 完成；Godot 4.7 同构建离线渲染，量化 Glow 剖面、Trail 采样、遮挡比例与主题对比度 |
+| 2026-09-08 | 视觉语言 v1 冻结 | 完成；三通道原则与 Ball / Paddle / Trail 参数确认 |
+| 2026-09-08 | 视觉规格同步 | 完成；`visual_spec.md`、`asset_registry.md`、`AGENTS.md` 已按 v1 更新 |
 
 ## 11. Phase 0 启动判断
 
@@ -242,13 +258,13 @@ Phase 0 结束时的结果（历史快照）：
 
 说明：表中“无 main scene / 无脚本”仅描述初始化完成当时。当前工程保持 Project Name 为 `Bounce Lite`，并由 `scripts/main.gd` 将实际窗口标题显式设置为 `Bouncing Ball`。
 
-## 13. V0.1.2 核心模型设计状态
+## 13. V0.1.2 核心模型设计状态（历史）
 
 - 技术方案：已由用户确认；
 - 书面规格：`docs/superpowers/specs/2026-09-08-v0.1.2-vitality-physics-separation-design.md`；
 - 实施计划：`docs/superpowers/plans/2026-09-08-v0.1.2-vitality-physics-separation.md`；
 - 代码状态：核心 TDD 迁移、fresh import、600 帧与变异验证完成；
-- 当前门槛：等待用户进行 V0.1.2 人工试玩；
+- 后续状态：用户已批准 V0.1.3 Wake Impulse 改动，当前人工试玩门见第 16 节；
 - 当前没有正式素材、正式音频、主题切换、Game Over 或后续玩法规则。
 
 ## 14. V0.1.1 Endless 原型实现证据（历史快照）
@@ -313,7 +329,9 @@ Phase 0 结束时的结果（历史快照）：
 
 ## 15. V0.1.2 Vitality–Physics 实现证据
 
-### 当前组件与职责
+本节记录 V0.1.2 机器验证时的实现快照；当前 Wake 行为已由第 16 节的 V0.1.3 实现替代。
+
+### 当时组件与职责
 
 | 组件 | 文件 | 当前职责 |
 | --- | --- | --- |
@@ -326,7 +344,7 @@ Phase 0 结束时的结果（历史快照）：
 | EndlessRules | `scripts/rules/endless_rules.gd` | Combo、Ground 清零、当前活跃时间、Rest/Wake 语义事件 |
 | BallVisuals | `scripts/ball/ball_visuals.gd` | Velocity-only Trail 长度/宽度、Vitality-only Glow 亮度/范围、碰撞形变与 Wake pulse |
 
-### 当前调试起点
+### 当时调试起点
 
 | 参数 | 值 |
 | --- | ---: |
@@ -342,7 +360,7 @@ Phase 0 结束时的结果（历史快照）：
 
 上述数值只作为 V0.1.2 人工试玩起点。
 
-### 当前机器证据
+### 当时机器证据
 
 | 检查 | 当前结果 |
 | --- | --- |
@@ -353,7 +371,7 @@ Phase 0 结束时的结果（历史快照）：
 | Vitality 领域边界 | BallVitalityModel 中 SurfaceKind、Wall/Ground/Paddle、restitution、impulse 引用为零 |
 | 变异检查 | 错用损耗后 Vitality、遗漏 Paddle impulse、Vitality 重建 Velocity、Trail 乘 Vitality 均产生预期失败并恢复 GREEN |
 
-### V0.1.2 人工试玩待确认
+### V0.1.2 人工试玩观察（历史）
 
 1. Ground 是否形成自然的小跳、滚动和休眠；
 2. Paddle 是否同时带来运动注入与 Vitality 恢复感；
@@ -362,3 +380,60 @@ Phase 0 结束时的结果（历史快照）：
 5. 是否存在空中冻结、接球减速、突然停止或速度失控。
 
 以上项目均为 `待确认`；最终机器验证完成后仍不得描述为体验验收通过。
+
+## 15A. 视觉语言 v1 冻结记录（`2026-09-08`）
+
+### 冻结内容
+
+三通道原则与 Ball / Paddle / Trail 完整参数已冻结，写入 `docs/visual_spec.md` §1.1、§8.5、§11.4、§11.5，资产登记同步至 `docs/asset_registry.md`。
+
+### 验证方式
+
+| 项 | 事实 |
+| --- | --- |
+| 引擎 | Godot `4.7.stable.official.5b4e0cb0f`，与本项目同一构建哈希 |
+| 方式 | 独立沙箱工程离线渲染，未修改本仓库任何文件 |
+| 尺度 | 1:1 设计尺度，底色 `dark.panel #171C26` |
+| 结论 | 全部数值可由运行时径向渐变贴图实现，不需要 Shader 或位图素材 |
+
+### 审计期间的关键实测
+
+以下为像素测量结果，不是估计值：
+
+| 观察 | 数值 |
+| --- | --- |
+| 当前 Ball Glow 剖面 | 四段全平台阶，边界 `16 / 19.4 / 26.5 / 36.6`，段内单一 RGB，段间突变；包络 73 px（登记为 55–60） |
+| 当前 Trail 峰值时机 | 采样数在落地损耗前 5 帧达到最大（14），刚接到球时最小（5） |
+| 休眠 Vitality 衰减 | 2 秒内从 `0.0743` 衰减到 `0.0002`；地面亚像素微跳持续吃 Ground 损耗 |
+| Paddle 遮挡静止 Ball | V0.1.2 稳定遮挡 24.7%；V0.1.3 Wake Impulse 后降至 5.8% |
+| Wake 后落地穿透 | 稳定停在 `y = 571.3`，比正常静止位置低 `6.3 px` |
+| 概念图 Light 主题实测 | 白球对近白面板 `1.03:1`，最强光晕 `1.76:1`，Paddle `1.35:1`；均低于非文字 UI 的 `3:1` 参考下限 |
+
+最后一项的含义：Light Theme 的可读性问题**不是实现没跟上，而是概念图本身没有解决**。因此 Light 需要单独设计而不是换色，用户已确认降级为非当前优先项。
+
+### 机器验证的边界
+
+上述全部为渲染与几何测量，只证明数值可实现且可测量。Glow 是否好看、Trail 是否舒服、Paddle 反馈手感是否成立，仍需人工试玩。
+
+## 16. V0.1.3 Resting Wake Impulse 实现证据
+
+### 当前行为
+
+- `DECAYING` 继续运行既有 Physics Loop，并可通过正常 Paddle Collision 恢复；
+- 进入 `RESTING` 时清零速度并开始 `rest_elapsed_time`；
+- 默认前 `0.12 s` 不接受 Wake Impulse；
+- 休息窗口结束后，仅横向落入 Paddle 作用窗口的实际运动输入会产生一次冲量；
+- 冲量使用 Paddle 水平速度，默认水平系数 `0.18`、向上系数 `0.45`；
+- 冲量低于 `180 px/s` 时保持 `RESTING`，允许短暂小跳或滚动；
+- 达到阈值时恢复最大 Vitality 的 `0.15`，进入 `DECAYING`；
+- Wake Impulse 不经过 SurfaceResponseModel，正常 Paddle Collision 行为保持不变。
+
+### 当前人工试玩待确认
+
+1. `0.12 s` Rest 窗口是否自然；
+2. 弱输入是否呈现轻推而非异常弹飞；
+3. 强输入是否具有明确救活感；
+4. Paddle 横向作用窗口是否易于理解；
+5. Wake 后进入 `DECAYING` 是否能自然衔接下一次有效接球。
+
+以上项目均为 `待确认`；F1 调参面板中的 `RESTING WAKE` 分组仅用于运行时校准，不代表参数已经定稿。
