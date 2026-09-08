@@ -35,12 +35,18 @@ func run(suite: RefCounted) -> void:
 		"BallVisuals accepts Wake feedback events")
 	suite.expect_true(visuals.has_method("advance_feedback"),
 		"BallVisuals exposes deterministic feedback progression")
+	suite.expect_true(visuals.has_method("_trail_width_scale"),
+		"BallVisuals exposes deterministic Velocity-only Trail width mapping")
+	suite.expect_true(visuals.has_method("_glow_radius_scale"),
+		"BallVisuals exposes deterministic Vitality-only Glow range mapping")
 	if (
 		not visuals.has_method("set_motion")
 		or not visuals.has_method("set_vitality")
 		or not visuals.has_method("play_collision_feedback")
 		or not visuals.has_method("play_wake_feedback")
 		or not visuals.has_method("advance_feedback")
+		or not visuals.has_method("_trail_width_scale")
+		or not visuals.has_method("_glow_radius_scale")
 	):
 		visuals.free()
 		return
@@ -51,6 +57,8 @@ func run(suite: RefCounted) -> void:
 		visuals.record_ball_position(Vector2(index * 10.0, 0.0))
 	var fast_trail_size: int = visuals.trail_points.size()
 	var fast_trail_capacity: int = visuals._trail_capacity()
+	var fast_trail_width: float = visuals._trail_width_scale()
+	var high_vitality_glow_radius: float = visuals._glow_radius_scale()
 	suite.expect_equal(fast_trail_size, 16,
 		"fast motion keeps the full light-trail history")
 
@@ -59,6 +67,11 @@ func run(suite: RefCounted) -> void:
 		"changing Vitality at equal Velocity does not alter Trail")
 	suite.expect_equal(visuals._trail_capacity(), fast_trail_capacity,
 		"Trail capacity is mathematically independent of Vitality")
+	suite.expect_float(visuals._trail_width_scale(), fast_trail_width, 0.0001,
+		"Trail width is independent of Vitality")
+	var low_vitality_glow_radius: float = visuals._glow_radius_scale()
+	suite.expect_true(low_vitality_glow_radius < high_vitality_glow_radius,
+		"lower Vitality reduces Glow range")
 	suite.expect_float(visuals.vitality_ratio, 0.20, 0.0001,
 		"Glow state receives low Vitality independently")
 
@@ -66,6 +79,10 @@ func run(suite: RefCounted) -> void:
 	suite.expect_true(visuals.trail_points.size() < fast_trail_size,
 		"slower Velocity shortens Trail at equal Vitality")
 	var slow_trail_size: int = visuals.trail_points.size()
+	suite.expect_true(visuals._trail_width_scale() < fast_trail_width,
+		"slower Velocity narrows Trail")
+	suite.expect_float(visuals._glow_radius_scale(), low_vitality_glow_radius, 0.0001,
+		"changing Velocity does not alter Glow range")
 	visuals.set_vitality(1.0, vitality_script.ActivityState.ACTIVE)
 	suite.expect_equal(visuals.trail_points.size(), slow_trail_size,
 		"raising Vitality still does not extend a slow Trail")

@@ -208,7 +208,7 @@ Liquid Glass 只作为材质语言参考，不要求实现折射或复杂动态�
 | 2026-09-08 | V0.1.2 技术设计与 TDD 计划 | 完成；设计 `58dcf50`，计划 `35db446`，均经用户确认 |
 | 2026-09-08 | V0.1.2 纯模型与 Controller 迁移 | 完成；Vitality、Surface Response、Velocity 结算与 Wake 分离 |
 | 2026-09-08 | V0.1.2 Visual/Rules 迁移 | 完成；Trail/Glow 数据源分离，旧 BallEnergyModel 运行时引用清零 |
-| 2026-09-08 | V0.1.2 最终机器验证 | 完成；fresh import、167 checks、600 帧及四项变异检查通过 |
+| 2026-09-08 | V0.1.2 最终机器验证 | 完成；fresh import、173 checks、600 帧及四项变异检查通过 |
 
 ## 11. Phase 0 启动判断
 
@@ -324,7 +324,7 @@ Phase 0 结束时的结果（历史快照）：
 | BallController | `scripts/ball/ball_controller.gd` | CharacterBody2D、重力、碰撞检测和“Velocity → Vitality → State”结算编排 |
 | PaddleController | `scripts/paddle/paddle_controller.gd` | 鼠标 X、平滑与边界、Wake 手势检测 |
 | EndlessRules | `scripts/rules/endless_rules.gd` | Combo、Ground 清零、当前活跃时间、Rest/Wake 语义事件 |
-| BallVisuals | `scripts/ball/ball_visuals.gd` | Velocity-only Trail、Vitality-only Glow、碰撞形变与 Wake pulse |
+| BallVisuals | `scripts/ball/ball_visuals.gd` | Velocity-only Trail 长度/宽度、Vitality-only Glow 亮度/范围、碰撞形变与 Wake pulse |
 
 ### 当前调试起点
 
@@ -347,7 +347,7 @@ Phase 0 结束时的结果（历史快照）：
 | 检查 | 当前结果 |
 | --- | --- |
 | Godot headless editor import | 退出 `0`；注册 BallVitalityModel、SurfaceResponseModel 等 14 个脚本类，无解析错误 |
-| 确定性测试 | `TEST PASS: 167 checks`，退出 `0` |
+| 确定性测试 | `TEST PASS: 173 checks`，退出 `0` |
 | Main Scene | headless 运行 600 帧，退出 `0`，无脚本或运行期错误 |
 | 旧模型引用 | `scripts/tests/scenes/project.godot` 中 BallEnergyModel、旧映射与同步方法引用为零 |
 | Vitality 领域边界 | BallVitalityModel 中 SurfaceKind、Wall/Ground/Paddle、restitution、impulse 引用为零 |

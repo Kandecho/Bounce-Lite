@@ -105,17 +105,26 @@ func _trim_trail() -> void:
 		trail_points.pop_front()
 
 
+func _trail_width_scale() -> float:
+	return lerpf(0.65, 1.0, motion_speed_ratio)
+
+
+func _glow_radius_scale() -> float:
+	return lerpf(0.78, 1.0, vitality_ratio)
+
+
 func _draw() -> void:
 	_draw_trail()
 	var rest_factor := 0.18 if activity_state == BallVitalityModelScript.ActivityState.RESTING else 1.0
 	var glow_strength := (lerpf(0.10, 0.42, vitality_ratio) + glow_pulse) * rest_factor
+	var glow_radius_scale := _glow_radius_scale()
 	var core_color := Color(0.97, 0.99, 1.0, 1.0).darkened(darken_pulse)
 	draw_set_transform(Vector2.ZERO, 0.0, deformation)
-	draw_circle(Vector2.ZERO, tuning.ball_radius * 2.25,
+	draw_circle(Vector2.ZERO, tuning.ball_radius * 2.25 * glow_radius_scale,
 		Color(0.31, 0.72, 1.0, clampf(glow_strength * 0.22, 0.0, 0.65)))
-	draw_circle(Vector2.ZERO, tuning.ball_radius * 1.65,
+	draw_circle(Vector2.ZERO, tuning.ball_radius * 1.65 * glow_radius_scale,
 		Color(0.47, 0.82, 1.0, clampf(glow_strength * 0.36, 0.0, 0.75)))
-	draw_circle(Vector2.ZERO, tuning.ball_radius * 1.20,
+	draw_circle(Vector2.ZERO, tuning.ball_radius * 1.20 * glow_radius_scale,
 		Color(0.73, 0.91, 1.0, clampf(glow_strength * 0.52, 0.0, 0.88)))
 	draw_circle(Vector2.ZERO, tuning.ball_radius, core_color)
 	draw_circle(Vector2(-4.0, -5.0), tuning.ball_radius * 0.28,
@@ -131,13 +140,14 @@ func _draw_trail() -> void:
 	var local_points := PackedVector2Array()
 	var outer_colors := PackedColorArray()
 	var inner_colors := PackedColorArray()
+	var width_scale := _trail_width_scale()
 	for index in range(trail_points.size()):
 		var progress := float(index) / float(segment_count)
 		local_points.append(to_local(trail_points[index]))
 		outer_colors.append(Color(0.34, 0.70, 1.0, progress * trail_strength * 0.10))
 		inner_colors.append(Color(0.68, 0.89, 1.0, progress * trail_strength * 0.22))
-	draw_polyline_colors(local_points, outer_colors, tuning.ball_radius * 1.95, true)
-	draw_polyline_colors(local_points, inner_colors, tuning.ball_radius * 1.20, true)
+	draw_polyline_colors(local_points, outer_colors, tuning.ball_radius * 1.95 * width_scale, true)
+	draw_polyline_colors(local_points, inner_colors, tuning.ball_radius * 1.20 * width_scale, true)
 
 
 func _deformation_for_normal(normal: Vector2, squash: float, stretch: float) -> Vector2:

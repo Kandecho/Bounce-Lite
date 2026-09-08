@@ -63,7 +63,7 @@ Bounce Lite 是一个面向轻量休闲桌面用户的放松型数字玩具。�
 - Paddle 采用普通响应、固定 impulse、最大速度限制与 Vitality 恢复；
 - Ground 清零 Combo 但继续游戏；
 - ACTIVE / DECAYING / RESTING 与 Paddle Wake；
-- 只表达 Vitality 的 Glow 与只表达 Velocity 的 Trail；
+- 只表达 Vitality 亮度/范围的 Glow 与只表达 Velocity 长度/宽度的 Trail；
 - Paddle / Wall / Ground squash/stretch、Ground 短暂变暗与 Wake 亮起；
 - 宽度接近球直径、只由实际速度控制的连续双层光迹；
 - 纯文字 `COMBO N` 与 `TIME MM:SS`。
@@ -88,7 +88,7 @@ Bounce Lite 是一个面向轻量休闲桌面用户的放松型数字玩具。�
 & 'D:\Apps\Godot_v4.7-stable_win64\Godot_v4.7-stable_win64_console.exe' --headless --path 'D:\hangk\Documents\Bounce Lite' --script res://tests/test_runner.gd
 ```
 
-当前重构测试基线：`TEST PASS: 167 checks`；fresh headless editor import 与主场景 600 帧运行均退出 `0`。碰撞前 Vitality、Paddle impulse、Velocity 独立性和 Velocity-only Trail 四项变异均被测试捕获并已恢复。
+当前重构测试基线：`TEST PASS: 173 checks`；fresh headless editor import 与主场景 600 帧运行均退出 `0`。碰撞前 Vitality、Paddle impulse、Velocity 独立性和 Velocity-only Trail 四项变异均被测试捕获并已恢复。
 
 主要目录：
 
