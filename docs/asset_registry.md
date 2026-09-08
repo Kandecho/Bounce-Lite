@@ -19,6 +19,7 @@
 | `待设计` | 已知需要该元素，但概念资料未提供足够视觉信息 |
 | `待确认` | 已有建议，等待用户或指定负责人确认 |
 | `已确认` | Phase 0 规格事实或用户明确决定已经记录 |
+| `原型实现` | 已有程序化验证实现，但不是正式素材或最终视觉 |
 | `阻塞` | 未决事项会阻止完整 V0.1 状态或资产工作 |
 
 尺寸格式：`Source BBox → 960×720 Design BBox`。`≈` 表示合成图测量，容限为 ±4 source px。
@@ -57,6 +58,7 @@ Window
 │   ├── Core
 │   └── Glow
 ├── HUD
+│   ├── Combo Text
 │   └── Timer
 │       ├── Container
 │       ├── Clock Icon
@@ -103,19 +105,20 @@ Window
 | A011 | Game Area Surface | 承载玩法对象和 HUD | REF001/REF002 | Not Produced | Yes | Light/Dark | Not Applicable | `≈(258,197,933,682) → (171,131,619,452)` | `light.panel` / `dark.panel` | Control/Panel + StyleBox | 已确认 | 统一几何；8–10 design px 圆角 |
 | A012 | Game Area Border | 标记玩法内容安全区 | REF001/REF002 | Not Produced | Yes | Light/Dark | Not Applicable | 同 A011；目标 1–2 design px | `light.panel-border` / `dark.panel-border` | StyleBox border | 已确认 | 对象效果默认不溢出到 Header/Footer |
 | A013 | Ball Core | 核心运动对象视觉 | REF001/REF002 | Not Produced | Yes | Shared core | Both | Light `≈50×50 → 33×33`；Dark `≈46×46 → 31×31`；目标直径约 32 | `light.ball-core` / `dark.ball-core` | 程序化圆形、Texture 或 Sprite2D | 已确认 | 图中位置是快照，不是固定出生位置 |
-| A014 | Ball Glow | 将 Ball 与背景分离并提供反馈 | REF001/REF002 合成效果 | Not Produced | Yes | Light/Dark | Both | Light 视觉包络约 55–60 design px；Dark 更低强度 | `light.ball-glow` / `dark.ball-glow` | Shader、程序化层或预制 Glow | 待确认 | 决策时点已确认：在玩法开发阶段按对比与性能测试选择；当前不阻塞初始化 |
-| A015 | Ball Trail | 表达移动方向和速度 | REF001 明确；REF002 未显示 | Not Produced | Yes | Light/Dark | Moving | Light Envelope `≈(602,359,134,111) → (399,238,89,74)`；约四段 | `light.ball-trail` / `dark.ball-trail` | 历史位置节点、Shader 或轻量 Particle | 待确认 | 决策时点已确认：在玩法开发阶段验证 Dark 样式与触发；禁止按 Theme 自动禁用 |
+| A014 | Ball Glow | 将 Ball 与背景分离并提供反馈 | REF001/REF002 合成效果 | Not Produced | Yes | Light/Dark | Both | Light 视觉包络约 55–60 design px；Dark 更低强度 | `light.ball-glow` / `dark.ball-glow` | V0.1：程序化多层圆；后续可评估 Shader/预制 Glow | 原型实现 | 强度随活跃比例连续变化；RESTING 保留微弱 Glow；不是正式主题效果 |
+| A015 | Ball Trail | 表达移动方向和速度 | REF001 明确；REF002 未显示 | Not Produced | Yes | Light/Dark | Moving | Light Envelope `≈(602,359,134,111) → (399,238,89,74)`；约四段 | `light.ball-trail` / `dark.ball-trail` | V0.1：最多 16 个历史位置采样的程序化线段 | 原型实现 | 长度与透明度随活跃比例变化；RESTING 清空；不按 Theme 禁用 |
 | A016 | Ball Particles | 可选碰撞/运动强调 | 概念图没有可确认独立层 | Not Produced | No | Light/Dark | Moving candidate | 未出现；尺寸由未来事件规格决定 | 引用 Ball Effect Token | GPUParticles2D 或不使用 | 待设计 | 问题：是否需要；影响：性能与视觉密度；确认人：用户；当前不阻塞基础视觉 |
 | A017 | Paddle Core | 玩家控制对象视觉 | REF001/REF002 | Not Produced | Yes | Light/Dark | Both | Light `232×28 → 154×19`；Dark `220×26 → 146×17`；统一目标约 `150×18` | `light.paddle-core` / `dark.paddle-core` | Control/StyleBox、程序化矩形或 Sprite | 已确认 | 胶囊形；视觉 Glow 不改变未来碰撞尺寸 |
-| A018 | Paddle Glow | 强调 Paddle 和可控性 | REF001/REF002 合成效果 | Not Produced | Yes | Light/Dark | Both | 包络大于 Core；具体 Blur 无法反解 | `light.paddle-glow` / `dark.paddle-glow` | Shader 或后置 UI 层 | 待确认 | 决策时点已确认：在玩法开发阶段按清晰度与性能验证选择 |
+| A018 | Paddle Glow | 强调 Paddle 和可控性 | REF001/REF002 合成效果 | Not Produced | Yes | Light/Dark | Both | 包络大于 Core；具体 Blur 无法反解 | `light.paddle-glow` / `dark.paddle-glow` | V0.1：程序化 StyleBox 外层；后续可评估 Shader | 原型实现 | 当前只验证可控对象辨识度，不代表正式效果 |
 
 ### 4.3 HUD Timer
 
 | Asset ID | 名称 | 用途 | 来源 | 来源版本 | 视觉基准 | Theme | Motion State | 尺寸比例 | 颜色 | 实现候选 | 状态 | 备注 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| A019 | Timer Container | 提供 Timer 稳定背景 | REF001/REF002 | Not Produced | Yes | Light/Dark | Not Applicable | `≈(990,220,180,62) → (656,146,119,41)` | `light.hud-surface` / `dark.hud-surface` | Control/Panel + StyleBox | 已确认 | 胶囊圆角；右上布局；Timer 本身非按钮 |
-| A020 | Clock Icon | 说明 Timer 语义 | REF001/REF002 | Not Produced | Yes | Light/Dark | Not Applicable | `≈(1017,236,28,28) → (674,156,19,19)` | `light.hud-icon` / `dark.hud-icon` | 矢量 Path、程序化 Line2D 或统一图标资产 | 已确认 | 与文字重复语义时作为装饰；保持单一 outline 家族 |
-| A021 | Timer Digits | 显示时间值 | REF001/REF002 | Not Produced | Yes | Light/Dark | Not Applicable | `≈(1069,236,74,28) → (709,156,49,19)` | `light.text-hud` / `dark.text-hud` | Label + tabular numerals | 待确认 | 问题：正计时/倒计时/格式上限未定；影响：文案宽度与逻辑；确认人：用户；Phase 0 只确认视觉格式候选 `MM:SS` |
+| A019 | Timer Container | 提供 Timer 稳定背景 | REF001/REF002 | Not Produced | Yes | Light/Dark | Not Applicable | `≈(990,220,180,62) → (656,146,119,41)` | `light.hud-surface` / `dark.hud-surface` | Control/Panel + StyleBox | 已确认 | 正式视觉规格保留；V0.1 极简 HUD 不绘制容器 |
+| A020 | Clock Icon | 说明 Timer 语义 | REF001/REF002 | Not Produced | Yes | Light/Dark | Not Applicable | `≈(1017,236,28,28) → (674,156,19,19)` | `light.hud-icon` / `dark.hud-icon` | 矢量 Path、程序化 Line2D 或统一图标资产 | 已确认 | 正式视觉规格保留；V0.1 极简 HUD 不绘制图标 |
+| A021 | Timer Digits | 显示当前活跃时间 | REF001/REF002 + 用户规则 | Not Produced | Yes | Light/Dark | Not Applicable | `≈(1069,236,74,28) → (709,156,49,19)` | `light.text-hud` / `dark.text-hud` | V0.1：纯文字 Label，`TIME MM:SS` | 原型实现 | 从最近一次 Wake/Active 到 Rest 正计时；不参与失败、难度或成绩目标 |
+| A034 | Combo Text | 提供轻量连续接球反馈 | 用户 V0.1 规则 | Not Produced | No | Neutral prototype | Not Applicable | 左上纯文字；当前字号 17 design px | 临时中性文字色；正式主题需映射 `*.text-hud` | V0.1：纯文字 Label，`COMBO N` | 原型实现 | Paddle 命中 +1；Ground 清零；无排行榜或奖励系统 |
 
 ### 4.4 Start State
 
@@ -179,7 +182,7 @@ V0.1 选择实现路线时，按以下顺序评估：
 
 Particles 是可选项，不是 V0.1 默认必需。
 
-## 7. Phase 0 登记结论
+## 7. Phase 0 登记结论（历史基线）
 
 - 概念图中可见元素：均已登记，无 `待拆解` 条目；
 - Theme 与 Motion State：已分别登记；
@@ -188,3 +191,12 @@ Particles 是可选项，不是 V0.1 默认必需。
 - 实现：均有候选或明确说明为何尚不能选择；
 - 正式素材：均未生产；
 - 状态视觉与字体方向：已由用户确认；具体字体文件授权归档和玩法交互映射在对应开发任务处理。
+
+## 8. V0.1 原型资产边界
+
+- 当前视觉全部由 Godot 节点和程序绘制生成，没有新增 Sprite、Texture、字体或音频资产；
+- `assets/concept/` 包含 `.gdignore`，两张参考图不参与运行时导入；
+- V0.1 使用单套中性暗色校准外观，只为检验 Core / Glow / Trail 与可读性，不代表“荧光”正式主题；
+- Light/Dark 规格仍然保留，Theme 与 Motion State 继续分离；
+- A014、A015、A018、A021、A034 的 `原型实现` 只说明验证实现存在，不代表正式资产验收；
+- A019 Timer Container 与 A020 Clock Icon 未进入当前极简 HUD；Particles 未实现。

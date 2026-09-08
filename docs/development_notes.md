@@ -2,7 +2,7 @@
 
 ## 1. 记录范围
 
-本文件记录 Phase 0 与 V0.1 项目初始化的环境证据、决策、偏差、风险和待确认事项。它不包含游戏实现，也不把未来候选方案视为已经授权。
+本文件记录 Phase 0、V0.1 项目初始化与 Endless 核心原型实现的环境证据、决策、偏差、风险和待确认事项。未来候选方案不视为已经授权。
 
 记录日期：`2026-09-08`
 
@@ -16,7 +16,7 @@
 | 初始文件 | `AGENTS.md`、`phase-0-plan.md`、`day-raw.png`、`night-raw.png` |
 | Git | 本地仓库；`main` 分支；不设置远端 |
 | Git 操作 | 用户已批准 `git init`；不创建 worktree、不推送 |
-| 项目状态 | 存在最小 `project.godot`；没有 main scene、脚本或可玩内容 |
+| 项目状态 | V0.1 Endless 原型已通过机器验证；等待人工试玩 |
 
 ## 3. Engine 与辅助环境证据
 
@@ -41,7 +41,7 @@ D:\Apps\Godot_v4.7-stable_win64\Godot_v4.7-stable_win64_console.exe
 4.7.stable.official.5b4e0cb0f
 ```
 
-两个可执行文件均以退出码 `0` 完成版本查询。未启动 Godot 编辑器，未创建工程。
+两个可执行文件均以退出码 `0` 完成版本查询。该句记录 Phase 0 初始核验；随后已按用户授权创建工程并完成 headless editor 与主场景验证。
 
 ### 系统
 
@@ -132,7 +132,7 @@ Liquid Glass 只作为材质语言参考，不要求实现折射或复杂动态�
 | 项目 | 推荐 | 当前事实 | 偏差 |
 | --- | --- | --- | --- |
 | Godot | 4.x / 指定安装目录 | 4.7 stable 已核验 | 无 |
-| Renderer | Compatibility | 尚无工程，未写入配置 | 无事实偏差；待 V0.1 落地 |
+| Renderer | Compatibility | 已写入 `project.godot` 并通过加载验证 | 无 |
 | Platform | Windows | 当前系统为 Windows x64 | 无 |
 | Design Resolution | 960×720 | 已写入规格 | 无 |
 | Git | 建立本地版本基线 | 本地 `main` 仓库、无远端 | 无 |
@@ -146,7 +146,7 @@ Liquid Glass 只作为材质语言参考，不要求实现折射或复杂动态�
 | Q002 | Start/Pause/Game Over 最终视觉 | 极简文字 UI，无按钮边框、卡片或复杂面板 | 用户 | 视觉方向已解除阻塞；交互映射另行规划 | 已确认 |
 | Q003 | 字体家族与授权 | 优先 Inter / Noto Sans；发布前复核实际文件授权 | 用户 | 字体方向已解除阻塞；字体资产尚未引入 | 已确认 |
 | Q004 | Light 次级文字对比度 | Version/Footer 使用 `#5E7190` | 用户 | 代表对比度达到 4.5:1 目标 | 已确认 |
-| Q005 | Glow/Trail/Particles 实现路线 | 在玩法开发阶段通过视觉/性能验证确定 | 用户 + V0.1 技术评估 | 不阻塞项目初始化 | 延后到开发阶段 |
+| Q005 | Glow/Trail/Particles 实现路线 | V0.1 使用程序化多层圆形 Glow 与历史位置 Trail；不使用 Particles | 用户范围 + V0.1 技术评估 | 满足低成本原型验证；正式路线仍待后续评估 | 原型已确认 |
 | Q006 | Git 初始化时间 | V0.1 项目初始化时建立本地仓库，不设置远端 | 用户 | 建立本地版本基线 | 已确认 |
 | Q007 | 目标用户、单局节奏、输入方式 | 休闲桌面用户；无固定时长；鼠标水平控制 Paddle；键盘非必需 | 用户 | 已建立玩法规划约束 | 已确认 |
 | Q008 | 概念图 `v0.1` 文案规则 | 与正式构建版本绑定 | 用户 | 影响版本显示和发布流程 | 待确认 |
@@ -155,9 +155,9 @@ Liquid Glass 只作为材质语言参考，不要求实现折射或复杂动态�
 
 ### 技术风险
 
-- Glow、模糊和透明层过多可能增加 Compatibility Renderer 下的填充率成本；V0.1 需用目标硬件测量帧时间。
+- 当前 Glow 使用多层程序化圆形，Trail 最多 16 个采样；机器验证未发现运行错误，但尚未在目标硬件测量帧时间。
 - 概念图是完整合成图，不能直接拆成独立运行时资产；背景、窗口和效果层仍需在正式制作阶段重建。
-- 项目当前没有 main scene；初始化验证只能证明配置可加载，不能证明玩法或导出可用。
+- Godot 脚本运行期错误不一定导致进程返回非零；验证命令必须同时扫描输出中的 `SCRIPT ERROR` / `ERROR:`。
 
 ### 视觉风险
 
@@ -168,8 +168,8 @@ Liquid Glass 只作为材质语言参考，不要求实现折射或复杂动态�
 
 ### 后续开发风险
 
-- Timer 当前只显示 `00:12`，尚未确认它表示倒计时、正计时还是局内时长。
-- Paddle 输入已确认为鼠标水平移动；Ball 速度范围、失误条件和单局结束条件仍未定义，后续不得用单调递增制造必然失败。
+- Timer 已实现为最近一次 Wake/Active 到进入 Rest 的正计时；它不参与失败或难度，仍应保持可独立移除。
+- Ball 初始参数已集中，但补能感、衰减节奏、Wake 阈值与接球动机仍需人工试玩，不得仅凭机器测试定稿。
 - 字体家族方向已批准，但具体字体文件、版本和许可证尚未归档，标题、Timer 和 Footer 的最终宽度仍需实测。
 - 随机或低强度动态变化若没有概率上限、冷却或可读性约束，仍可能意外形成不可处理阶段；玩法规格需建立约束与验证指标。
 
@@ -187,6 +187,10 @@ Liquid Glass 只作为材质语言参考，不要求实现折射或复杂动态�
 | 2026-09-08 | 用户通过 Phase 0 人工确认门 | 完成；Q002、Q003、Q007 及相关主题/可读性/Git 决策已确认 |
 | 2026-09-08 | V0.1 项目初始化 | 完成；创建最小工程、空目录、Git 规则与本地 `main` 仓库 |
 | 2026-09-08 | Godot 配置加载验证 | 完成；Godot 4.7 headless editor 退出码 `0` |
+| 2026-09-08 | V0.1 书面规格与 TDD 计划 | 完成；用户确认技术设计后执行 |
+| 2026-09-08 | 确定性规则实现 | 完成；Energy、Speed Mapping、State、Rules、Wake、Ball 碰撞测试通过 |
+| 2026-09-08 | Endless 主场景整合 | 完成；Ball、Paddle、边界、HUD 与程序化视觉已连接 |
+| 2026-09-08 | V0.1 机器验收 | 完成；86 checks；主场景 180 帧无错误；等待人工试玩 |
 
 ## 11. Phase 0 启动判断
 
@@ -194,18 +198,18 @@ Phase 0 规格与文档工作：`完成`。
 
 是否具备进入 Bounce Lite V0.1 项目初始化的条件：`是`，且用户已明确批准。
 
-当前结果：
+Phase 0 结束时的结果（历史快照）：
 
 - `Q002`、`Q003`、`Q007` 已由用户确认并写入规格；
 - `Q001`、`Q004`、`Q006` 已确认；
 - `Q005` 的决策时点已确认，技术路线延后到获批的开发任务；
 - 已建立 Godot 4.7 / Compatibility / Windows / 960×720 / 4:3 基线；
 - 已建立本地 `main` Git 仓库，远端为空；
-- 没有 main scene、玩法脚本、正式素材或可玩 Demo。
+- 当时没有 main scene、玩法脚本、正式素材或可玩 Demo。
 
-是否具备进入 V0.1 玩法实现准备的条件：`是`。用户已经确认范围、技术路线、状态流、Timer 语义与验收重点；当前等待书面设计复核，通过后编写 TDD 实施计划并开始代码。
+是否具备进入 V0.1 玩法实现准备的条件：`是`。该确认门已经通过，V0.1 Endless 原型现已完成机器实现验证。
 
-## 12. V0.1 初始化证据
+## 12. V0.1 初始化证据（历史快照）
 
 | 项目 | 结果 |
 | --- | --- |
@@ -218,12 +222,71 @@ Phase 0 规格与文档工作：`完成`。
 | Git | 本地 `main` 仓库；无远端 |
 | 禁止产物检查 | 无 `*.gd`、`*.tscn`、`*.tres`、音频或新制正式素材 |
 
-说明：Godot 的 `application/config/name` 同时用于项目名并默认影响原生窗口标题。当前工程保持 Project Name 为 `Bounce Lite`，另以项目元数据登记 UI Title `Bouncing Ball`；实际窗口标题将在获批的主窗口实现中显式设置，初始化阶段不为此创建脚本。
+说明：表中“无 main scene / 无脚本”仅描述初始化完成当时。当前工程保持 Project Name 为 `Bounce Lite`，并由 `scripts/main.gd` 将实际窗口标题显式设置为 `Bouncing Ball`。
 
 ## 13. V0.1 核心玩法设计状态
 
 - 技术方案：已由用户确认；
 - 书面规格：`docs/superpowers/specs/2026-09-08-v0.1-core-gameplay-design.md`；
-- 当前门槛：等待用户复核书面规格；
-- 复核通过后的下一步：编写 TDD 实施计划，然后按 Red → Green → Refactor 实现；
-- 当前未创建任何玩法 `.gd`、`.tscn`、`.tres`、正式素材或音频。
+- 实施计划：`docs/superpowers/plans/2026-09-08-v0.1-core-gameplay.md`；
+- 代码状态：已按 Red → Green → mutation check 实现；
+- 当前门槛：等待用户人工试玩；
+- 当前没有正式素材、正式音频、主题切换、Game Over 或后续玩法规则。
+
+## 14. V0.1 Endless 原型实现证据
+
+### 组件与职责
+
+| 组件 | 文件 | 当前职责 |
+| --- | --- | --- |
+| PrototypeTuning | `scripts/config/prototype_tuning.gd` | 集中保存速度、能量损耗、Wake、Paddle 与 Trail 参数 |
+| BallEnergyModel | `scripts/ball/ball_energy_model.gd` | Energy 约束、平方速度映射、环境耗散、Paddle 恢复、状态导出 |
+| BallController | `scripts/ball/ball_controller.gd` | CharacterBody2D 移动、碰撞分类、确定性反射 |
+| PaddleController | `scripts/paddle/paddle_controller.gd` | 鼠标 X、平滑与边界、Wake 手势检测 |
+| EndlessRules | `scripts/rules/endless_rules.gd` | Combo、Ground 清零、当前活跃时间、Rest/Wake 规则事件 |
+| BallVisuals | `scripts/ball/ball_visuals.gd` | 程序化 Core、能量关联 Glow、历史位置 Trail |
+| PrototypeHUD | `scripts/ui/prototype_hud.gd` | 纯文字 Combo 与 `TIME MM:SS` |
+| Main | `scenes/main.tscn`、`scripts/main.gd` | 组装边界与组件、连接信号、设置 UI Title |
+
+### 初始调参基线
+
+| 参数 | 当前值 |
+| --- | ---: |
+| Active Speed | `360 px/s` |
+| Max Speed 安全上限 | `520 px/s` |
+| Wall / Top Energy Retention | `0.985` |
+| Ground Energy Retention | `0.75` |
+| Active Threshold | `300 px/s` |
+| Rest Threshold | `35 px/s` |
+| Wake Speed | `330 px/s` |
+| Wake Paddle Velocity | `450 px/s` |
+| Wake Hold | `0.08 s` |
+| Paddle Smoothing | `18` |
+| Paddle Size | `150×18 px` |
+| Ball Radius | `16 px` |
+| Trail Samples | `16` |
+
+上述数值仅是试玩起点，不是最终设计。
+
+### 机器验证
+
+| 检查 | 结果 |
+| --- | --- |
+| Godot headless editor 导入 / 加载 | 退出 `0`，无错误日志 |
+| 确定性测试 | `TEST PASS: 86 checks`，退出 `0` |
+| Main Scene | headless 运行 180 帧，退出 `0`，无 `SCRIPT ERROR` / `ERROR:` |
+| Git Remote | 空 |
+| 正式资产 / 音频 | 未新增；概念目录以 `.gdignore` 排除运行时导入 |
+| `git diff --check` | 退出 `0` |
+
+### 人工试玩待确认
+
+1. 接球是否有明显的重新注入能量感；
+2. ACTIVE → DECAYING → RESTING 是否自然；
+3. Wake 是否容易触发且不会误触；
+4. 无失败条件时是否仍有主动接球欲望；
+5. Combo 清零是否足以形成失误反馈；
+6. 是否出现越玩越快、最终不可控的问题；
+7. 最需要调整的物理参数。
+
+以上七项均为 `待确认`，机器验证不代替体验判断。

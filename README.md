@@ -1,6 +1,6 @@
 # Bounce Lite
 
-Bounce Lite 是一个面向轻量休闲桌面用户的放松型数字玩具。Phase 0 已完成，用户已批准进入 V0.1 项目初始化；当前已有可被 Godot 4.7 加载的最小工程，但没有主场景、游戏逻辑或正式素材。
+Bounce Lite 是一个面向轻量休闲桌面用户的放松型数字玩具。当前已完成 V0.1 Endless 核心原型的代码与机器验证，正在等待人工试玩；正式素材、正式音频和精修视觉仍未制作。
 
 ## 名称
 
@@ -13,11 +13,11 @@ Bounce Lite 是一个面向轻量休闲桌面用户的放松型数字玩具。Ph
 
 - 当前阶段：`V0.1 - Core Gameplay Implementation`
 - Phase 0 规格日期：`2026-09-08`
-- V0.1 状态：`Endless 书面设计已确认；进入 TDD 实现`
-- Godot 工程状态：`已初始化；无 main scene`
+- V0.1 状态：`Endless 原型已实现并通过机器验证；等待人工试玩`
+- Godot 工程状态：`main scene 可运行`
 - Git 状态：`本地仓库，main 分支，不设置远端`
 
-当前初始化只落地技术基线与目录骨架。Ball、Paddle、碰撞、Timer、状态流和视觉制作仍需后续任务明确授权。
+当前原型包含 CharacterBody2D Ball、独立能量模型、鼠标 Paddle、Endless Rules、Combo、活跃计时、Rest/Wake 和程序化 Core/Glow/Trail。不存在 Game Over，也没有主题切换、正式资产或竞技系统。
 
 ## 技术基线
 
@@ -29,7 +29,7 @@ Bounce Lite 是一个面向轻量休闲桌面用户的放松型数字玩具。Ph
 | Concept Reference Resolution | `1448 × 1086`（4:3） |
 | Game Design Resolution | `960 × 720`（4:3） |
 | Scaling | 等比缩放；非 4:3 窗口使用 letterbox / pillarbox |
-| Scripting | GDScript 候选；当前无脚本 |
+| Scripting | GDScript |
 
 ## 文档导航
 
@@ -51,17 +51,41 @@ Bounce Lite 是一个面向轻量休闲桌面用户的放松型数字玩具。Ph
 
 归档副本与原文件的字节数和 SHA-256 已核对一致。概念图是视觉基准，不是已批准的运行时素材。
 
-## 当前初始化边界
+## 当前 V0.1 实现
 
-当前已完成：创建最小 `project.godot`、基础空目录、Git 忽略规则与本地版本库；同步已确认规格。
+已实现：
 
-当前未授权：创建场景或脚本、实现 Ball/Paddle/碰撞/游戏循环/计时/计分、实现音效或动画、制作 Demo、生产正式素材、设置 Git 远端。
+- 无重力、封闭矩形中的确定性反弹；
+- Wall/Top 轻微耗能、Ground 明显耗能；
+- Paddle 命中恢复到正常活跃能量，不叠加加速；
+- Ground 清零 Combo 但继续游戏；
+- ACTIVE / DECAYING / RESTING 与 Paddle Wake；
+- 随活跃程度变化的程序化 Glow / Trail；
+- 纯文字 `COMBO N` 与 `TIME MM:SS`。
+
+未实现且仍不属于当前范围：Game Over、Classic/Recover、排行榜、主题切换、Paddle 分区、障碍物、正式素材、正式音频和复杂视觉精修。
 
 ## 运行与构建
 
-用 Godot 4.7 打开根目录即可检查工程设置。当前没有 main scene，因此没有游戏运行、导出或构建步骤。
+用 Godot 4.7 打开根目录并运行项目。窗口设计分辨率为 `960×720`。
 
-初始化目录：
+控制：移动鼠标水平控制 Paddle；Ball 进入 RESTING 后，快速且持续地移动 Paddle 约 80 ms 可将其唤醒。
+
+命令行运行：
+
+```powershell
+& 'D:\Apps\Godot_v4.7-stable_win64\Godot_v4.7-stable_win64_console.exe' --path 'D:\hangk\Documents\Bounce Lite'
+```
+
+运行确定性测试：
+
+```powershell
+& 'D:\Apps\Godot_v4.7-stable_win64\Godot_v4.7-stable_win64_console.exe' --headless --path 'D:\hangk\Documents\Bounce Lite' --script res://tests/test_runner.gd
+```
+
+当前机器基线：`TEST PASS: 86 checks`；主场景已无头运行 180 帧且没有脚本或运行期错误。
+
+主要目录：
 
 ```text
 assets/{concept,sprites,ui,effects,audio}/
@@ -72,4 +96,4 @@ docs/
 
 ## 下一步
 
-当前按已确认的 V0.1 Endless 设计执行 TDD 实施计划。完成机器验证后停止，等待人工试玩。
+停止在人工试玩门。试玩后重点判断补能感、衰减是否自然、Wake 触发质量、无失败条件时的接球动机、Combo 清零反馈、是否出现不可控加速，以及最需要调整的物理参数；未获得反馈前不进入后续功能或主题制作。
