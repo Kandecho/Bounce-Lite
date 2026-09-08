@@ -10,6 +10,7 @@ extends Resource
 
 @export_group("Energy and Speed")
 @export_range(0.001, 100.0, 0.001) var max_energy: float = 1.0
+@export_range(1.0, 2000.0, 1.0) var initial_speed: float = 360.0
 @export_range(1.0, 2000.0, 1.0) var active_speed: float = 360.0
 @export_range(1.0, 2000.0, 1.0) var max_speed: float = 520.0
 @export_range(0.0, 3000.0, 1.0) var gravity_acceleration: float = 520.0

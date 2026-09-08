@@ -32,11 +32,11 @@ func _ready() -> void:
 	ball.start_active(Vector2(0.62, 1.0))
 
 
-func _on_ball_paddle_hit(_energy_before: float, _energy_after: float) -> void:
+func _on_ball_paddle_hit(_vitality_before: float, _vitality_after: float) -> void:
 	rules.handle_paddle_hit()
 
 
-func _on_ball_surface_hit(kind: int, _energy_before: float, _energy_after: float) -> void:
+func _on_ball_surface_hit(kind: int, _vitality_before: float, _vitality_after: float) -> void:
 	rules.handle_surface_hit(kind)
 
 
