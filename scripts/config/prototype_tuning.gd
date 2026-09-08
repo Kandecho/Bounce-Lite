@@ -1,6 +1,13 @@
 class_name PrototypeTuning
 extends Resource
 
+@export_group("Vitality")
+@export_range(0.001, 100.0, 0.001) var max_vitality: float = 1.0
+@export_range(0.0, 1.0, 0.001) var active_vitality_ratio: float = 0.70
+@export_range(0.0, 1.0, 0.001) var rest_vitality_ratio: float = 0.08
+@export_range(0.0, 1.0, 0.001) var wake_vitality_ratio: float = 0.85
+@export_range(0.0, 500.0, 1.0) var rest_settle_speed: float = 45.0
+
 @export_group("Energy and Speed")
 @export_range(0.001, 100.0, 0.001) var max_energy: float = 1.0
 @export_range(1.0, 2000.0, 1.0) var active_speed: float = 360.0
