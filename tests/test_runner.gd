@@ -7,6 +7,7 @@ const TEST_PATHS: Array[String] = [
 	"res://tests/test_endless_rules.gd",
 	"res://tests/test_paddle_wake.gd",
 	"res://tests/test_ball_controller.gd",
+	"res://tests/test_ball_visuals.gd",
 	"res://tests/test_scene_smoke.gd",
 ]
 

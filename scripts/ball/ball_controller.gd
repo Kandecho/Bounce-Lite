@@ -30,7 +30,7 @@ func _physics_process(delta: float) -> void:
 		velocity = Vector2.ZERO
 		_update_visuals(false)
 		return
-	_sync_velocity_from_energy()
+	advance_air_motion(delta)
 	var remaining_motion := velocity * delta
 	for collision_index in range(MAX_COLLISIONS_PER_FRAME):
 		if remaining_motion.length_squared() <= MOTION_EPSILON * MOTION_EPSILON:
@@ -45,15 +45,15 @@ func _physics_process(delta: float) -> void:
 			kind = int(collider.get_meta("surface_kind"))
 		var valid_paddle_hit := (
 			kind == BallEnergyModelScript.SurfaceKind.PADDLE
-			and direction.y > 0.0
+			and velocity.y > 0.0
 			and normal.y < -0.5
 		)
-		var speed_before := maxf(velocity.length(), MOTION_EPSILON)
+		var motion_before := remaining_motion.length()
 		resolve_surface_collision(kind, normal, valid_paddle_hit)
 		if is_resting():
 			break
-		var speed_ratio := velocity.length() / speed_before
-		remaining_motion = collision.get_remainder().bounce(normal) * speed_ratio
+		var remaining_fraction := collision.get_remainder().length() / maxf(motion_before, MOTION_EPSILON)
+		remaining_motion = velocity * delta * remaining_fraction
 	_update_visuals(true)
 
 
@@ -82,15 +82,28 @@ func set_direction(value: Vector2) -> void:
 	_sync_velocity_from_energy()
 
 
+func advance_air_motion(delta: float) -> void:
+	if energy_model == null or is_resting() or delta <= 0.0:
+		return
+	velocity.y += tuning.gravity_acceleration * delta
+	velocity = velocity.limit_length(tuning.max_speed)
+	if not velocity.is_zero_approx():
+		direction = velocity.normalized()
+
+
 func resolve_surface_collision(kind: int, normal: Vector2, valid_paddle_hit: bool) -> void:
 	if energy_model == null:
 		return
 	var energy_before: float = energy_model.current_energy
 	if not normal.is_zero_approx():
-		direction = direction.bounce(normal.normalized()).normalized()
+		var incoming_direction := velocity.normalized()
+		if incoming_direction.is_zero_approx():
+			incoming_direction = direction
+		direction = incoming_direction.bounce(normal.normalized()).normalized()
 	if kind == BallEnergyModelScript.SurfaceKind.PADDLE and valid_paddle_hit:
 		energy_model.restore_from_paddle()
 		_sync_velocity_from_energy()
+		_play_collision_feedback(BallEnergyModelScript.SurfaceKind.PADDLE, normal)
 		paddle_hit.emit(energy_before, energy_model.current_energy)
 		return
 	var effective_kind := kind
@@ -98,6 +111,7 @@ func resolve_surface_collision(kind: int, normal: Vector2, valid_paddle_hit: boo
 		effective_kind = BallEnergyModelScript.SurfaceKind.WALL
 	energy_model.apply_environment_collision(effective_kind)
 	_sync_velocity_from_energy()
+	_play_collision_feedback(effective_kind, normal)
 	surface_hit.emit(effective_kind, energy_before, energy_model.current_energy)
 
 
@@ -109,6 +123,9 @@ func wake_from_paddle(paddle_velocity_x: float) -> bool:
 		horizontal_sign = 1.0
 	set_direction(Vector2(horizontal_sign * 0.35, -1.0))
 	_sync_velocity_from_energy()
+	var visuals := get_node_or_null("Visuals")
+	if visuals != null and visuals.has_method("play_wake_feedback"):
+		visuals.play_wake_feedback()
 	return true
 
 
@@ -142,5 +159,13 @@ func _update_visuals(record_position: bool) -> void:
 		return
 	if visuals.has_method("set_activity"):
 		visuals.set_activity(energy_model.activity_ratio(), energy_model.state)
+	if visuals.has_method("set_motion_speed_ratio"):
+		visuals.set_motion_speed_ratio(velocity.length() / maxf(tuning.max_speed, MOTION_EPSILON))
 	if record_position and visuals.has_method("record_ball_position"):
 		visuals.record_ball_position(global_position)
+
+
+func _play_collision_feedback(kind: int, normal: Vector2) -> void:
+	var visuals := get_node_or_null("Visuals")
+	if visuals != null and visuals.has_method("play_collision_feedback"):
+		visuals.play_collision_feedback(kind, normal)

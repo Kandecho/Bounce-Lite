@@ -34,8 +34,8 @@ func run(suite: RefCounted) -> void:
 
 	model.reset_active()
 	model.apply_environment_collision(energy_script.SurfaceKind.GROUND)
-	suite.expect_float(model.current_energy, 0.75, 0.0001,
-		"ground collision keeps seventy-five percent energy")
+	suite.expect_float(model.current_energy, 0.65, 0.0001,
+		"ground collision keeps sixty-five percent energy")
 	suite.expect_true(model.current_energy < 0.985,
 		"ground collision loses more energy than a wall collision")
 
