@@ -76,16 +76,17 @@ Phase 0 不创建 Godot 工程，不实现游戏内容。
 
 ### V0.1B - Gameplay Implementation
 
-需要用户另行批准范围与验收标准，候选内容包括：
+用户已确认本子阶段的 Endless 技术方案；当前等待书面设计复核。实现范围为：
 
-- 最小玩法规则；
-- Ball、Paddle、碰撞与游戏循环；
-- Timer 的实际语义；
-- 输入与状态流；
-- 视觉资产生产或程序化实现；
-- 可运行与导出验证。
+- CharacterBody2D Ball 与确定性反弹；
+- 独立 BallEnergyModel；
+- 鼠标 Paddle 输入与 Wake 手势；
+- EndlessRules、Combo 和当前活跃时间；
+- ACTIVE / DECAYING / RESTING；
+- 程序化基础 Core / Glow / Trail；
+- 自动化规则测试与可运行验证。
 
-上述清单是未来范围候选，不是 V0.1A 初始化授权。
+不存在 Game Over，不实现其他模式、正式素材、正式音频、主题系统或精修视觉。完整技术边界见 `docs/superpowers/specs/2026-09-08-v0.1-core-gameplay-design.md`。
 
 ### 后续阶段
 

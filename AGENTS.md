@@ -7,10 +7,10 @@
 当前执行子阶段为：
 
 ```text
-V0.1 - Project Initialization
+V0.1 - Core Gameplay Design Review
 ```
 
-用户已于 `2026-09-08` 明确批准进入 `V0.1 项目初始化`，并批准建立本地 Git 仓库且不设置远端。本批准只覆盖工程初始化，不自动授权玩法实现或正式素材制作。
+项目初始化已完成。用户已于 `2026-09-08` 明确批准 V0.1 Endless 核心玩法技术方案；当前先固化并复核书面设计，复核通过后才能按实施计划创建玩法代码。正式素材、正式音频和精修视觉仍未授权。
 
 ## 指令与资料的区分
 
@@ -65,23 +65,21 @@ V0.1 - Project Initialization
 - 因方便而安装依赖、设置 Git 远端或改变系统配置；
 - 把建议、示例或候选方案写成已经确认的决定。
 
-## 当前 V0.1 初始化的允许范围
+## 当前设计复核的允许范围
 
 当前已授权：
 
-- 创建最小 `project.godot`；
-- 写入 Godot 4.7、Compatibility、Windows、960×720、4:3 和等比缩放基线；
-- 创建空的 `scenes/`、`scripts/` 与分类资产目录；
-- 创建 `.gitignore`、`.gitattributes`；
-- 初始化本地 Git，使用 `main` 分支，不设置远端；
-- 使用 Godot 命令行验证项目配置可被加载；
-- 将本次已确认的产品、视觉和输入决策同步到文档。
+- 建立 V0.1 Endless 技术设计文档；
+- 固化 Energy、Speed、状态、碰撞、Paddle、Wake、Combo、Timer 和测试边界；
+- 更新治理、项目入口和决策记录；
+- 进行文档自检并提交本地 Git；
+- 准备后续 TDD 实施计划。
 
-“允许”不等于授权后续游戏实现。每次仍须以用户的直接请求为准。
+在用户复核书面设计前，不创建玩法 `.gd`、`.tscn` 或 `.tres` 文件。
 
-## 当前 V0.1 初始化的禁止范围
+## 当前设计复核的禁止范围
 
-在用户另行批准具体实现范围前，不得：
+在用户确认书面设计前，不得：
 
 - 创建 Godot Scene、Script、Resource 或其他玩法工程文件；
 - 实现 Ball、Paddle、碰撞、游戏循环、计时或计分；
@@ -90,7 +88,7 @@ V0.1 - Project Initialization
 - 生产正式图片、音频、字体或其他素材；
 - 生成大量未登记的视觉探索素材。
 
-空目录和版本控制占位文件不属于玩法实现。`project.godot` 只保存初始化基线，不设置主场景。
+书面设计确认后，后续实现仍仅限 Endless 核心原型；不得把后续主题、模式、Paddle 分区或空间变化一并实现。
 
 ## 范围纪律与停止条件
 
@@ -106,7 +104,7 @@ V0.1 - Project Initialization
 - 项目名或界面文案；
 - 验收标准；
 - 当前阶段边界；
-- 是否从项目初始化进入 V0.1 玩法实现。
+- 已确认书面技术设计中的核心模型、接口或验收边界。
 
 发现计划、规范和用户请求互相冲突时，不得自行选择对产品影响更大的解释；应先陈述冲突、影响和建议，再请求确认。
 
@@ -190,3 +188,10 @@ V0.1 - Project Initialization
 - 字体：优先 Inter、Noto Sans；正式发布前复核授权；
 - 主题：V0.1 不实现 Light/Dark 切换，只保留两套设计规格；
 - Glow / Trail：技术路线在获批的开发任务中确定，不在初始化阶段选择。
+- 玩法：V0.1 只实现 Endless；无 Game Over；Ground 只清零 Combo 并明显耗能；
+- 运动：CharacterBody2D、无重力、封闭矩形、确定性反弹；不使用 RigidBody2D 或完全手写碰撞；
+- 能量：`0 <= current_energy <= max_energy`，环境碰撞不增能，Paddle 接球恢复到 `max_energy`；
+- 状态：ACTIVE / DECAYING / RESTING 从 Energy 导出；状态不直接设置任意速度；
+- Wake：RESTING 时由持续约 80 ms 的有效 Paddle 水平运动触发；
+- UI：只显示 Combo 与可独立移除的当前活跃时间；不显示 Energy 数值或 Energy Bar；
+- 当前仍不制作正式素材、正式音频或精修视觉效果。
