@@ -16,7 +16,7 @@
 | 初始文件 | `AGENTS.md`、`phase-0-plan.md`、`day-raw.png`、`night-raw.png` |
 | Git | 本地仓库；`main` 分支；不设置远端 |
 | Git 操作 | 用户已批准 `git init`；不创建 worktree、不推送 |
-| 项目状态 | V0.1 Endless 原型已通过机器验证；等待人工试玩 |
+| 项目状态 | V0.1.2 Physics/Vitality 核心重构已完成；最终机器验证进行中 |
 
 ## 3. Engine 与辅助环境证据
 
@@ -101,6 +101,11 @@ Python 的当前环境未安装 Pillow；Phase 0 没有安装依赖，而是使�
 | 2026-09-08 | V0.1.1 加入固定重力 `520 px/s²` | 用户确认短设计 | 重力独立于 Energy；Ball 自然倾向落地 |
 | 2026-09-08 | V0.1.1 Ground Energy Retention 调整为 `0.65` | 用户确认短设计 | 反弹高度随落地次数明显衰减 |
 | 2026-09-08 | V0.1.1 增加差异化碰撞与 Wake 视觉反馈 | 用户直接确认 | 只动画 Ball；不增加正式动画系统、Shader 或粒子 |
+| 2026-09-08 | V0.1.2 废弃 Energy-driven Motion | 用户直接确认 | Velocity 属于 Physics；Vitality 属于 Ball State，二者不互相替代 |
+| 2026-09-08 | BallVitalityModel 不持有 Surface 规则 | 用户直接确认 | 只应用 delta、clamp Vitality 并结算 ActivityState |
+| 2026-09-08 | 所有碰撞统一由 SurfaceResponseModel 纯计算 | 用户直接确认 | 使用碰撞前 Velocity/Vitality；先应用 Velocity，再应用 Vitality delta |
+| 2026-09-08 | Resting 使用低 Vitality + Ground 低速联合门槛 | 用户确认设计文档 | 避免 Wall 损耗导致空中冻结，保留小跳/滚动阶段 |
+| 2026-09-08 | Trail 只表达 Velocity，Glow 只表达 Vitality | 用户直接确认 | 两类视觉信息不再共享单一 activity 乘积 |
 
 ## 6. 视觉分析记录
 
@@ -159,6 +164,8 @@ Liquid Glass 只作为材质语言参考，不要求实现折射或复杂动态�
 ### 技术风险
 
 - 当前 Glow 使用多层程序化圆形，Trail 最多 16 个采样；机器验证未发现运行错误，但尚未在目标硬件测量帧时间。
+- Ground 的 restitution、tangent retention、Vitality retention 与 settle 门槛是耦合体验参数；确定性测试只能证明结算顺序，不能证明休眠节奏自然。
+- 低速 Ground 持续接触可能在连续物理帧产生多次响应；最终 600 帧验证需排查错误或失控，主观节奏仍交由试玩。
 - 概念图是完整合成图，不能直接拆成独立运行时资产；背景、窗口和效果层仍需在正式制作阶段重建。
 - Godot 脚本运行期错误不一定导致进程返回非零；验证命令必须同时扫描输出中的 `SCRIPT ERROR` / `ERROR:`。
 
@@ -197,6 +204,10 @@ Liquid Glass 只作为材质语言参考，不要求实现折射或复杂动态�
 | 2026-09-08 | 用户确认 V0.1.1 调整设计 | 完成；固定重力、Ground 损耗、碰撞反馈与宽光迹 |
 | 2026-09-08 | V0.1.1 TDD 与变异检查 | 完成；去重力、0.75 Ground、Trail 忽略速度均被测试捕获 |
 | 2026-09-08 | V0.1.1 离线视觉 QA | 完成；120 帧两轮复核；分段 Trail 修正为连续双层渐变光迹 |
+| 2026-09-08 | V0.1.1 重构前现场快照 | 完成；`18c1931 chore: snapshot v0.1.1 endless prototype baseline` |
+| 2026-09-08 | V0.1.2 技术设计与 TDD 计划 | 完成；设计 `58dcf50`，计划 `35db446`，均经用户确认 |
+| 2026-09-08 | V0.1.2 纯模型与 Controller 迁移 | 完成；Vitality、Surface Response、Velocity 结算与 Wake 分离 |
+| 2026-09-08 | V0.1.2 Visual/Rules 迁移 | 完成；Trail/Glow 数据源分离，旧 BallEnergyModel 运行时引用清零 |
 
 ## 11. Phase 0 启动判断
 
@@ -230,16 +241,18 @@ Phase 0 结束时的结果（历史快照）：
 
 说明：表中“无 main scene / 无脚本”仅描述初始化完成当时。当前工程保持 Project Name 为 `Bounce Lite`，并由 `scripts/main.gd` 将实际窗口标题显式设置为 `Bouncing Ball`。
 
-## 13. V0.1.1 核心玩法设计状态
+## 13. V0.1.2 核心模型设计状态
 
 - 技术方案：已由用户确认；
-- 书面规格：`docs/superpowers/specs/2026-09-08-v0.1-core-gameplay-design.md`；
-- 实施计划：`docs/superpowers/plans/2026-09-08-v0.1-core-gameplay.md`；
-- 代码状态：V0.1 与 V0.1.1 均按 Red → Green → mutation check 实现；
-- 当前门槛：等待用户进行 V0.1.1 人工试玩；
+- 书面规格：`docs/superpowers/specs/2026-09-08-v0.1.2-vitality-physics-separation-design.md`；
+- 实施计划：`docs/superpowers/plans/2026-09-08-v0.1.2-vitality-physics-separation.md`；
+- 代码状态：核心 TDD 迁移完成，最终 import、600 帧与变异验证进行中；
+- 当前门槛：完成机器验证后等待用户进行 V0.1.2 人工试玩；
 - 当前没有正式素材、正式音频、主题切换、Game Over 或后续玩法规则。
 
-## 14. V0.1.1 Endless 原型实现证据
+## 14. V0.1.1 Endless 原型实现证据（历史快照）
+
+本节记录提交 `18c1931` 对应的 V0.1.1 历史状态。当前实现已由第 15 节的 V0.1.2 架构替代。
 
 ### 组件与职责
 
@@ -296,3 +309,54 @@ Phase 0 结束时的结果（历史快照）：
 5. 是否会主动想接球维持运动。
 
 以上五项均为 `待确认`，机器验证与离线帧检查不代替体验判断。
+
+## 15. V0.1.2 Vitality–Physics 实现证据
+
+### 当前组件与职责
+
+| 组件 | 文件 | 当前职责 |
+| --- | --- | --- |
+| PrototypeTuning | `scripts/config/prototype_tuning.gd` | 分组保存 Vitality、Physics、Surface Response、Paddle 与 Visual 参数 |
+| BallVitalityModel | `scripts/ball/ball_vitality_model.gd` | Vitality clamp/delta、ACTIVE/DECAYING、联合 RESTING 与 Wake 状态 |
+| SurfaceCollisionResult | `scripts/physics/surface_collision_result.gd` | 单次碰撞的 Velocity/Vitality 只读快照 |
+| SurfaceResponseModel | `scripts/physics/surface_response_model.gd` | 纯计算 Wall/Top/Ground/Paddle 的 restitution、friction、impulse 与 delta |
+| BallController | `scripts/ball/ball_controller.gd` | CharacterBody2D、重力、碰撞检测和“Velocity → Vitality → State”结算编排 |
+| PaddleController | `scripts/paddle/paddle_controller.gd` | 鼠标 X、平滑与边界、Wake 手势检测 |
+| EndlessRules | `scripts/rules/endless_rules.gd` | Combo、Ground 清零、当前活跃时间、Rest/Wake 语义事件 |
+| BallVisuals | `scripts/ball/ball_visuals.gd` | Velocity-only Trail、Vitality-only Glow、碰撞形变与 Wake pulse |
+
+### 当前调试起点
+
+| 参数 | 值 |
+| --- | ---: |
+| Initial / Max / Wake Speed | `360 / 520 / 330 px/s` |
+| Gravity Acceleration | `520 px/s²` |
+| Max / Active / Rest / Wake Vitality Ratio | `1.00 / 0.70 / 0.08 / 0.85` |
+| Rest Settle Speed | `45 px/s` |
+| Wall/Top Restitution | `0.96 → 0.995` |
+| Wall/Top Tangent / Vitality Retention | `0.995 / 0.985` |
+| Ground Restitution | `0.12 → 0.78` |
+| Ground Tangent / Vitality Retention | `0.80 / 0.65` |
+| Paddle Restitution / Impulse | `0.72 → 0.92 / 160 px/s` |
+
+上述数值只作为 V0.1.2 人工试玩起点。
+
+### 当前机器证据
+
+| 检查 | 当前结果 |
+| --- | --- |
+| 确定性测试 | `TEST PASS: 166 checks`，退出 `0` |
+| Main Scene 短时 smoke | headless 运行 180 帧，退出 `0` |
+| 旧模型引用 | `scripts/tests/scenes/project.godot` 中 BallEnergyModel、旧映射与同步方法引用为零 |
+| Vitality 领域边界 | BallVitalityModel 中 SurfaceKind、Wall/Ground/Paddle、restitution、impulse 引用为零 |
+| 最终验证 | editor import、600 帧与变异检查待执行 |
+
+### V0.1.2 人工试玩待确认
+
+1. Ground 是否形成自然的小跳、滚动和休眠；
+2. Paddle 是否同时带来运动注入与 Vitality 恢复感；
+3. Trail 与 Glow 是否清楚表达 Motion 与 Vitality；
+4. Wake 是否仍然有意图明确且可靠；
+5. 是否存在空中冻结、接球减速、突然停止或速度失控。
+
+以上项目均为 `待确认`；最终机器验证完成后仍不得描述为体验验收通过。

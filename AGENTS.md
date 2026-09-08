@@ -7,10 +7,10 @@
 当前执行子阶段为：
 
 ```text
-V0.1.1 - Gravity Decay Tuning
+V0.1.2 - Vitality–Physics Separation
 ```
 
-用户已提供首轮试玩方向并批准 V0.1.1：加入固定重力、加强 Ground 损耗、改善碰撞反馈与 Trail。V0.1.1 实现已完成，当前等待新一轮人工试玩；在用户提供反馈或明确批准下一步前，不继续调参、扩展功能或进入主题制作。正式素材、正式音频和精修视觉仍未授权。
+用户已明确批准 V0.1.2：将 Energy-driven Motion 重构为独立 Physics 与 Vitality 领域，并统一通过 Surface Response 结算碰撞。核心代码重构已完成，正在进行最终机器验证；完成后必须停在新一轮人工试玩门。正式素材、正式音频和精修视觉仍未授权。
 
 ## 指令与资料的区分
 
@@ -69,15 +69,15 @@ V0.1.1 - Gravity Decay Tuning
 
 当前已经按确认规格实现：
 
-- BallEnergyModel 与集中调参；
+- BallVitalityModel、SurfaceResponseModel、SurfaceCollisionResult 与集中调参；
 - CharacterBody2D Ball 运动及 Wall/Top/Ground/Paddle 碰撞；
 - 鼠标 Paddle 输入、平滑移动与 Wake 手势；
 - EndlessRules、Combo 与当前活跃时间；
 - ACTIVE / DECAYING / RESTING；
 - 程序化基础 Ball Core / Glow / Trail 与 Paddle；
-- 固定重力与 Energy 驱动的完整二维反弹速度；
+- 独立 Velocity、固定重力、统一 Surface Response 与 Vitality 碰撞损耗；
 - Paddle / Wall / Ground squash/stretch、Glow/Darken 与 Wake 反馈；
-- Energy × 实际速度共同控制的连续双层光迹；
+- 只表达 Velocity 的连续双层光迹与只表达 Vitality 的基础 Glow；
 - 纯文字 Combo / Timer HUD；
 - TDD、headless 场景验证和必要文档更新。
 
@@ -89,7 +89,7 @@ V0.1.1 - Gravity Decay Tuning
 - 实现正式音效、正式动画、复杂 Shader 或粒子效果；
 - 生产正式图片、音频、字体或其他素材；
 - 实现主题切换、“荧光/暖阳”正式主题、Paddle 分区、障碍物或空间变化；
-- 增加排行榜、最高分、奖励系统或 Energy 数值/进度条；
+- 增加排行榜、最高分、奖励系统或 Vitality/Energy 数值与进度条；
 - 生成大量未登记的视觉探索素材。
 
 实现仅限 Endless 核心原型；不得把后续主题、模式、Paddle 分区或空间变化一并实现。
@@ -191,26 +191,28 @@ V0.1.1 - Gravity Decay Tuning
 - 状态 UI：Start、Pause、Game Over 使用极简纯文字层级，不使用按钮边框、卡片或复杂面板；
 - 字体：优先 Inter、Noto Sans；正式发布前复核授权；
 - 主题：V0.1 不实现 Light/Dark 切换，只保留两套设计规格；
-- Glow / Trail：技术路线在获批的开发任务中确定，不在初始化阶段选择。
+- Glow / Trail：V0.1.2 使用程序化实现；Trail 只表达 Velocity，Glow 只表达 Vitality；正式路线仍待后续确认。
 - 玩法：V0.1 只实现 Endless；无 Game Over；Ground 只清零 Combo 并明显耗能；
-- 运动：CharacterBody2D、固定重力 `520 px/s²`、封闭矩形、确定性碰撞响应；不使用 RigidBody2D 或完全手写碰撞；
-- 能量：`0 <= current_energy <= max_energy`，环境碰撞不增能，Paddle 接球恢复到 `max_energy`；
-- Ground：能量保留率 `0.65`；碰撞后反弹速度由损耗后的 Energy 重新映射；
-- 状态：ACTIVE / DECAYING / RESTING 从 Energy 导出；状态不直接设置任意速度；
+- 运动：CharacterBody2D、固定重力 `520 px/s²`、封闭矩形；Velocity 只来自当前 Velocity、Gravity、Surface Response 与 Paddle impulse；不使用 RigidBody2D 或完全手写碰撞；
+- Vitality：`0 <= current_vitality <= max_vitality`，只因碰撞改变；Paddle 返回恢复到 max 所需的 delta；
+- Surface：响应先使用碰撞前 Velocity/Vitality 计算，再应用 Velocity、Vitality delta 与状态；
+- Ground：Vitality retention `0.65`，恢复系数随碰撞前 Vitality 变化，并通过切向损耗形成小跳/滚动；
+- 状态：ACTIVE / DECAYING 由 Vitality 范围决定；低 Vitality 只有在 Ground 响应后速度足够低时才进入 RESTING；
 - Wake：RESTING 时由持续约 80 ms 的有效 Paddle 水平运动触发；
-- UI：只显示 Combo 与可独立移除的当前活跃时间；不显示 Energy 数值或 Energy Bar；
+- 视觉：Trail 只表达 Velocity，Glow 只表达 Vitality；二者不得重新组合为单一 activity 值；
+- UI：只显示 Combo 与可独立移除的当前活跃时间；不显示 Vitality/Energy 数值或进度条；
 - 当前仍不制作正式素材、正式音频或精修视觉效果。
 
 ## 当前人工试玩门
 
 机器验证只证明工程可加载、确定性规则符合断言且主场景可持续运行，不代表主观体验已经通过。
 
-下一次开发前必须取得用户对 V0.1.1 以下观察的反馈：
+最终机器验证完成后，下一次开发前必须取得用户对 V0.1.2 以下观察的反馈：
 
-1. 不接球时，球是否自然从运动 → 衰弱 → 休眠；
-2. 接球是否有恢复活力的感觉；
-3. Ground 是否像损耗而非普通碰撞；
-4. 速度变化是否自然；
-5. 是否会主动想接球维持运动。
+1. Ground 是否形成自然的小跳、滚动和休眠；
+2. Paddle 是否同时带来运动注入与 Vitality 恢复感；
+3. Trail 是否只读作运动残影，Glow 是否只读作自身活力；
+4. Wake 是否仍然有意图明确且可靠；
+5. 是否存在空中冻结、接球减速、突然停止或速度失控。
 
 未取得反馈前，不得把机器验证描述为体验验收通过。

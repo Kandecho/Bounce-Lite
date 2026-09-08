@@ -12,7 +12,7 @@ run/main_scene="res://scenes/main.tscn"
 [bounce_lite]
 
 ui_title="Bouncing Ball"
-phase="v0.1.1-gravity-decay-tuning"
+phase="v0.1.2-vitality-physics-separation"
 target_platform="Windows"
 
 [display]

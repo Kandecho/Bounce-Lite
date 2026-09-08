@@ -76,17 +76,32 @@ Phase 0 不创建 Godot 工程，不实现游戏内容。
 
 ### V0.1B - Gameplay Implementation
 
-用户已确认本子阶段的 Endless 技术方案；当前等待书面设计复核。实现范围为：
+用户已确认并完成本子阶段的 Endless 初始实现及 V0.1.1 重力调整。V0.1/V0.1.1 历史范围为：
 
 - CharacterBody2D Ball 与确定性反弹；
-- 独立 BallEnergyModel；
+- 初始 BallEnergyModel；
 - 鼠标 Paddle 输入与 Wake 手势；
 - EndlessRules、Combo 和当前活跃时间；
 - ACTIVE / DECAYING / RESTING；
 - 程序化基础 Core / Glow / Trail；
 - 自动化规则测试与可运行验证。
 
-不存在 Game Over，不实现其他模式、正式素材、正式音频、主题系统或精修视觉。完整技术边界见 `docs/superpowers/specs/2026-09-08-v0.1-core-gameplay-design.md`。
+该 Energy-driven Motion 架构已由 V0.1.2 替代，但文档保留为历史基线。
+
+### V0.1.2 - Vitality–Physics Separation
+
+用户已于 `2026-09-08` 批准本重构。当前实现范围为：
+
+- Velocity、Position、Gravity 与 Collision 属于 Physics；
+- Inflation/Elasticity、Bounce capability、ActivityState 与基础视觉强度属于 Vitality；
+- BallVitalityModel 不持有 Surface 或速度映射规则；
+- SurfaceResponseModel 以碰撞前 Velocity/Vitality 计算纯 CollisionResult；
+- BallController 依次应用 Velocity、Vitality delta 与状态；
+- Paddle 使用统一响应、固定 impulse、速度上限与 Vitality 恢复；
+- Ground 通过恢复系数、切向损耗和 Rest 联合门槛形成自然安定；
+- Trail 只表达 Velocity，Glow 只表达 Vitality。
+
+不存在 Game Over，不实现其他模式、正式素材、正式音频、主题系统或精修视觉。当前技术边界见 `docs/superpowers/specs/2026-09-08-v0.1.2-vitality-physics-separation-design.md`。
 
 ### 后续阶段
 
@@ -97,7 +112,7 @@ Phase 0 不创建 Godot 工程，不实现游戏内容。
 | 项目 | 基线 |
 | --- | --- |
 | Engine | Godot 4.7 stable，已核验并用于项目初始化 |
-| Language | GDScript 候选 |
+| Language | GDScript 已确认并用于当前原型 |
 | Renderer | Compatibility 已确认 |
 | Primary Target | Windows 已确认 |
 | Design Resolution | 960×720 |
@@ -151,4 +166,4 @@ Phase 0 完成不等于 V0.1 自动开始。最终流程为：
 
 > 概念图 → 生产规格 → Phase 0 报告 → 用户确认 → 正式制作
 
-该确认门已于 `2026-09-08` 通过；当前只完成 V0.1 项目初始化。玩法实现仍需下一次明确授权。
+该确认门已于 `2026-09-08` 通过；V0.1、V0.1.1 与获批的 V0.1.2 核心实现均已进入机器验证流程。每次机器验证只证明确定性规则和工程可运行，不能替代人工体验验收。

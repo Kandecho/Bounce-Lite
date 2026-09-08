@@ -1,6 +1,6 @@
 # Bounce Lite
 
-Bounce Lite 是一个面向轻量休闲桌面用户的放松型数字玩具。当前已完成 V0.1.1 重力衰弱调整的代码与机器验证，正在等待人工试玩；正式素材、正式音频和精修视觉仍未制作。
+Bounce Lite 是一个面向轻量休闲桌面用户的放松型数字玩具。当前已完成 V0.1.2 Vitality–Physics Separation 核心重构，正在完成最终机器验证；正式素材、正式音频和精修视觉仍未制作。
 
 ## 名称
 
@@ -11,13 +11,13 @@ Bounce Lite 是一个面向轻量休闲桌面用户的放松型数字玩具。�
 
 ## 当前状态
 
-- 当前阶段：`V0.1.1 - Gravity Decay Tuning`
+- 当前阶段：`V0.1.2 - Vitality–Physics Separation`
 - Phase 0 规格日期：`2026-09-08`
-- V0.1.1 状态：`固定重力、Ground 损耗和视觉反馈已实现；等待人工试玩`
+- V0.1.2 状态：`Physics/Vitality、Surface Response 与视觉数据边界已实现；最终机器验证进行中`
 - Godot 工程状态：`main scene 可运行`
 - Git 状态：`本地仓库，main 分支，不设置远端`
 
-当前原型包含 CharacterBody2D Ball、独立能量模型、鼠标 Paddle、Endless Rules、Combo、活跃计时、Rest/Wake 和程序化 Core/Glow/Trail。不存在 Game Over，也没有主题切换、正式资产或竞技系统。
+当前原型包含 CharacterBody2D Ball、独立 BallVitalityModel、纯计算 SurfaceResponseModel、鼠标 Paddle、Endless Rules、Combo、活跃计时、Rest/Wake 和程序化 Core/Glow/Trail。不存在 Game Over，也没有主题切换、正式资产或竞技系统。
 
 ## 技术基线
 
@@ -39,8 +39,10 @@ Bounce Lite 是一个面向轻量休闲桌面用户的放松型数字玩具。�
 - [`docs/visual_spec.md`](docs/visual_spec.md)：布局、主题、色彩、UI、动效与可访问性规格
 - [`docs/asset_registry.md`](docs/asset_registry.md)：完整资产树与逐项登记
 - [`docs/development_notes.md`](docs/development_notes.md)：环境证据、决策、风险和待确认事项
-- [`docs/superpowers/specs/2026-09-08-v0.1-core-gameplay-design.md`](docs/superpowers/specs/2026-09-08-v0.1-core-gameplay-design.md)：Endless 能量循环、组件职责、接口与测试设计
-- [`docs/superpowers/plans/2026-09-08-v0.1-core-gameplay.md`](docs/superpowers/plans/2026-09-08-v0.1-core-gameplay.md)：逐项 TDD 实施计划与机器验收命令
+- [`docs/superpowers/specs/2026-09-08-v0.1.2-vitality-physics-separation-design.md`](docs/superpowers/specs/2026-09-08-v0.1.2-vitality-physics-separation-design.md)：当前 Physics/Vitality、Surface Response、事件与视觉边界
+- [`docs/superpowers/plans/2026-09-08-v0.1.2-vitality-physics-separation.md`](docs/superpowers/plans/2026-09-08-v0.1.2-vitality-physics-separation.md)：当前逐项 TDD 重构与验收计划
+- [`docs/superpowers/specs/2026-09-08-v0.1-core-gameplay-design.md`](docs/superpowers/specs/2026-09-08-v0.1-core-gameplay-design.md)：V0.1/V0.1.1 历史 Energy-driven 设计基线
+- [`docs/superpowers/plans/2026-09-08-v0.1-core-gameplay.md`](docs/superpowers/plans/2026-09-08-v0.1-core-gameplay.md)：V0.1/V0.1.1 历史实施计划
 
 ## 概念图
 
@@ -51,18 +53,19 @@ Bounce Lite 是一个面向轻量休闲桌面用户的放松型数字玩具。�
 
 归档副本与原文件的字节数和 SHA-256 已核对一致。概念图是视觉基准，不是已批准的运行时素材。
 
-## 当前 V0.1 实现
+## 当前 V0.1.2 实现
 
 已实现：
 
-- 固定重力、封闭矩形中的确定性碰撞响应；
-- Wall/Top 轻微耗能、Ground 明显耗能；
-- Paddle 命中恢复到正常活跃能量，不叠加加速；
+- 独立 Velocity、固定重力与封闭矩形中的确定性运动；
+- 统一 Surface Response；Wall/Top 轻微耗散，Ground 强耗散；
+- Vitality 只因碰撞变化，不直接重建 Velocity；
+- Paddle 采用普通响应、固定 impulse、最大速度限制与 Vitality 恢复；
 - Ground 清零 Combo 但继续游戏；
 - ACTIVE / DECAYING / RESTING 与 Paddle Wake；
-- 随活跃程度变化的程序化 Glow / Trail；
+- 只表达 Vitality 的 Glow 与只表达 Velocity 的 Trail；
 - Paddle / Wall / Ground squash/stretch、Ground 短暂变暗与 Wake 亮起；
-- 宽度接近球直径、由 Energy 与实际速度共同控制的连续双层光迹；
+- 宽度接近球直径、只由实际速度控制的连续双层光迹；
 - 纯文字 `COMBO N` 与 `TIME MM:SS`。
 
 未实现且仍不属于当前范围：Game Over、Classic/Recover、排行榜、主题切换、Paddle 分区、障碍物、正式素材、正式音频和复杂视觉精修。
@@ -85,7 +88,7 @@ Bounce Lite 是一个面向轻量休闲桌面用户的放松型数字玩具。�
 & 'D:\Apps\Godot_v4.7-stable_win64\Godot_v4.7-stable_win64_console.exe' --headless --path 'D:\hangk\Documents\Bounce Lite' --script res://tests/test_runner.gd
 ```
 
-当前机器基线：`TEST PASS: 112 checks`；主场景已无头运行 600 帧且没有脚本或运行期错误。
+当前重构测试基线：`TEST PASS: 166 checks`；主场景短时 headless smoke 已通过。最终 editor import、600 帧运行和变异验证尚待本轮完成。
 
 主要目录：
 
@@ -98,4 +101,4 @@ docs/
 
 ## 下一步
 
-停止在 V0.1.1 人工试玩门。试玩后重点判断自然衰弱与休眠、接球恢复活力、Ground 损耗感、速度变化，以及是否愿意主动接球维持运动；未获得反馈前不进入后续功能或主题制作。
+完成最终机器验证后停止在 V0.1.2 人工试玩门。试玩重点是 Ground 小跳/滚动后的自然休眠、Paddle 重新注入运动、Trail/Glow 信息分工、Wake 可靠性，以及是否存在空中冻结、接球减速或速度失控；未获得反馈前不进入后续功能或主题制作。
