@@ -1,7 +1,8 @@
 class_name EndlessRules
 extends Node
 
-const BallEnergyModelScript = preload("res://scripts/ball/ball_energy_model.gd")
+const BallVitalityModelScript = preload("res://scripts/ball/ball_vitality_model.gd")
+const SurfaceResponseModelScript = preload("res://scripts/physics/surface_response_model.gd")
 
 signal combo_changed(value: int)
 signal active_time_changed(seconds: float)
@@ -28,13 +29,13 @@ func handle_paddle_hit() -> void:
 
 
 func handle_surface_hit(kind: int) -> void:
-	if kind == BallEnergyModelScript.SurfaceKind.GROUND:
+	if kind == SurfaceResponseModelScript.SurfaceKind.GROUND:
 		combo = 0
 		combo_changed.emit(combo)
 
 
 func handle_activity_state_changed(state: int) -> void:
-	if state == BallEnergyModelScript.ActivityState.RESTING:
+	if state == BallVitalityModelScript.ActivityState.RESTING:
 		timer_running = false
 		rest_started.emit()
 

@@ -22,10 +22,6 @@ func run(suite: RefCounted) -> void:
 		"Vitality starts at max")
 	suite.expect_equal(model.state, vitality_script.ActivityState.ACTIVE,
 		"maximum Vitality starts ACTIVE")
-	suite.expect_false(model.has_method("speed_for_current_energy"),
-		"Vitality has no Energy-to-Speed mapping")
-	suite.expect_false(model.has_method("energy_for_speed"),
-		"Vitality has no Speed-to-Energy mapping")
 
 	model.set_vitality(0.5)
 	model.apply_delta(-0.2)

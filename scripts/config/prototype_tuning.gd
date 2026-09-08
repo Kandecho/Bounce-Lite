@@ -8,17 +8,10 @@ extends Resource
 @export_range(0.0, 1.0, 0.001) var wake_vitality_ratio: float = 0.85
 @export_range(0.0, 500.0, 1.0) var rest_settle_speed: float = 45.0
 
-@export_group("Energy and Speed")
-@export_range(0.001, 100.0, 0.001) var max_energy: float = 1.0
+@export_group("Physics")
 @export_range(1.0, 2000.0, 1.0) var initial_speed: float = 360.0
-@export_range(1.0, 2000.0, 1.0) var active_speed: float = 360.0
 @export_range(1.0, 2000.0, 1.0) var max_speed: float = 520.0
 @export_range(0.0, 3000.0, 1.0) var gravity_acceleration: float = 520.0
-@export_range(1.0, 2000.0, 1.0) var active_threshold_speed: float = 300.0
-@export_range(0.0, 500.0, 1.0) var rest_threshold_speed: float = 35.0
-@export_range(0.0, 1.0, 0.001) var wall_energy_retention: float = 0.985
-@export_range(0.0, 1.0, 0.001) var top_energy_retention: float = 0.985
-@export_range(0.0, 1.0, 0.001) var ground_energy_retention: float = 0.65
 @export_range(1.0, 2000.0, 1.0) var wake_speed: float = 330.0
 
 @export_group("Surface Response")
