@@ -1,0 +1,28 @@
+; Engine configuration file.
+; Keep project initialization settings minimal until gameplay work is authorized.
+
+config_version=5
+
+[application]
+
+config/name="Bounce Lite"
+config/features=PackedStringArray("4.7", "GL Compatibility")
+
+[bounce_lite]
+
+ui_title="Bouncing Ball"
+phase="v0.1-project-initialization"
+target_platform="Windows"
+
+[display]
+
+window/size/viewport_width=960
+window/size/viewport_height=720
+window/size/resizable=true
+window/stretch/mode="canvas_items"
+window/stretch/aspect="keep"
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"

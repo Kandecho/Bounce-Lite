@@ -1,0 +1,10 @@
+# Godot generated/imported data
+.godot/
+.import/
+.mono/
+*.translation
+
+# Operating system metadata
+.DS_Store
+Thumbs.db
+Desktop.ini
