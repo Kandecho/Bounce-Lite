@@ -19,11 +19,16 @@ var direction: Vector2 = Vector2(0.65, -1.0).normalized()
 func _ready() -> void:
 	if energy_model == null:
 		configure(tuning)
+	var visuals := get_node_or_null("Visuals")
+	if visuals != null and visuals.has_method("configure"):
+		visuals.configure(tuning)
+	_update_visuals(false)
 
 
 func _physics_process(delta: float) -> void:
 	if energy_model == null or is_resting() or delta <= 0.0:
 		velocity = Vector2.ZERO
+		_update_visuals(false)
 		return
 	_sync_velocity_from_energy()
 	var remaining_motion := velocity * delta
@@ -49,12 +54,16 @@ func _physics_process(delta: float) -> void:
 			break
 		var speed_ratio := velocity.length() / speed_before
 		remaining_motion = collision.get_remainder().bounce(normal) * speed_ratio
+	_update_visuals(true)
 
 
 func configure(source_tuning: Resource) -> void:
 	tuning = source_tuning if source_tuning != null else PrototypeTuningScript.new()
 	energy_model = BallEnergyModelScript.new(tuning)
 	energy_model.activity_state_changed.connect(_on_energy_state_changed)
+	var visuals := get_node_or_null("Visuals")
+	if visuals != null and visuals.has_method("configure"):
+		visuals.configure(tuning)
 	_sync_velocity_from_energy()
 
 
@@ -113,12 +122,25 @@ func is_resting() -> bool:
 func _sync_velocity_from_energy() -> void:
 	if energy_model == null or is_resting():
 		velocity = Vector2.ZERO
+		_update_visuals(false)
 		return
 	var speed: float = minf(energy_model.speed_for_current_energy(), tuning.max_speed)
 	velocity = direction * speed
+	_update_visuals(false)
 
 
 func _on_energy_state_changed(previous: int, current: int) -> void:
 	if current == BallEnergyModelScript.ActivityState.RESTING:
 		velocity = Vector2.ZERO
+	_update_visuals(false)
 	activity_state_changed.emit(previous, current)
+
+
+func _update_visuals(record_position: bool) -> void:
+	var visuals := get_node_or_null("Visuals")
+	if visuals == null or energy_model == null:
+		return
+	if visuals.has_method("set_activity"):
+		visuals.set_activity(energy_model.activity_ratio(), energy_model.state)
+	if record_position and visuals.has_method("record_ball_position"):
+		visuals.record_ball_position(global_position)
