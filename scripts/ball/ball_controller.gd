@@ -162,12 +162,10 @@ func _update_visuals(record_position: bool) -> void:
 	var visuals := get_node_or_null("Visuals")
 	if visuals == null or vitality_model == null:
 		return
-	if visuals.has_method("set_activity"):
-		visuals.set_activity(vitality_model.vitality_ratio(), vitality_model.state)
-	if visuals.has_method("set_motion_speed_ratio"):
-		visuals.set_motion_speed_ratio(
-			velocity.length() / maxf(tuning.max_speed, MOTION_EPSILON)
-		)
+	if visuals.has_method("set_vitality"):
+		visuals.set_vitality(vitality_model.vitality_ratio(), vitality_model.state)
+	if visuals.has_method("set_motion"):
+		visuals.set_motion(velocity)
 	if record_position and visuals.has_method("record_ball_position"):
 		visuals.record_ball_position(global_position)
 

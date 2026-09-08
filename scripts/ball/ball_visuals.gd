@@ -2,12 +2,14 @@ class_name BallVisuals
 extends Node2D
 
 const PrototypeTuningScript = preload("res://scripts/config/prototype_tuning.gd")
-const BallEnergyModelScript = preload("res://scripts/ball/ball_energy_model.gd")
+const BallVitalityModelScript = preload("res://scripts/ball/ball_vitality_model.gd")
+const SurfaceResponseModelScript = preload("res://scripts/physics/surface_response_model.gd")
 
 var tuning: Resource = PrototypeTuningScript.new()
-var energy_ratio: float = 1.0
+var vitality_ratio: float = 1.0
+var motion_velocity: Vector2 = Vector2.ZERO
 var motion_speed_ratio: float = 1.0
-var activity_state: int = BallEnergyModelScript.ActivityState.ACTIVE
+var activity_state: int = BallVitalityModelScript.ActivityState.ACTIVE
 var trail_points: Array[Vector2] = []
 var deformation: Vector2 = Vector2.ONE
 var glow_pulse: float = 0.0
@@ -27,28 +29,30 @@ func configure(source_tuning: Resource) -> void:
 	queue_redraw()
 
 
-func set_activity(value: float, state: int) -> void:
-	energy_ratio = clampf(value, 0.0, 1.0)
+func set_vitality(value: float, state: int) -> void:
+	vitality_ratio = clampf(value, 0.0, 1.0)
 	activity_state = state
-	if activity_state == BallEnergyModelScript.ActivityState.RESTING:
-		trail_points.clear()
-	_trim_trail()
 	queue_redraw()
 
 
-func set_motion_speed_ratio(value: float) -> void:
-	motion_speed_ratio = clampf(value, 0.0, 1.0)
+func set_motion(value: Vector2) -> void:
+	motion_velocity = value
+	motion_speed_ratio = clampf(
+		value.length() / maxf(tuning.max_speed, 0.001),
+		0.0,
+		1.0
+	)
 	_trim_trail()
 	queue_redraw()
 
 
 func play_collision_feedback(kind: int, normal: Vector2) -> void:
 	match kind:
-		BallEnergyModelScript.SurfaceKind.PADDLE:
+		SurfaceResponseModelScript.SurfaceKind.PADDLE:
 			deformation = _deformation_for_normal(normal, tuning.paddle_hit_squash, 1.24)
 			glow_pulse = tuning.paddle_glow_pulse
 			darken_pulse = 0.0
-		BallEnergyModelScript.SurfaceKind.GROUND:
+		SurfaceResponseModelScript.SurfaceKind.GROUND:
 			deformation = _deformation_for_normal(normal, tuning.ground_hit_squash, 1.16)
 			glow_pulse = 0.0
 			darken_pulse = tuning.ground_darken_pulse
@@ -77,7 +81,7 @@ func advance_feedback(delta: float) -> void:
 
 
 func record_ball_position(value: Vector2) -> void:
-	if activity_state == BallEnergyModelScript.ActivityState.RESTING:
+	if motion_velocity.is_zero_approx():
 		return
 	if trail_points.is_empty() or trail_points[-1].distance_to(value) >= tuning.trail_sample_distance:
 		trail_points.append(value)
@@ -86,10 +90,13 @@ func record_ball_position(value: Vector2) -> void:
 
 
 func _trail_capacity() -> int:
-	if activity_state == BallEnergyModelScript.ActivityState.RESTING:
+	if motion_velocity.is_zero_approx():
 		return 0
-	var trail_activity := energy_ratio * motion_speed_ratio
-	return maxi(2, roundi(lerpf(2.0, float(tuning.trail_max_samples), trail_activity)))
+	return maxi(2, roundi(lerpf(
+		2.0,
+		float(tuning.trail_max_samples),
+		motion_speed_ratio
+	)))
 
 
 func _trim_trail() -> void:
@@ -100,8 +107,8 @@ func _trim_trail() -> void:
 
 func _draw() -> void:
 	_draw_trail()
-	var rest_factor := 0.18 if activity_state == BallEnergyModelScript.ActivityState.RESTING else 1.0
-	var glow_strength := (lerpf(0.10, 0.42, energy_ratio) + glow_pulse) * rest_factor
+	var rest_factor := 0.18 if activity_state == BallVitalityModelScript.ActivityState.RESTING else 1.0
+	var glow_strength := (lerpf(0.10, 0.42, vitality_ratio) + glow_pulse) * rest_factor
 	var core_color := Color(0.97, 0.99, 1.0, 1.0).darkened(darken_pulse)
 	draw_set_transform(Vector2.ZERO, 0.0, deformation)
 	draw_circle(Vector2.ZERO, tuning.ball_radius * 2.25,
@@ -117,10 +124,10 @@ func _draw() -> void:
 
 
 func _draw_trail() -> void:
-	if trail_points.size() < 2 or activity_state == BallEnergyModelScript.ActivityState.RESTING:
+	if trail_points.size() < 2 or motion_velocity.is_zero_approx():
 		return
 	var segment_count := trail_points.size() - 1
-	var trail_strength := energy_ratio * lerpf(0.35, 1.0, motion_speed_ratio)
+	var trail_strength := lerpf(0.35, 1.0, motion_speed_ratio)
 	var local_points := PackedVector2Array()
 	var outer_colors := PackedColorArray()
 	var inner_colors := PackedColorArray()
