@@ -12,10 +12,12 @@ var tuning: Resource = PrototypeTuningScript.new()
 @onready var paddle: CharacterBody2D = $GameArea/Paddle
 @onready var rules: Node = $EndlessRules
 @onready var hud: CanvasLayer = $HUD
+@onready var runtime_tuning_panel: Control = $RuntimeTuningPanel
 
 
 func _ready() -> void:
 	DisplayServer.window_set_title("Bouncing Ball")
+	runtime_tuning_panel.configure(tuning)
 	paddle.configure(tuning, GAME_LEFT, GAME_RIGHT, PADDLE_Y)
 	ball.configure(tuning)
 	rules.configure_ball(ball)

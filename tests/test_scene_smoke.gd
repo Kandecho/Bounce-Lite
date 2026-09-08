@@ -17,6 +17,10 @@ func run(suite: RefCounted) -> void:
 	suite.expect_not_null(main.get_node_or_null("HUD"), "scene owns a HUD")
 	suite.expect_not_null(main.get_node_or_null("HUD/ComboLabel"), "HUD owns Combo text")
 	suite.expect_not_null(main.get_node_or_null("HUD/TimerLabel"), "HUD owns Timer text")
+	var tuning_panel := main.get_node_or_null("RuntimeTuningPanel")
+	suite.expect_not_null(tuning_panel, "scene owns a runtime tuning panel")
+	if tuning_panel != null:
+		suite.expect_false(tuning_panel.visible, "runtime tuning panel is hidden by default")
 
 	var ground := main.get_node_or_null("GameArea/Ground")
 	suite.expect_not_null(ground, "scene owns a Ground boundary")

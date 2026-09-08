@@ -31,6 +31,7 @@ extends Resource
 @export_range(0.0, 1.0, 0.001) var paddle_restitution_max: float = 0.92
 @export_range(0.0, 1.0, 0.001) var paddle_tangent_retention: float = 1.0
 @export_range(0.0, 1000.0, 1.0) var paddle_impulse: float = 160.0
+@export_range(0.0, 1.0, 0.01) var paddle_vitality_restore: float = 1.0
 
 @export_group("Paddle")
 @export_range(1.0, 3000.0, 1.0) var wake_paddle_velocity: float = 450.0

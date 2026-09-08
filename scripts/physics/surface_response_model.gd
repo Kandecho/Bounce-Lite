@@ -107,7 +107,8 @@ func _tangent_retention_for(kind: int) -> float:
 
 func _vitality_delta_for(kind: int, vitality_before: float, max_vitality: float) -> float:
 	if kind == SurfaceKind.PADDLE:
-		return maxf(max_vitality, 0.001) - vitality_before
+		var missing_vitality := maxf(maxf(max_vitality, 0.001) - vitality_before, 0.0)
+		return missing_vitality * clampf(tuning.paddle_vitality_restore, 0.0, 1.0)
 	var retention := 1.0
 	match kind:
 		SurfaceKind.TOP:

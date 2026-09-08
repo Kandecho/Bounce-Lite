@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
 [ext_resource type="Script" path="res://scripts/ball/ball_controller.gd" id="2_ball"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" path="res://scripts/paddle/paddle_controller.gd" id="4_paddle"]
 [ext_resource type="Script" path="res://scripts/rules/endless_rules.gd" id="5_rules"]
 [ext_resource type="Script" path="res://scripts/ui/prototype_hud.gd" id="6_hud"]
+[ext_resource type="Script" path="res://scripts/dev/runtime_tuning_panel.gd" id="7_tuning_panel"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBox_game_area"]
 bg_color = Color(0.066, 0.082, 0.112, 1)
@@ -132,3 +133,11 @@ theme_override_colors/font_color = Color(0.88, 0.91, 0.97, 0.9)
 theme_override_font_sizes/font_size = 17
 text = "TIME 00:00"
 horizontal_alignment = 2
+
+[node name="RuntimeTuningPanel" type="PanelContainer" parent="."]
+visible = false
+offset_left = 618.0
+offset_top = 16.0
+offset_right = 944.0
+offset_bottom = 430.0
+script = ExtResource("7_tuning_panel")

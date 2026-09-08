@@ -78,6 +78,16 @@ func run(suite: RefCounted) -> void:
 	suite.expect_false(paddle.settle_allowed,
 		"Paddle never grants physical settling")
 
+	tuning.set("paddle_vitality_restore", 0.50)
+	var partial_restore: RefCounted = response.resolve(
+		Vector2(0.0, 100.0), Vector2.UP,
+		response_script.SurfaceKind.PADDLE, 0.20, 0.20, 1.0, true)
+	suite.expect_float(partial_restore.vitality_delta, 0.40, 0.0001,
+		"Paddle restore scales the missing Vitality")
+	suite.expect_float(partial_restore.vitality_after, 0.60, 0.0001,
+		"partial Paddle restore reports the resulting Vitality")
+	tuning.set("paddle_vitality_restore", 1.0)
+
 	var capped_paddle: RefCounted = response.resolve(
 		Vector2(0.0, 500.0), Vector2.UP,
 		response_script.SurfaceKind.PADDLE, 1.0, 1.0, 1.0, true)
