@@ -4,6 +4,7 @@ const TestSupport = preload("res://tests/test_support.gd")
 
 const TEST_PATHS: Array[String] = [
 	"res://tests/test_ball_vitality_model.gd",
+	"res://tests/test_surface_response_model.gd",
 	"res://tests/test_ball_energy_model.gd",
 	"res://tests/test_endless_rules.gd",
 	"res://tests/test_paddle_wake.gd",

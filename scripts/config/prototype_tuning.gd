@@ -20,6 +20,24 @@ extends Resource
 @export_range(0.0, 1.0, 0.001) var ground_energy_retention: float = 0.65
 @export_range(1.0, 2000.0, 1.0) var wake_speed: float = 330.0
 
+@export_group("Surface Response")
+@export_range(0.0, 1.0, 0.001) var wall_restitution_min: float = 0.96
+@export_range(0.0, 1.0, 0.001) var wall_restitution_max: float = 0.995
+@export_range(0.0, 1.0, 0.001) var wall_tangent_retention: float = 0.995
+@export_range(0.0, 1.0, 0.001) var wall_vitality_retention: float = 0.985
+@export_range(0.0, 1.0, 0.001) var top_restitution_min: float = 0.96
+@export_range(0.0, 1.0, 0.001) var top_restitution_max: float = 0.995
+@export_range(0.0, 1.0, 0.001) var top_tangent_retention: float = 0.995
+@export_range(0.0, 1.0, 0.001) var top_vitality_retention: float = 0.985
+@export_range(0.0, 1.0, 0.001) var ground_restitution_min: float = 0.12
+@export_range(0.0, 1.0, 0.001) var ground_restitution_max: float = 0.78
+@export_range(0.0, 1.0, 0.001) var ground_tangent_retention: float = 0.80
+@export_range(0.0, 1.0, 0.001) var ground_vitality_retention: float = 0.65
+@export_range(0.0, 1.0, 0.001) var paddle_restitution_min: float = 0.72
+@export_range(0.0, 1.0, 0.001) var paddle_restitution_max: float = 0.92
+@export_range(0.0, 1.0, 0.001) var paddle_tangent_retention: float = 1.0
+@export_range(0.0, 1000.0, 1.0) var paddle_impulse: float = 160.0
+
 @export_group("Paddle")
 @export_range(1.0, 3000.0, 1.0) var wake_paddle_velocity: float = 450.0
 @export_range(0.01, 1.0, 0.01) var wake_hold_seconds: float = 0.08
