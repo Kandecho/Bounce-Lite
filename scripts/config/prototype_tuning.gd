@@ -5,14 +5,20 @@ extends Resource
 @export_range(0.001, 100.0, 0.001) var max_vitality: float = 1.0
 @export_range(0.0, 1.0, 0.001) var active_vitality_ratio: float = 0.70
 @export_range(0.0, 1.0, 0.001) var rest_vitality_ratio: float = 0.08
-@export_range(0.0, 1.0, 0.001) var wake_vitality_ratio: float = 0.85
 @export_range(0.0, 500.0, 1.0) var rest_settle_speed: float = 45.0
 
 @export_group("Physics")
 @export_range(1.0, 2000.0, 1.0) var initial_speed: float = 360.0
 @export_range(1.0, 2000.0, 1.0) var max_speed: float = 520.0
 @export_range(0.0, 3000.0, 1.0) var gravity_acceleration: float = 520.0
-@export_range(1.0, 2000.0, 1.0) var wake_speed: float = 330.0
+
+@export_group("Resting Wake")
+@export_range(0.0, 1.0, 0.01) var wake_rest_delay_seconds: float = 0.12
+@export_range(0.0, 1.0, 0.01) var wake_horizontal_factor: float = 0.18
+@export_range(0.0, 2.0, 0.01) var wake_vertical_factor: float = 0.45
+@export_range(0.0, 1000.0, 1.0) var wake_activation_impulse: float = 180.0
+@export_range(0.0, 1.0, 0.01) var wake_vitality_restore_ratio: float = 0.15
+@export_range(0.0, 100.0, 1.0) var wake_horizontal_margin: float = 12.0
 
 @export_group("Surface Response")
 @export_range(0.0, 1.0, 0.001) var wall_restitution_min: float = 0.96
@@ -34,8 +40,6 @@ extends Resource
 @export_range(0.0, 1.0, 0.01) var paddle_vitality_restore: float = 1.0
 
 @export_group("Paddle")
-@export_range(1.0, 3000.0, 1.0) var wake_paddle_velocity: float = 450.0
-@export_range(0.01, 1.0, 0.01) var wake_hold_seconds: float = 0.08
 @export_range(1.0, 60.0, 0.5) var paddle_smoothing: float = 18.0
 @export var paddle_size: Vector2 = Vector2(150.0, 18.0)
 

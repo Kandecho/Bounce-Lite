@@ -20,12 +20,11 @@ func _ready() -> void:
 	runtime_tuning_panel.configure(tuning)
 	paddle.configure(tuning, GAME_LEFT, GAME_RIGHT, PADDLE_Y)
 	ball.configure(tuning)
-	rules.configure_ball(ball)
 
 	ball.paddle_hit.connect(_on_ball_paddle_hit)
 	ball.surface_hit.connect(_on_ball_surface_hit)
 	ball.activity_state_changed.connect(_on_ball_activity_state_changed)
-	paddle.wake_gesture.connect(_on_paddle_wake_gesture)
+	paddle.motion_sampled.connect(_on_paddle_motion_sampled)
 	rules.combo_changed.connect(hud.set_combo)
 	rules.active_time_changed.connect(hud.set_active_time)
 
@@ -46,5 +45,6 @@ func _on_ball_activity_state_changed(_previous: int, current: int) -> void:
 	rules.handle_activity_state_changed(current)
 
 
-func _on_paddle_wake_gesture(velocity_x: float) -> void:
-	rules.handle_wake_gesture(velocity_x)
+func _on_paddle_motion_sampled(paddle_velocity: Vector2, paddle_position: Vector2) -> void:
+	if ball.apply_resting_wake_impulse(paddle_velocity, paddle_position):
+		rules.begin_wake_cycle()

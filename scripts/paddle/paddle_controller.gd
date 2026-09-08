@@ -3,15 +3,13 @@ extends CharacterBody2D
 
 const PrototypeTuningScript = preload("res://scripts/config/prototype_tuning.gd")
 
-signal wake_gesture(velocity_x: float)
+signal motion_sampled(paddle_velocity: Vector2, paddle_position: Vector2)
 
 var tuning: Resource = PrototypeTuningScript.new()
 var left_bound: float = 0.0
 var right_bound: float = 960.0
 var fixed_y: float = 0.0
 var target_x: float = 0.0
-var wake_accumulator: float = 0.0
-var wake_latched: bool = false
 
 
 func _ready() -> void:
@@ -53,22 +51,8 @@ func advance_motion(delta: float) -> void:
 	position.x = clampf(position.x, _minimum_center_x(), _maximum_center_x())
 	position.y = fixed_y
 	velocity = Vector2((position.x - previous_x) / delta, 0.0)
-	if advance_wake_detector(velocity.x, delta):
-		wake_gesture.emit(velocity.x)
-
-
-func advance_wake_detector(velocity_x: float, delta: float) -> bool:
-	if absf(velocity_x) < tuning.wake_paddle_velocity:
-		wake_accumulator = 0.0
-		wake_latched = false
-		return false
-	if wake_latched:
-		return false
-	wake_accumulator += maxf(delta, 0.0)
-	if wake_accumulator + 0.000001 < tuning.wake_hold_seconds:
-		return false
-	wake_latched = true
-	return true
+	if not velocity.is_zero_approx():
+		motion_sampled.emit(velocity, global_position)
 
 
 func _minimum_center_x() -> float:

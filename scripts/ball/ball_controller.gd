@@ -18,6 +18,8 @@ const DEFAULT_DIRECTION := Vector2(0.65, -1.0)
 var tuning: Resource = PrototypeTuningScript.new()
 var vitality_model: RefCounted
 var surface_response_model: RefCounted
+var rest_elapsed_time: float = 0.0
+var resting_wake_impulse_consumed := false
 
 
 func _ready() -> void:
@@ -30,7 +32,12 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
-	if vitality_model == null or is_resting() or delta <= 0.0:
+	if vitality_model == null or delta <= 0.0:
+		velocity = Vector2.ZERO
+		_update_visuals(false)
+		return
+	advance_resting_time(delta)
+	if is_resting() and velocity.length_squared() <= MOTION_EPSILON * MOTION_EPSILON:
 		velocity = Vector2.ZERO
 		_update_visuals(false)
 		return
@@ -48,13 +55,14 @@ func _physics_process(delta: float) -> void:
 		if collider != null and collider.has_meta("surface_kind"):
 			kind = int(collider.get_meta("surface_kind"))
 		var valid_paddle_hit := (
-			kind == SurfaceResponseModelScript.SurfaceKind.PADDLE
+			not is_resting()
+			and kind == SurfaceResponseModelScript.SurfaceKind.PADDLE
 			and velocity.y > 0.0
 			and normal.y < -0.5
 		)
 		var motion_before := remaining_motion.length()
 		resolve_surface_collision(kind, normal, valid_paddle_hit)
-		if is_resting():
+		if velocity.length_squared() <= MOTION_EPSILON * MOTION_EPSILON:
 			break
 		var remaining_fraction := (
 			collision.get_remainder().length()
@@ -80,12 +88,16 @@ func start_active(initial_direction: Vector2) -> void:
 		configure(tuning)
 		return
 	vitality_model.reset_active()
+	rest_elapsed_time = 0.0
+	resting_wake_impulse_consumed = false
 	velocity = _safe_direction(initial_direction) * tuning.initial_speed
 	_update_visuals(false)
 
 
 func advance_air_motion(delta: float) -> void:
-	if vitality_model == null or is_resting() or delta <= 0.0:
+	if vitality_model == null or delta <= 0.0:
+		return
+	if is_resting() and velocity.length_squared() <= MOTION_EPSILON * MOTION_EPSILON:
 		return
 	velocity.y += tuning.gravity_acceleration * delta
 	velocity = velocity.limit_length(tuning.max_speed)
@@ -94,6 +106,8 @@ func advance_air_motion(delta: float) -> void:
 func resolve_surface_collision(kind: int, normal: Vector2, valid_paddle_hit: bool) -> void:
 	if vitality_model == null or surface_response_model == null:
 		return
+	var was_resting := is_resting()
+	var effective_paddle_hit := valid_paddle_hit and not was_resting
 	var vitality_before: float = vitality_model.current_vitality
 	var result: RefCounted = surface_response_model.resolve(
 		velocity,
@@ -102,13 +116,18 @@ func resolve_surface_collision(kind: int, normal: Vector2, valid_paddle_hit: boo
 		vitality_model.vitality_ratio(),
 		vitality_before,
 		vitality_model.max_vitality,
-		valid_paddle_hit
+		effective_paddle_hit
 	)
 	velocity = result.velocity_after.limit_length(tuning.max_speed)
 	vitality_model.apply_delta(result.vitality_delta)
-	vitality_model.resolve_activity(result.settle_allowed)
-	if is_resting():
-		velocity = Vector2.ZERO
+	if was_resting:
+		if result.effective_surface_kind == SurfaceResponseModelScript.SurfaceKind.GROUND \
+			and result.settle_allowed:
+			_settle_resting_motion()
+	else:
+		vitality_model.resolve_activity(result.settle_allowed)
+		if is_resting():
+			velocity = Vector2.ZERO
 	var vitality_after: float = vitality_model.current_vitality
 	_update_visuals(false)
 	surface_resolved.emit(result)
@@ -120,21 +139,48 @@ func resolve_surface_collision(kind: int, normal: Vector2, valid_paddle_hit: boo
 		surface_hit.emit(result.effective_surface_kind, vitality_before, vitality_after)
 
 
-func wake_from_paddle(paddle_velocity_x: float) -> bool:
-	if vitality_model == null:
+func advance_resting_time(delta: float) -> void:
+	if not is_resting() or delta <= 0.0:
+		return
+	rest_elapsed_time += delta
+
+
+func apply_resting_wake_impulse(
+	paddle_velocity: Vector2,
+	paddle_position: Vector2
+) -> bool:
+	if vitality_model == null or not is_resting():
 		return false
-	var wake_vitality: float = vitality_model.max_vitality * tuning.wake_vitality_ratio
-	if not vitality_model.wake(wake_vitality):
+	if resting_wake_impulse_consumed:
 		return false
-	var horizontal_sign := signf(paddle_velocity_x)
-	if is_zero_approx(horizontal_sign):
-		horizontal_sign = 1.0
-	velocity = _safe_direction(Vector2(horizontal_sign * 0.35, -1.0)) * tuning.wake_speed
+	if rest_elapsed_time + 0.000001 < tuning.wake_rest_delay_seconds:
+		return false
+	if not _paddle_is_in_wake_range(paddle_position.x):
+		return false
+	var paddle_speed := absf(paddle_velocity.x)
+	if is_zero_approx(paddle_speed):
+		return false
+
+	var impulse := Vector2(
+		paddle_velocity.x * tuning.wake_horizontal_factor,
+		-paddle_speed * tuning.wake_vertical_factor
+	).limit_length(tuning.max_speed)
+	resting_wake_impulse_consumed = true
+	velocity = (velocity + impulse).limit_length(tuning.max_speed)
+
+	var activated := false
+	if impulse.length() + 0.000001 >= tuning.wake_activation_impulse:
+		var restored_vitality: float = (
+			vitality_model.current_vitality
+			+ vitality_model.max_vitality * tuning.wake_vitality_restore_ratio
+		)
+		activated = vitality_model.wake(restored_vitality)
 	_update_visuals(false)
-	var visuals := get_node_or_null("Visuals")
-	if visuals != null and visuals.has_method("play_wake_feedback"):
-		visuals.play_wake_feedback()
-	return true
+	if activated:
+		var visuals := get_node_or_null("Visuals")
+		if visuals != null and visuals.has_method("play_wake_feedback"):
+			visuals.play_wake_feedback()
+	return activated
 
 
 func is_resting() -> bool:
@@ -142,6 +188,21 @@ func is_resting() -> bool:
 		vitality_model != null
 		and vitality_model.state == BallVitalityModelScript.ActivityState.RESTING
 	)
+
+
+func _paddle_is_in_wake_range(paddle_x: float) -> bool:
+	var horizontal_reach: float = (
+		tuning.paddle_size.x * 0.5
+		+ tuning.ball_radius
+		+ tuning.wake_horizontal_margin
+	)
+	return absf(global_position.x - paddle_x) <= horizontal_reach
+
+
+func _settle_resting_motion() -> void:
+	velocity = Vector2.ZERO
+	rest_elapsed_time = 0.0
+	resting_wake_impulse_consumed = false
 
 
 func _safe_direction(value: Vector2) -> Vector2:
@@ -153,7 +214,7 @@ func _safe_direction(value: Vector2) -> Vector2:
 
 func _on_vitality_state_changed(previous: int, current: int) -> void:
 	if current == BallVitalityModelScript.ActivityState.RESTING:
-		velocity = Vector2.ZERO
+		_settle_resting_motion()
 	_update_visuals(false)
 	activity_state_changed.emit(previous, current)
 

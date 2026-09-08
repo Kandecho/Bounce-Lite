@@ -31,6 +31,16 @@ func run(suite: RefCounted) -> void:
 		"panel exposes Paddle impulse")
 	suite.expect_false(panel.has_parameter("initial_speed"),
 		"panel omits launch-only Initial speed")
+	suite.expect_true(panel.has_parameter("wake_rest_delay_seconds"),
+		"panel exposes the Rest window")
+	suite.expect_true(panel.has_parameter("wake_horizontal_factor"),
+		"panel exposes Wake horizontal inheritance")
+	suite.expect_true(panel.has_parameter("wake_vertical_factor"),
+		"panel exposes Wake lift strength")
+	suite.expect_true(panel.has_parameter("wake_activation_impulse"),
+		"panel exposes the discrete Wake threshold")
+	suite.expect_true(panel.has_parameter("wake_vitality_restore_ratio"),
+		"panel exposes partial Wake Vitality recovery")
 
 	suite.expect_true(panel.set_parameter_value("gravity_acceleration", 700.0),
 		"panel accepts a Gravity edit")
@@ -40,6 +50,21 @@ func run(suite: RefCounted) -> void:
 		"panel accepts a Max velocity edit")
 	suite.expect_float(tuning.max_speed, 640.0, 0.001,
 		"Max velocity edit updates the shared tuning resource")
+	panel.set_parameter_value("wake_rest_delay_seconds", 0.18)
+	panel.set_parameter_value("wake_horizontal_factor", 0.22)
+	panel.set_parameter_value("wake_vertical_factor", 0.55)
+	panel.set_parameter_value("wake_activation_impulse", 210.0)
+	panel.set_parameter_value("wake_vitality_restore_ratio", 0.18)
+	suite.expect_float(tuning.wake_rest_delay_seconds, 0.18, 0.0001,
+		"Rest window edits update shared tuning")
+	suite.expect_float(tuning.wake_horizontal_factor, 0.22, 0.0001,
+		"Wake horizontal edits update shared tuning")
+	suite.expect_float(tuning.wake_vertical_factor, 0.55, 0.0001,
+		"Wake lift edits update shared tuning")
+	suite.expect_float(tuning.wake_activation_impulse, 210.0, 0.001,
+		"Wake threshold edits update shared tuning")
+	suite.expect_float(tuning.wake_vitality_restore_ratio, 0.18, 0.0001,
+		"Wake Vitality edits update shared tuning")
 	var ball: CharacterBody2D = ball_script.new()
 	ball.configure(tuning)
 	ball.velocity = Vector2.ZERO

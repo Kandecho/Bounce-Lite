@@ -18,21 +18,14 @@ func run(suite: RefCounted) -> void:
 	var tuning: Resource = tuning_script.new()
 	var paddle: CharacterBody2D = paddle_script.new()
 	paddle.configure(tuning, 171.0, 790.0, 529.0)
-
-	suite.expect_false(paddle.advance_wake_detector(500.0, 0.04),
-		"one short fast movement does not wake")
-	suite.expect_true(paddle.advance_wake_detector(500.0, 0.04),
-		"sustained fast movement reaches eighty milliseconds and wakes")
-	suite.expect_false(paddle.advance_wake_detector(500.0, 0.04),
-		"a latched gesture does not fire every frame")
-	suite.expect_false(paddle.advance_wake_detector(0.0, 0.016),
-		"dropping below threshold resets the detector")
-	suite.expect_false(paddle.advance_wake_detector(500.0, 0.04),
-		"a reset detector requires a new full hold")
-	suite.expect_true(paddle.advance_wake_detector(500.0, 0.04),
-		"a second sustained gesture can wake again")
-	suite.expect_false(paddle.advance_wake_detector(100.0, 0.2),
-		"low-speed movement never triggers wake")
+	var motion_samples: Array = []
+	var has_motion_signal := paddle.has_signal("motion_sampled")
+	suite.expect_true(has_motion_signal,
+		"Paddle exposes actual motion samples instead of a binary Wake gesture")
+	if has_motion_signal:
+		paddle.connect("motion_sampled", func(sample_velocity: Vector2, sample_position: Vector2) -> void:
+			motion_samples.append([sample_velocity, sample_position])
+		)
 
 	paddle.position = Vector2(480.0, 529.0)
 	paddle.set_target_x(1000.0)
@@ -43,4 +36,16 @@ func run(suite: RefCounted) -> void:
 		"Paddle does not move vertically")
 	suite.expect_true(paddle.velocity.x > 0.0,
 		"Paddle velocity reflects actual horizontal movement")
+	if has_motion_signal:
+		suite.expect_equal(motion_samples.size(), 1,
+			"one Paddle update publishes one non-zero motion sample")
+		if motion_samples.size() == 1:
+			suite.expect_float(motion_samples[0][0].x, paddle.velocity.x, 0.001,
+				"motion sample carries actual Paddle velocity")
+			suite.expect_float(motion_samples[0][0].y, 0.0, 0.001,
+				"motion sample remains horizontal")
+		paddle.set_target_x(paddle.position.x)
+		paddle.advance_motion(0.1)
+		suite.expect_equal(motion_samples.size(), 1,
+			"stationary Paddle updates do not publish Wake input")
 	paddle.free()

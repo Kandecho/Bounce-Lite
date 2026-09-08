@@ -9,10 +9,18 @@ func run(suite: RefCounted) -> void:
 	if packed == null:
 		return
 	var main: Node = packed.instantiate()
-	suite.expect_not_null(main.get_node_or_null("GameArea/Ball"), "scene owns a Ball")
+	var ball := main.get_node_or_null("GameArea/Ball")
+	suite.expect_not_null(ball, "scene owns a Ball")
+	if ball != null:
+		suite.expect_true(ball.has_method("apply_resting_wake_impulse"),
+			"Ball exposes Resting Wake Impulse")
 	suite.expect_not_null(main.get_node_or_null("GameArea/Ball/Visuals"),
 		"Ball owns procedural visuals")
-	suite.expect_not_null(main.get_node_or_null("GameArea/Paddle"), "scene owns a Paddle")
+	var paddle := main.get_node_or_null("GameArea/Paddle")
+	suite.expect_not_null(paddle, "scene owns a Paddle")
+	if paddle != null:
+		suite.expect_true(paddle.has_signal("motion_sampled"),
+			"Paddle exposes continuous motion input")
 	suite.expect_not_null(main.get_node_or_null("EndlessRules"), "scene owns Endless rules")
 	suite.expect_not_null(main.get_node_or_null("HUD"), "scene owns a HUD")
 	suite.expect_not_null(main.get_node_or_null("HUD/ComboLabel"), "HUD owns Combo text")

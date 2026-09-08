@@ -12,15 +12,10 @@ signal wake_started()
 var combo: int = 0
 var active_time_seconds: float = 0.0
 var timer_running: bool = true
-var ball_controller: Node
 
 
 func _process(delta: float) -> void:
 	advance_active_time(delta)
-
-
-func configure_ball(value: Node) -> void:
-	ball_controller = value
 
 
 func handle_paddle_hit() -> void:
@@ -38,15 +33,6 @@ func handle_activity_state_changed(state: int) -> void:
 	if state == BallVitalityModelScript.ActivityState.RESTING:
 		timer_running = false
 		rest_started.emit()
-
-
-func handle_wake_gesture(velocity_x: float) -> bool:
-	if ball_controller == null or not ball_controller.has_method("wake_from_paddle"):
-		return false
-	if not ball_controller.wake_from_paddle(velocity_x):
-		return false
-	begin_wake_cycle()
-	return true
 
 
 func begin_wake_cycle() -> void:
