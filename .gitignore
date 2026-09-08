@@ -8,3 +8,6 @@
 .DS_Store
 Thumbs.db
 Desktop.ini
+
+# Claude desktop app output
+Claude outputs/
