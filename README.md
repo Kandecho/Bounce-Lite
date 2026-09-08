@@ -88,6 +88,14 @@ Bounce Lite 是一个面向轻量休闲桌面用户的放松型数字玩具。�
 & 'D:\Apps\Godot_v4.7-stable_win64\Godot_v4.7-stable_win64_console.exe' --headless --path 'D:\hangk\Documents\Bounce Lite' --script res://tests/test_runner.gd
 ```
 
+人工试玩可直接双击根目录 `run-playtest.bat`。游戏关闭后控制台会保留退出码和错误日志。辅助模式：
+
+```powershell
+.\run-playtest.bat --editor
+.\run-playtest.bat --test
+.\run-playtest.bat --check
+```
+
 当前重构测试基线：`TEST PASS: 173 checks`；fresh headless editor import 与主场景 600 帧运行均退出 `0`。碰撞前 Vitality、Paddle impulse、Velocity 独立性和 Velocity-only Trail 四项变异均被测试捕获并已恢复。
 
 主要目录：
