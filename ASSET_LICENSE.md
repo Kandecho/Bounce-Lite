@@ -5,14 +5,14 @@ scene definitions, project configuration, launch scripts and technical documenta
 Procedural rendering code is included in that code license. It does not grant
 rights to separate media merely because that media is referenced by a scene or document.
 
-The root MIT grant **does not cover media in `assets/`, root reference PNGs,
+The root MIT grant **does not cover media in `assets/`, reference PNGs,
 or media embedded in documentation**. Their terms are as follows:
 
 - Kenney audio files and the small audition edits derived from them are
   available under CC0-1.0. Original notices and exact source mappings are in
   [THIRD_PARTY_ASSETS.md](THIRD_PARTY_ASSETS.md). No exclusive rights are claimed
   over those files; they must not be described as proprietary game assets.
-- `day-raw.png`, `night-raw.png` and their identical copies in `assets/concept/`
+- `assets/concept/light_mode/day-raw.png` and `assets/concept/dark_mode/night-raw.png`
   are user-supplied design references, not runtime assets. No license for reuse
   is granted by this repository. Their original authorship / upstream provenance
   is not established here; rights remain with the respective rights holders.

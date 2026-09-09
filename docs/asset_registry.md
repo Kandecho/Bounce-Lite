@@ -252,3 +252,7 @@ A017 Paddle Core 不属于任何通道：它是形态，不表达状态。
 | Wall / Top | Digital Audio / pepSound3.ogg | pepSound1.ogg |
 
 Weak Wake无专门音效。全部音频来自Kenney CC0；17个原始OGG、4个最小裁片WAV已入库，其中历史试听素材保留但未接入。当前素材与参数见[V0.1.4基线](v0.1.4-basic-audio.md)；全部来源、包名、原文件和裁片映射见[第三方记录](../THIRD_PARTY_ASSETS.md)，许可边界见[资产许可](../ASSET_LICENSE.md)。没有建立正式资产生产流程。
+
+### 参考文件位置整理（2026-09-09）
+
+REF001 / REF002统一使用assets/concept/内归档路径。根目录重复PNG经SHA-256再次核对一致后移除，其未被游戏引用的.import配置同时移除。表中的原文件名保留来源含义，不表示根目录仍有副本。素材内容与许可未变。

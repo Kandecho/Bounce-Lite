@@ -1,5 +1,7 @@
 # Bounce Lite Phase 0 - Project Setup & Visual Specification
 
+本历史文件于2026-09-09从根目录迁入 docs/history/。下文目录树及路径保留当时记录；当前参考图统一位于 assets/concept/，当前状态见[README](../../README.md)。
+
 ## 0. 文档定位
 
 本文件是 Bounce Lite 的 Phase 0 执行基线，用于把概念图转化为可追踪、可验收、可供后续 Agent 使用的生产规格。

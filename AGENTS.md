@@ -79,7 +79,7 @@ current user instruction > current active repository documentation > historical 
 
 改动确定性行为时先添加可复现回归，再实现修复；运行 tests/test_runner.gd。几何、Wake 或场景接线改动另跑 tests/test_physics_scenarios.gd；音频事件接线另跑 tests/test_audio_scenarios.gd。视觉改动执行 tests/capture_visual_baseline.gd 并检查截图。阶段结束运行 headless import 与主场景 1200 帧。纯文档修改检查差异、链接和状态一致性即可，不机械重跑全部测试。
 
-Godot console 路径由本机 GODOT_CONSOLE 或忽略的 godot.local.txt 提供，启动器也支持 PATH。自动化验证显式将 --log-file 指向仓库 .godot 下。
+Godot console 路径由本机 GODOT_CONSOLE 或忽略的 .local/godot.local.txt 提供，启动器也支持 PATH。自动化验证显式将 --log-file 指向仓库 .godot 下。
 
 ## 人工试听门
 

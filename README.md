@@ -39,7 +39,7 @@
 
 F2/F3 分别切换 Paddle/Ground A/B，F4 显示唯一 Strong Wake 候选，F5 静音比较，F6 切换 Wall A/B。新选择在下一次真实事件播放，不保存。
 
-Godot 编辑器可直接打开 project.godot。命令行/双击启动器依次读取 `GODOT_CONSOLE` 环境变量、被忽略的 `godot.local.txt` 中的完整可执行路径，或 PATH 中的 godot_console.exe / godot.exe。机器路径不写入共享脚本。
+Godot 编辑器可直接打开 project.godot。命令行/双击启动器依次读取 `GODOT_CONSOLE` 环境变量、被忽略的 `.local/godot.local.txt` 中的完整可执行路径，或 PATH 中的 godot_console.exe / godot.exe。机器路径不写入共享脚本。
 
 在仓库根目录运行（先设置本机 `GODOT_CONSOLE`）：
 
@@ -76,6 +76,6 @@ Kenney 音频保留各自 CC0；三个包、全部已入库候选、原文件与
 - [当前 V0.1.3 实施与验证](docs/superpowers/plans/2026-09-09-v0.1.3-bugfix-visual-implementation.md)。
 - [视觉规格](docs/visual_spec.md)、[资产登记](docs/asset_registry.md)、[开发记录](docs/development_notes.md)。
 - [冻结问题及处置](docs/reviews/bounce-lite-v0.1.3-wake-impulse-frozen-issues.md)、[历史视觉审查](docs/reviews/2026-09-08-v0.1.3-visual-sync-review.md)。
-- [Phase 0](phase-0-plan.md) 与 docs/superpowers 中 V0.1/V0.1.2 文件仅作为历史基线。
+- [Phase 0](docs/history/phase-0-plan.md) 与 docs/superpowers 中 V0.1/V0.1.2 文件仅作为历史基线。
 
-原始 day-raw.png / night-raw.png 及 assets/concept 中归档副本保持不变；它们是参考证据，不是运行时素材。
+概念图统一保存在 assets/concept/light_mode/day-raw.png 与 assets/concept/dark_mode/night-raw.png，内容哈希保持不变；根目录重复文件已清理。它们是参考证据，不是运行时素材。

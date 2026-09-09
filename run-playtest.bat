@@ -3,7 +3,7 @@ setlocal
 
 for %%I in ("%~dp0.") do set "PROJECT_DIR=%%~fI"
 rem Prefer an explicit environment variable, then ignored local config, then PATH.
-if not defined GODOT_CONSOLE if exist "%PROJECT_DIR%\godot.local.txt" set /p GODOT_CONSOLE=<"%PROJECT_DIR%\godot.local.txt"
+if not defined GODOT_CONSOLE if exist "%PROJECT_DIR%\.local\godot.local.txt" set /p GODOT_CONSOLE=<"%PROJECT_DIR%\.local\godot.local.txt"
 if not defined GODOT_CONSOLE for %%E in (godot_console.exe godot.exe) do for /f "delims=" %%G in ('where %%E 2^>nul') do if not defined GODOT_CONSOLE set "GODOT_CONSOLE=%%G"
 
 if not exist "%GODOT_CONSOLE%" goto :missing_godot
@@ -61,7 +61,7 @@ exit /b %ERRORLEVEL%
 :missing_godot
 echo ERROR: Godot console executable was not found:
 echo   %GODOT_CONSOLE%
-echo Set GODOT_CONSOLE or put its full path in ignored godot.local.txt.
+echo Set GODOT_CONSOLE or put its full path in ignored .local\godot.local.txt.
 pause
 exit /b 1
 

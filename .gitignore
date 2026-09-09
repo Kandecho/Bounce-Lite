@@ -20,6 +20,7 @@ Claude outputs/
 .idea/
 .codex/
 .agents/
+/.local/
 godot.local.txt
 *.log
 *.tmp

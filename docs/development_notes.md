@@ -488,3 +488,11 @@ BasicAudio节点通过surface_resolved和wake_impulse_applied接入，Paddle仅�
 未解决：Paddle Resting Support、既有高速Paddle sweep和configure开局副作用；Ground最新音高及重复舒适度待听感确认；概念参考图权利来源待核实。未启动V0.1.5/V0.2。实际push结果与commit以Git历史和远端refs为准。
 
 补充退出证据：首次使用--fixed-fps 60加速1200帧运行虽退出0，但报告8个ObjectDB实例/3个资源退出时仍占用；随后按普通headless 1200帧并启用verbose复查，退出0且未复现该提示。音频场景测试自身包含线程清理等待；生产代码未加等待。快速进程退出时的资源清理时序保留为investigation，不能据一次复跑断言已修复。
+
+## 21. 根目录小范围整理（2026-09-09）
+
+用户授权整理、提交并推送。Phase 0计划移至docs/history/phase-0-plan.md，保留正文历史路径并添加现址说明；README入口更新。两张概念PNG与assets/concept/归档SHA-256一致，移除根目录重复文件及其未被游戏引用的Godot导入配置；归档内容不变。许可说明和资产登记更新现址。
+
+本地Godot路径配置移至忽略的.local/godot.local.txt，启动器、README及AGENTS同步；.local/.gdignore为仅本机文件，避免Godot扫描本地配置。现有Claude outputs与.godot仍为忽略的本地产物，未删除。玩法、音频和正式资产内容不变。
+
+验证范围为启动器--check、文档链接、引用/哈希核对、Godot headless import及短主场景启动；不重复全套玩法回归。提交与推送结果见Git历史。
