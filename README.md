@@ -1,81 +1,60 @@
 # Bounce Lite
 
-轻量休闲桌面数字玩具。**V0.1.3 已获用户验收；V0.1.4 Basic Audio Feedback 已形成首次远端基线。** 无 Game Over 或主题切换。
+> A video game with the tactile feel of a real toy.
 
-- Project Name：Bounce Lite；窗口标题：Bouncing Ball。
-- Godot 4.7.stable.official.5b4e0cb0f / GDScript / Compatibility。
-- Windows，960×720，4:3；非 4:3 窗口等比缩放并留边。
+Bounce Lite 是一个轻量的桌面数字玩具。移动鼠标控制挡板，接住、拨动一颗不断弹跳的球，感受碰撞、弹性与运动带来的反馈。
 
-## 已确认版本路线
+这里没有 Game Over，也没有必须坚持多久的压力。你可以连续接球，也可以看着它慢慢停下来，再拨弄一下，让它重新动起来。
 
-| 版本 | 范围 | 状态 |
-| --- | --- | --- |
-| V0.1.3 | bug fixes + frozen visual presentation implementation | 已获用户验收 |
-| V0.1.4 | basic audio feedback | 基础方向已确认；回归通过；Ground 最新音高待试听 |
-| V0.1.5 | final investigation / final experience review | 路线已确认；未启动 |
+## 核心体验
 
-当前用户指令优先于当前有效仓库文档；历史计划与审查建议不覆盖当前决定。
+Bounce Lite 希望让屏幕中的互动拥有真实玩具的触感：输入直接，反馈清楚，每次拨动都会影响接下来的运动。
 
-## 当前实现
+- **接住与弹起**：用挡板与球互动，观察不同移动方式带来的反弹。
+- **停下与唤醒**：球会逐渐失去活力、进入休息；在附近移动挡板，可以让它重新活动。
+- **看见与听见反馈**：荧光青球体、光晕与残影呈现活力和运动，简短的电子音效回应弹起与落地。
 
-- CharacterBody2D Ball、独立 Physics / Vitality、统一 Surface Response。
-- ACTIVE / DECAYING / RESTING；Ground 清零 Combo 并耗损 Vitality，不终止游戏。
-- 重力已按用户试玩结论设为 260 px/s²，改善整体纵向活动范围。
-- RESTING 后等待约 0.12 s；中心距离 200 px 内的实际 Paddle 运动触发 Wake。弱输入最多采样 50 ms，强输入立即响应；连续冲量为 (vx×0.18, −abs(vx)×0.70)。
-- Paddle 始终参与真实碰撞：让开可顺利跃起，挡住起跳路径会正常碰撞；无碰撞例外、随机冲量或必达顶板要求。
-- 弱输入只轻推并保持 RESTING；强输入增加 0.15 最大 Vitality，默认进入 DECAYING；再次在 Ground 停稳后重新开放输入；Paddle 支撑适配尚未实现。
-- Paddle Y=537，与稳定落地 Ball 保留约 3 px 间隙；Ground settle、越界异常恢复及 Ball 绘制层级已修复。
-- 荧光青 Core、连续 Vitality Glow、固定时间采样离散 Velocity Trail。
-- Paddle 有效/无效接触和强弱 Wake 的瞬时反馈，无常驻 Glow。
-- Dark panel 校准为 #171C26；仅 Combo / Timer HUD；F1 临时调参，不保存；调试面板位于独立 CanvasLayer 10，统一覆盖游戏对象。
+它追求的是随手玩一会儿的轻松感，以及“再拨一下会怎样”的好奇心。
 
-音频采用 Kenney CC0 Digital Audio / Sci-fi Sounds：Paddle pepSound3 弹起、Strong Wake 同类更强弹起、Ground 短促下沉；Weak Wake 无专门音效，Wall/Top 已接入低音量反馈。详见[当前音频基线](docs/v0.1.4-basic-audio.md)。
+## 当前状态
 
-不包含其他模式、排行榜、Paddle 分区、障碍物、正式图片/字体、正式音频系统、复杂 Shader 或粒子。
+当前为 **V0.1.4 可玩原型**，已具备核心交互、视觉反馈和基础音效，仍在打磨整体体验。当前提供 Godot 工程源码，主要面向 Windows 试玩。
 
-## 运行与验证
+详细进度与版本路线见[项目概览](docs/project_overview.md)。
 
-双击 [run-playtest.bat](run-playtest.bat) 试玩；鼠标水平控制 Paddle，F1 打开开发调参面板。弱/强 Wake 按输入冲量区分，不再使用旧的“持续快速移动 80 ms”手势。
+## 运行试玩
 
-F2/F3 分别切换 Paddle/Ground A/B，F4 显示唯一 Strong Wake 候选，F5 静音比较，F6 切换 Wall A/B。新选择在下一次真实事件播放，不保存。
+### 使用 Godot 编辑器
 
-Godot 编辑器可直接打开 project.godot。命令行/双击启动器依次读取 `GODOT_CONSOLE` 环境变量、被忽略的 `.local/godot.local.txt` 中的完整可执行路径，或 PATH 中的 godot_console.exe / godot.exe。机器路径不写入共享脚本。
+1. 准备 Godot **4.7 stable**。
+2. 下载或克隆本仓库，在 Godot 中导入根目录的 `project.godot`。
+3. 打开工程，按 **F5** 启动游戏。
 
-在仓库根目录运行（先设置本机 `GODOT_CONSOLE`）：
+游戏中左右移动鼠标控制挡板；球停下后，在附近拨动挡板尝试唤醒它。游戏内 **F5** 可切换静音，比较有声与无声的体验。
 
-~~~powershell
-$repo = (Get-Location).Path
-$godot = $env:GODOT_CONSOLE
-New-Item -ItemType Directory -Force "$repo/.godot" | Out-Null
-& $godot --headless --log-file "$repo/.godot/tests.log" --path $repo --script res://tests/test_runner.gd
-& $godot --headless --fixed-fps 60 --log-file "$repo/.godot/physics.log" --path $repo --script res://tests/test_physics_scenarios.gd
-& $godot --headless --fixed-fps 60 --log-file "$repo/.godot/audio.log" --path $repo --script res://tests/test_audio_scenarios.gd
-~~~
+### 使用 Windows 启动器
 
-本次基线回归：确定性381、物理场景803、音频场景38 checks 通过；headless import 与主场景1200帧退出0。环境仍报告根证书存储/编辑器用户配置保存错误，未出现脚本或场景错误。V0.1.3 视觉截图属于前轮证据，本轮未改视觉。
+配置好 Godot 路径后，可直接双击 [run-playtest.bat](run-playtest.bat)：
 
-## 已确认与待判断
+- 设置 `GODOT_CONSOLE` 环境变量为 Godot 可执行文件的完整路径；或
+- 创建 `.local/godot.local.txt`，在第一行填写该完整路径（不加引号）；或
+- 将名为 `godot_console.exe` 或 `godot.exe` 的程序加入 PATH。
 
-用户已验收 V0.1.3；音频加入后的改善、Paddle / Strong Wake / Wall 当前方案通过，Ground A 可用。最新 Ground 固定音高1.5尚无单独试听确认；需判断整体音区和重复播放舒适度。
+本地路径配置不会提交到 Git。开发调参与音效对比操作见[音频试玩说明](docs/v0.1.4-basic-audio.md)。
 
-Paddle Resting Support 保持 pending / investigation：当前没有统一支撑 Surface 状态，Ground settle 才会复位 Wake 消费；Paddle 支撑时的静止、移开与唤醒尚未适配。现有高速 Paddle sweep、configure 开局副作用也未扩展修复。加速 headless 退出曾报告资源仍占用，普通1200帧复查未复现，清理时序保持 investigation。没有把这些问题标记为已完成功能。
+## 技术栈
 
-V0.1.5 与 V0.2 未启动。
+使用 **Godot 4.7 / GDScript / Compatibility 渲染器**。画面以 960×720、4:3 为设计基准，窗口缩放时保持比例。球体、光晕与残影由程序绘制，基础音效使用 Kenney 素材。
 
-## License 与资产
+## 文档
 
-代码、测试、场景配置、启动器及技术文档采用 [MIT License](LICENSE)，允许第三方商业使用，也保留作者商业发行的选择。媒体资产不默认随代码采用 MIT，边界见 [ASSET_LICENSE.md](ASSET_LICENSE.md)。
+- [项目概览](docs/project_overview.md)：产品方向、版本路线与当前状态。
+- [视觉规格](docs/visual_spec.md)：视觉语言与反馈设计。
+- [基础音频](docs/v0.1.4-basic-audio.md)：声音方向、试玩操作与验证入口。
+- [开发记录](docs/development_notes.md)：实现及验证历史。
 
-Kenney 音频保留各自 CC0；三个包、全部已入库候选、原文件与裁片来源见 [THIRD_PARTY_ASSETS.md](THIRD_PARTY_ASSETS.md)。概念 PNG 是用户提供的参考，未授予再使用权，其上游权利状态待核实。
+## License / Third-party assets
 
-## 文档导航
+代码及技术文档采用 [MIT License](LICENSE)。媒体资产的许可独立说明，见 [ASSET_LICENSE.md](ASSET_LICENSE.md)。
 
-- [AGENTS.md](AGENTS.md)：治理与授权边界。
-- [项目概览](docs/project_overview.md)：产品及已确认版本路线。
-- [当前 V0.1.3 设计](docs/superpowers/specs/2026-09-09-v0.1.3-bugfix-visual-design.md)。
-- [当前 V0.1.3 实施与验证](docs/superpowers/plans/2026-09-09-v0.1.3-bugfix-visual-implementation.md)。
-- [视觉规格](docs/visual_spec.md)、[资产登记](docs/asset_registry.md)、[开发记录](docs/development_notes.md)。
-- [冻结问题及处置](docs/reviews/bounce-lite-v0.1.3-wake-impulse-frozen-issues.md)、[历史视觉审查](docs/reviews/2026-09-08-v0.1.3-visual-sync-review.md)。
-- [Phase 0](docs/history/phase-0-plan.md) 与 docs/superpowers 中 V0.1/V0.1.2 文件仅作为历史基线。
-
-概念图统一保存在 assets/concept/light_mode/day-raw.png 与 assets/concept/dark_mode/night-raw.png，内容哈希保持不变；根目录重复文件已清理。它们是参考证据，不是运行时素材。
+Kenney 音频素材采用 **CC0**；素材包、原始来源及裁片记录见 [THIRD_PARTY_ASSETS.md](THIRD_PARTY_ASSETS.md)。概念参考图不包含在 MIT 授权中。
