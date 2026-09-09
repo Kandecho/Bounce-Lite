@@ -25,7 +25,9 @@ func run(suite: RefCounted) -> void:
 	suite.expect_not_null(main.get_node_or_null("HUD"), "scene owns a HUD")
 	suite.expect_not_null(main.get_node_or_null("HUD/ComboLabel"), "HUD owns Combo text")
 	suite.expect_not_null(main.get_node_or_null("HUD/TimerLabel"), "HUD owns Timer text")
-	var tuning_panel := main.get_node_or_null("RuntimeTuningPanel")
+	var tuning_panel := main.get_node_or_null("DebugOverlay/RuntimeTuningPanel")
+	suite.expect_true(main.get_node("DebugOverlay").layer > main.get_node("HUD").layer,
+		"debug overlay draws above the whole game and HUD")
 	suite.expect_not_null(tuning_panel, "scene owns a runtime tuning panel")
 	if tuning_panel != null:
 		suite.expect_false(tuning_panel.visible, "runtime tuning panel is hidden by default")
@@ -35,4 +37,11 @@ func run(suite: RefCounted) -> void:
 	if ground != null:
 		suite.expect_true(ground.has_meta("surface_kind"),
 			"Ground carries collision classification metadata")
+	if ground != null and paddle != null and ball != null:
+		var ground_top: float = ground.position.y - ground.get_node("CollisionShape2D").shape.size.y * 0.5
+		var radius: float = ball.get_node("CollisionShape2D").shape.radius
+		var paddle_bottom: float = paddle.position.y + paddle.get_node("CollisionShape2D").shape.size.y * 0.5
+		suite.expect_true(ground_top - radius * 2.0 - paddle_bottom >= 2.9,
+			"Paddle leaves a real gap above the resting circle")
+		suite.expect_true(ball.z_index > paddle.z_index, "Ball draws above Paddle")
 	main.free()

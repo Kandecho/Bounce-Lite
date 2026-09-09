@@ -7,3 +7,6 @@
 *.wav binary
 *.ogg binary
 *.mp3 binary
+
+# Preserve upstream license files byte-for-byte, including original whitespace.
+assets/audio/*/License.txt -text -whitespace

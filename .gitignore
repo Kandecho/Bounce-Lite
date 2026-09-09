@@ -11,3 +11,18 @@ Desktop.ini
 
 # Claude desktop app output
 Claude outputs/
+
+# Local credentials, editor settings and machine-specific launch configuration
+.env
+.env.*
+!.env.example
+.vscode/
+.idea/
+.codex/
+.agents/
+godot.local.txt
+*.log
+*.tmp
+*.bak
+exports/
+build/

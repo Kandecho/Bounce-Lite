@@ -18,7 +18,7 @@ const PARAMETER_SPECS: Array[Dictionary] = [
 		"target": "max_speed",
 		"minimum": 1.0,
 		"maximum": 2000.0,
-		"step": 10.0,
+		"step": 1.0,
 	},
 	{
 		"group": "PHYSICS",

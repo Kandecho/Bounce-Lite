@@ -20,7 +20,7 @@ Bounce Lite 是一个轻量、单屏、低认知负担的桌面休息游戏，�
 
 - 单一主要对象：Ball；
 - 单一直接控制对象：Paddle；
-- 视觉重点：柔和背景、克制的窗口层级、清晰的球体、发光挡板和简洁 Timer；
+- 视觉重点：克制的背景、青色 Ball、Vitality Glow、离散 Velocity Trail、瞬时 Paddle 输入反馈和简洁 Timer；
 - 情绪目标：轻松、安静、柔和、短时可进入；
 - 反馈原则：运动反馈应明确，但不以大量粒子或强烈闪烁制造负担；
 - 主题原则：Light 与 Dark 是视觉主题，Idle 与 Moving 是运动状态，两个维度独立。
@@ -103,7 +103,7 @@ Phase 0 不创建 Godot 工程，不实现游戏内容。
 
 不存在 Game Over，不实现其他模式、正式素材、正式音频、主题系统或精修视觉。当前技术边界见 `docs/superpowers/specs/2026-09-08-v0.1.2-vitality-physics-separation-design.md`。
 
-### V0.1.3 - Resting Wake Impulse
+### V0.1.3 - Bug Fixes & Frozen Visual Presentation
 
 用户已于 `2026-09-08` 批准本轮改动。V0.1.3 保留既有状态体系：低 Vitality、低速度但尚未停稳的球继续使用 `DECAYING` 和正常 Physics Loop；只有低 Vitality 且 Ground 响应允许稳定时才进入 `RESTING`。
 
@@ -111,9 +111,17 @@ Phase 0 不创建 Godot 工程，不实现游戏内容。
 
 V0.1.3 的关键 Wake 参数已集中到 `PrototypeTuning`，并接入 F1 运行时调参面板；不保存调参结果。
 
-### 后续阶段
+2026-09-09 用户已明确批准 V0.1.3 包含 bug fixes 与冻结视觉实现。当前已修复 Paddle/Resting Ball 重叠、Ground settle、越界恢复及绘制层级，并实现青色 Core、连续 Glow、离散 Trail、Paddle 瞬时反馈及 Dark token 校准。机器验证完成，V0.1.3已通过用户整体验收，包括Rest/Wake修复。重力已确认改为 260 px/s²，Wake 中心范围 200 px，弱输入采样 50 ms、强输入立即响应，竖直系数 0.70。Paddle 始终参与真实碰撞，无随机冲量，不要求 Wake 到达顶板。当前完整契约见 [V0.1.3 spec](superpowers/specs/2026-09-09-v0.1.3-bugfix-visual-design.md)。
 
-音频、完善动效、主题切换、更多平台与发布流程均需在 V0.1 之后单独规划。不得从当前概念图自动推导这些功能已经获批。
+### V0.1.4 - Basic Audio Feedback
+
+版本范围已确认：基础音频反馈。已接入并形成 V0.1.4 baseline，当前候选与人工确认边界见文末状态及音频记录。
+
+### V0.1.5 - Final Investigation / Final Experience Review
+
+版本范围已由用户于 2026-09-09 确认：最终调查与整体体验复核。未启动；具体发现不提前转为 V0.1.3 功能扩展。
+
+其他模式、主题切换、更多平台和发布流程仍需另行授权。
 
 ## 7. 技术路线摘要
 
@@ -156,7 +164,7 @@ Renderer、平台、分辨率和缩放方式已写入工程基线。变更这些
 - 开源字体优先 `Inter`、`Noto Sans`，正式发布前复核授权；
 - V0.1 不实现 Light/Dark 主题切换，只保留两套设计规格；
 - Light 版本文字与 Footer 的颜色按可读性目标加深；
-- Glow / Trail 等效果的实现路线在开发阶段通过技术验证确定。
+- V0.1.3 Glow / Trail 已采用运行时径向渐变贴图；不需要 Shader 或正式位图。
 
 ## 10. Phase 0 成功条件
 
@@ -175,3 +183,9 @@ Phase 0 完成不等于 V0.1 自动开始。最终流程为：
 > 概念图 → 生产规格 → Phase 0 报告 → 用户确认 → 正式制作
 
 该确认门已于 `2026-09-08` 通过；V0.1、V0.1.1、V0.1.2 与获批的 V0.1.3 核心实现均已进入机器验证流程。每次机器验证只证明确定性规则和工程可运行，不能替代人工体验验收。
+
+当前以用户最新授权为准：用户已验收V0.1.3。V0.1.4已确认以最小音频验证电子玩具感：Paddle pepSound3弹起、Strong Wake同类更有能量、Weak Wake无专门音效、Ground forceField短片下沉，Wall/Top已接入。Paddle/Strong Wake/Wall通过，Ground A可用；最新固定音高1.5待单独试听。确定性381、物理场景803、音频场景38 checks通过。Paddle Resting Support仅为pending设计问题，未实现；V0.1.5未启动。见 [音频基线](v0.1.4-basic-audio.md)。
+
+## V0.1.4 当前状态（2026-09-09）
+
+用户已验收V0.1.3。V0.1.4已确认以最小音频验证电子玩具感：Paddle pepSound3弹起、Strong Wake同类更有能量、Weak Wake无专门音效、Ground forceField短片下沉，Wall/Top已接入。Paddle/Strong Wake/Wall通过，Ground A可用；最新固定音高1.5待单独试听。确定性381、物理场景803、音频场景38 checks通过。Paddle Resting Support仅为pending设计问题，未实现；V0.1.5未启动。

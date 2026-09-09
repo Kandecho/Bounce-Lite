@@ -12,7 +12,7 @@ run/main_scene="res://scenes/main.tscn"
 [bounce_lite]
 
 ui_title="Bouncing Ball"
-phase="v0.1.2-vitality-physics-separation"
+phase="v0.1.4-basic-audio-feedback"
 target_platform="Windows"
 
 [display]

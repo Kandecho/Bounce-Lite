@@ -17,7 +17,7 @@ func run(suite: RefCounted) -> void:
 
 	var tuning: Resource = tuning_script.new()
 	var paddle: CharacterBody2D = paddle_script.new()
-	paddle.configure(tuning, 171.0, 790.0, 529.0)
+	paddle.configure(tuning, 171.0, 790.0, 537.0)
 	var motion_samples: Array = []
 	var has_motion_signal := paddle.has_signal("motion_sampled")
 	suite.expect_true(has_motion_signal,
@@ -27,12 +27,12 @@ func run(suite: RefCounted) -> void:
 			motion_samples.append([sample_velocity, sample_position])
 		)
 
-	paddle.position = Vector2(480.0, 529.0)
+	paddle.position = Vector2(480.0, 537.0)
 	paddle.set_target_x(1000.0)
 	paddle.advance_motion(1.0)
 	suite.expect_true(paddle.position.x <= 715.001,
 		"Paddle center stays inside the right boundary")
-	suite.expect_float(paddle.position.y, 529.0, 0.001,
+	suite.expect_float(paddle.position.y, 537.0, 0.001,
 		"Paddle does not move vertically")
 	suite.expect_true(paddle.velocity.x > 0.0,
 		"Paddle velocity reflects actual horizontal movement")

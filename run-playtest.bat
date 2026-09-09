@@ -2,10 +2,13 @@
 setlocal
 
 for %%I in ("%~dp0.") do set "PROJECT_DIR=%%~fI"
-set "GODOT_CONSOLE=D:\Apps\Godot_v4.7-stable_win64\Godot_v4.7-stable_win64_console.exe"
+rem Prefer an explicit environment variable, then ignored local config, then PATH.
+if not defined GODOT_CONSOLE if exist "%PROJECT_DIR%\godot.local.txt" set /p GODOT_CONSOLE=<"%PROJECT_DIR%\godot.local.txt"
+if not defined GODOT_CONSOLE for %%E in (godot_console.exe godot.exe) do for /f "delims=" %%G in ('where %%E 2^>nul') do if not defined GODOT_CONSOLE set "GODOT_CONSOLE=%%G"
 
 if not exist "%GODOT_CONSOLE%" goto :missing_godot
 if not exist "%PROJECT_DIR%\project.godot" goto :missing_project
+if not exist "%PROJECT_DIR%\.godot" mkdir "%PROJECT_DIR%\.godot"
 
 if "%~1"=="" goto :play
 if /I "%~1"=="--editor" goto :editor
@@ -18,7 +21,7 @@ pushd "%PROJECT_DIR%"
 echo Starting Bounce Lite from:
 echo   %PROJECT_DIR%
 echo.
-"%GODOT_CONSOLE%" --path "%PROJECT_DIR%"
+"%GODOT_CONSOLE%" --log-file "%PROJECT_DIR%\.godot\playtest.log" --path "%PROJECT_DIR%"
 set "RESULT=%ERRORLEVEL%"
 popd
 echo.
@@ -28,7 +31,7 @@ exit /b %RESULT%
 
 :editor
 pushd "%PROJECT_DIR%"
-"%GODOT_CONSOLE%" --editor --path "%PROJECT_DIR%"
+"%GODOT_CONSOLE%" --log-file "%PROJECT_DIR%\.godot\editor.log" --editor --path "%PROJECT_DIR%"
 set "RESULT=%ERRORLEVEL%"
 popd
 echo.
@@ -38,7 +41,7 @@ exit /b %RESULT%
 
 :test
 pushd "%PROJECT_DIR%"
-"%GODOT_CONSOLE%" --headless --path "%PROJECT_DIR%" --script res://tests/test_runner.gd
+"%GODOT_CONSOLE%" --headless --log-file "%PROJECT_DIR%\.godot\tests.log" --path "%PROJECT_DIR%" --script res://tests/test_runner.gd
 set "RESULT=%ERRORLEVEL%"
 popd
 echo.
@@ -58,6 +61,7 @@ exit /b %ERRORLEVEL%
 :missing_godot
 echo ERROR: Godot console executable was not found:
 echo   %GODOT_CONSOLE%
+echo Set GODOT_CONSOLE or put its full path in ignored godot.local.txt.
 pause
 exit /b 1
 

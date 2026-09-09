@@ -1,120 +1,99 @@
 extends RefCounted
 
-const TUNING_PATH := "res://scripts/config/prototype_tuning.gd"
-const VITALITY_PATH := "res://scripts/ball/ball_vitality_model.gd"
-const RESPONSE_PATH := "res://scripts/physics/surface_response_model.gd"
-const VISUALS_PATH := "res://scripts/ball/ball_visuals.gd"
+const Visuals = preload("res://scripts/ball/ball_visuals.gd")
+const Paddle = preload("res://scripts/paddle/paddle_controller.gd")
+const Tuning = preload("res://scripts/config/prototype_tuning.gd")
+const Vitality = preload("res://scripts/ball/ball_vitality_model.gd")
+const Response = preload("res://scripts/physics/surface_response_model.gd")
 
 
 func run(suite: RefCounted) -> void:
-	var tuning_script: Script = load(TUNING_PATH)
-	var vitality_script: Script = load(VITALITY_PATH)
-	var response_script: Script = load(RESPONSE_PATH)
-	var visuals_script: Script = load(VISUALS_PATH)
-	suite.expect_not_null(visuals_script, "BallVisuals exists")
-	if (
-		tuning_script == null
-		or vitality_script == null
-		or response_script == null
-		or visuals_script == null
-	):
-		return
-	suite.expect_true(visuals_script.can_instantiate(), "BallVisuals parses")
-	if not visuals_script.can_instantiate():
-		return
-
-	var visuals: Node2D = visuals_script.new()
-	visuals.configure(tuning_script.new())
-	suite.expect_true(visuals.has_method("set_motion"),
-		"BallVisuals accepts a Velocity snapshot for Trail")
-	suite.expect_true(visuals.has_method("set_vitality"),
-		"BallVisuals accepts a Vitality snapshot for Glow")
-	suite.expect_true(visuals.has_method("play_collision_feedback"),
-		"BallVisuals accepts collision feedback events")
-	suite.expect_true(visuals.has_method("play_wake_feedback"),
-		"BallVisuals accepts Wake feedback events")
-	suite.expect_true(visuals.has_method("advance_feedback"),
-		"BallVisuals exposes deterministic feedback progression")
-	suite.expect_true(visuals.has_method("_trail_width_scale"),
-		"BallVisuals exposes deterministic Velocity-only Trail width mapping")
-	suite.expect_true(visuals.has_method("_glow_radius_scale"),
-		"BallVisuals exposes deterministic Vitality-only Glow range mapping")
-	if (
-		not visuals.has_method("set_motion")
-		or not visuals.has_method("set_vitality")
-		or not visuals.has_method("play_collision_feedback")
-		or not visuals.has_method("play_wake_feedback")
-		or not visuals.has_method("advance_feedback")
-		or not visuals.has_method("_trail_width_scale")
-		or not visuals.has_method("_glow_radius_scale")
-	):
+	var visuals: Node2D = Visuals.new()
+	visuals.configure(Tuning.new())
+	suite.expect_true(visuals.has_method("glow_peak"), "frozen visuals expose Vitality glow")
+	suite.expect_true(visuals.has_method("advance_motion_history"), "Trail samples elapsed motion time")
+	if not visuals.has_method("glow_peak") or not visuals.has_method("advance_motion_history"):
 		visuals.free()
 		return
-
-	visuals.set_vitality(1.0, vitality_script.ActivityState.ACTIVE)
-	visuals.set_motion(Vector2(520.0, 0.0))
-	for index in range(30):
-		visuals.record_ball_position(Vector2(index * 10.0, 0.0))
-	var fast_trail_size: int = visuals.trail_points.size()
-	var fast_trail_capacity: int = visuals._trail_capacity()
-	var fast_trail_width: float = visuals._trail_width_scale()
-	var high_vitality_glow_radius: float = visuals._glow_radius_scale()
-	suite.expect_equal(fast_trail_size, 16,
-		"fast motion keeps the full light-trail history")
-
-	visuals.set_vitality(0.20, vitality_script.ActivityState.DECAYING)
-	suite.expect_equal(visuals.trail_points.size(), fast_trail_size,
-		"changing Vitality at equal Velocity does not alter Trail")
-	suite.expect_equal(visuals._trail_capacity(), fast_trail_capacity,
-		"Trail capacity is mathematically independent of Vitality")
-	suite.expect_float(visuals._trail_width_scale(), fast_trail_width, 0.0001,
-		"Trail width is independent of Vitality")
-	var low_vitality_glow_radius: float = visuals._glow_radius_scale()
-	suite.expect_true(low_vitality_glow_radius < high_vitality_glow_radius,
-		"lower Vitality reduces Glow range")
-	suite.expect_float(visuals.vitality_ratio, 0.20, 0.0001,
-		"Glow state receives low Vitality independently")
-
-	visuals.set_motion(Vector2(130.0, 0.0))
-	suite.expect_true(visuals.trail_points.size() < fast_trail_size,
-		"slower Velocity shortens Trail at equal Vitality")
-	var slow_trail_size: int = visuals.trail_points.size()
-	suite.expect_true(visuals._trail_width_scale() < fast_trail_width,
-		"slower Velocity narrows Trail")
-	suite.expect_float(visuals._glow_radius_scale(), low_vitality_glow_radius, 0.0001,
-		"changing Velocity does not alter Glow range")
-	visuals.set_vitality(1.0, vitality_script.ActivityState.ACTIVE)
-	suite.expect_equal(visuals.trail_points.size(), slow_trail_size,
-		"raising Vitality still does not extend a slow Trail")
-
-	visuals.set_motion(Vector2.ZERO)
-	suite.expect_equal(visuals.trail_points.size(), 0,
-		"zero Velocity clears the motion trail")
-	visuals.record_ball_position(Vector2(999.0, 0.0))
-	suite.expect_equal(visuals.trail_points.size(), 0,
-		"zero Velocity cannot record new Trail samples")
-
-	visuals.play_collision_feedback(response_script.SurfaceKind.PADDLE, Vector2.UP)
-	var paddle_glow: float = visuals.glow_pulse
-	suite.expect_true(visuals.deformation.y < 1.0 and visuals.deformation.x > 1.0,
-		"Paddle hit squashes vertically before release")
-	suite.expect_true(paddle_glow > 0.0, "Paddle hit boosts Glow")
-
-	visuals.play_collision_feedback(response_script.SurfaceKind.WALL, Vector2.LEFT)
-	suite.expect_true(visuals.deformation.x < 1.0,
-		"Wall hit gives weak compression along the collision normal")
-	suite.expect_true(visuals.glow_pulse < paddle_glow,
-		"Wall feedback is weaker than Paddle feedback")
-
-	visuals.play_collision_feedback(response_script.SurfaceKind.GROUND, Vector2.UP)
-	suite.expect_true(visuals.darken_pulse > 0.0,
-		"Ground hit briefly darkens the Ball")
+	visuals.set_vitality(1.0, Vitality.ActivityState.ACTIVE)
+	visuals.set_motion(Vector2(520, 0))
+	suite.expect_equal(visuals.core_color().to_html(false), "6be9ff", "full Vitality uses cyan Core")
+	suite.expect_float(visuals.glow_peak(), 0.85, 0.0001, "full Vitality Glow peak")
+	var peak: float = visuals.glow_peak()
+	var color: Color = visuals.core_color()
+	visuals.set_motion(Vector2(130, 0))
+	suite.expect_float(visuals.glow_peak(), peak, 0.0001, "Velocity cannot change Glow intensity")
+	suite.expect_equal(visuals.core_color(), color, "Velocity cannot change Core color")
+	visuals.play_collision_feedback(Response.SurfaceKind.PADDLE, Vector2.UP)
+	suite.expect_float(visuals.glow_peak(), peak, 0.0001, "collision decoration cannot boost Glow")
 	visuals.play_wake_feedback()
-	suite.expect_true(visuals.glow_pulse > paddle_glow,
-		"Wake produces the strongest light pulse")
-	visuals.advance_feedback(1.0)
-	suite.expect_float(visuals.deformation.x, 1.0, 0.001,
-		"collision deformation releases back to the round Core")
-	suite.expect_true(visuals.glow_pulse < 0.001 and visuals.darken_pulse < 0.001,
-		"temporary light feedback decays")
+	suite.expect_float(visuals.glow_peak(), peak, 0.0001, "Wake decoration cannot boost Glow")
+	suite.expect_true(visuals.deformation.x < 1.0, "Wake retains optional geometric feedback")
+	visuals.set_vitality(0.4, Vitality.ActivityState.DECAYING)
+	suite.expect_float(visuals.glow_peak(), 0.49, 0.0001, "Glow continuously maps Vitality")
+	suite.expect_equal(visuals.core_color().to_html(false), "569aa6", "mid Vitality frozen Core color")
+	visuals.set_vitality(0.04, Vitality.ActivityState.RESTING)
+	var rest_color: Color = visuals.core_color()
+	suite.expect_float(visuals.glow_peak(), 0.25, 0.0001, "RESTING has constant Glow floor")
+	visuals.set_vitality(0.0, Vitality.ActivityState.RESTING)
+	suite.expect_float(visuals.glow_peak(), 0.25, 0.0001, "zero Vitality cannot extinguish RESTING Glow")
+	suite.expect_equal(visuals.core_color(), rest_color, "RESTING Core remains legible at zero Vitality")
+	suite.expect_float(visuals.glow_alpha_at_radius(1.75), 0.0, 0.00001, "Glow ends at 1.75 radii")
+	suite.expect_float(visuals.glow_alpha_at_radius(1.0), 0.25, 0.00001, "Glow peaks at circle edge")
+	suite.expect_true(visuals.glow_alpha_at_radius(1.2) > visuals.glow_alpha_at_radius(1.4),
+		"Glow decreases continuously outside Core")
+	for frame_rate in [30, 60, 120]:
+		visuals.clear_motion_history()
+		visuals.set_motion(Vector2(520, 0))
+		visuals.advance_motion_history(Vector2.ZERO, 0.0)
+		for frame in range(frame_rate):
+			visuals.advance_motion_history(Vector2(520.0 * (frame + 1) / frame_rate, 0), 1.0 / frame_rate)
+		suite.expect_equal(visuals.trail_points.size(), 11, "fixed-time samples are frame-rate independent")
+		suite.expect_equal(visuals.trail_ghosts().size(), 4, "fast motion displays four discrete ghosts")
+		var ghosts: Array = visuals.trail_ghosts()
+		suite.expect_float(ghosts[0].x, 520.0 - 44.2, 0.02, "ghost spacing encodes actual speed")
+	var fast_ghosts: Array = visuals.trail_ghosts()
+	var trail_color: Color = visuals.trail_color()
+	visuals.set_vitality(1.0, Vitality.ActivityState.ACTIVE)
+	suite.expect_equal(visuals.trail_ghosts(), fast_ghosts, "Vitality cannot change ghost positions")
+	suite.expect_equal(visuals.trail_color(), trail_color, "Trail always uses full Vitality Glow color")
+	visuals.set_motion(Vector2(160, 0))
+	suite.expect_equal(visuals.trail_ghosts().size(), 1, "160 px/s displays one ghost")
+	suite.expect_float(visuals.trail_spacing(), 18.0, 0.001, "slow Trail maintains 18 px minimum spacing")
+	visuals.set_motion(Vector2.ZERO)
+	suite.expect_equal(visuals.trail_points.size(), 0, "stopping clears stale motion history")
+	suite.expect_equal(visuals.trail_ghosts().size(), 0, "zero Velocity displays no Trail")
 	visuals.free()
+	_test_paddle_feedback(suite)
+
+
+func _test_paddle_feedback(suite: RefCounted) -> void:
+	var paddle: CharacterBody2D = Paddle.new()
+	paddle.configure(Tuning.new(), 175, 786, 537)
+	suite.expect_true(paddle.has_method("play_collision_feedback"), "Paddle accepts contact feedback")
+	if not paddle.has_method("play_collision_feedback"):
+		paddle.free()
+		return
+	suite.expect_equal(paddle.feedback_color().to_html(false), "45786e", "Paddle idle uses frozen token")
+	paddle.play_collision_feedback(true, Vector2(480, 528))
+	suite.expect_float(paddle.feedback_strength(), 1.0, 0.0001, "valid contact flashes at full intensity")
+	paddle.advance_feedback(0.14)
+	suite.expect_true(paddle.feedback_strength() <= 0.08, "feedback is near baseline after 140 ms")
+	paddle.advance_feedback(0.12)
+	suite.expect_float(paddle.feedback_strength(), 0.0, 0.00001, "contact never leaves a persistent layer")
+	suite.expect_equal(paddle.feedback_color().to_html(false), "45786e", "Paddle returns exactly to idle")
+	paddle.play_collision_feedback(false, Vector2.ZERO)
+	suite.expect_float(paddle.feedback_strength(), 0.28, 0.0001, "invalid contact is weaker")
+	paddle.play_wake_feedback(90, 180, false, Vector2.ZERO)
+	var weak: float = paddle.feedback_strength()
+	suite.expect_float(weak, 0.30, 0.0001, "weak Wake feedback continuously maps impulse")
+	paddle.play_wake_feedback(179, 180, false, Vector2.ZERO)
+	suite.expect_true(paddle.feedback_strength() > weak and paddle.feedback_strength() < 0.45,
+		"weak Wake feedback rises toward activation threshold")
+	paddle.play_wake_feedback(180, 180, true, Vector2.ZERO)
+	suite.expect_float(paddle.feedback_strength(), 0.85, 0.0001, "strong Wake has a visible threshold jump")
+	paddle.advance_feedback(0.14)
+	suite.expect_true(paddle.feedback_strength() < 0.08, "strong Wake also returns near baseline in 140 ms")
+	paddle.advance_feedback(0.13)
+	suite.expect_float(paddle.feedback_strength(), 0.0, 0.0001, "strong Wake fully clears")
+	paddle.free()

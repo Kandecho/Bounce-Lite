@@ -1,3 +1,5 @@
+> 2026-09-09 处置更新：用户已授权并完成 V0.1.3 修复及冻结视觉实现。以下正文保留原始问题证据与当时候选，不再表示全部“未实施”。Paddle Y=537、Ground settle、safe bounds、Ball z_index 已落实并通过确定性/场景验证；Paddle sweep 仍未实施。手感与最终效果待用户试玩。当前契约见 docs/superpowers/specs/2026-09-09-v0.1.3-bugfix-visual-design.md。
+
 # Bounce Lite V0.1.3 Wake Impulse 待处理记录
 
 ## 记录状态
@@ -169,4 +171,3 @@ Wake Impulse 当前口径保持：
 ## 八、冻结结论
 
 当前 V0.1.3 Wake Impulse 不继续扩展。优先问题是恢复合理的默认空间关系、稳定 RESTING 落地姿态，并为 Ball 建立不可恢复越界的最终保护。Paddle sweep 作为已知后续风险登记，暂不实施。
-

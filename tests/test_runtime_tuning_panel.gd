@@ -21,6 +21,8 @@ func run(suite: RefCounted) -> void:
 	var tuning: Resource = tuning_script.new()
 	var panel: Control = panel_script.new()
 	panel.configure(tuning)
+	suite.expect_float(panel._controls["max_speed"].value, tuning.max_speed, 0.001,
+		"panel displays the actual speed cap without step rounding")
 
 	suite.expect_false(panel.visible, "runtime tuning panel starts hidden")
 	suite.expect_true(panel.has_parameter("gravity_acceleration"),

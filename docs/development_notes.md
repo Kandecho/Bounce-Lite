@@ -4,7 +4,7 @@
 
 本文件记录 Phase 0、V0.1 项目初始化与 Endless 核心原型实现的环境证据、决策、偏差、风险和待确认事项。未来候选方案不视为已经授权。
 
-记录日期：`2026-09-08`
+记录日期：`2026-09-08`；最近实现同步：`2026-09-09`。历史章节保留当时状态，当前结论见 §17。
 
 时区：`Asia/Shanghai`
 
@@ -16,7 +16,7 @@
 | 初始文件 | `AGENTS.md`、`phase-0-plan.md`、`day-raw.png`、`night-raw.png` |
 | Git | 本地仓库；`main` 分支；不设置远端 |
 | Git 操作 | 用户已批准 `git init`；不创建 worktree、不推送 |
-| 项目状态 | V0.1.3 Resting Wake Impulse 实现与机器验证已完成；等待人工试玩 |
+| 项目状态 | V0.1.3 Bug Fixes & Frozen Visual Presentation 已实现并机器验证；等待人工试玩 |
 
 ## 3. Engine 与辅助环境证据
 
@@ -437,3 +437,54 @@ Phase 0 结束时的结果（历史快照）：
 5. Wake 后进入 `DECAYING` 是否能自然衔接下一次有效接球。
 
 以上项目均为 `待确认`；F1 调参面板中的 `RESTING WAKE` 分组仅用于运行时校准，不代表参数已经定稿。
+
+## 17. V0.1.3 Bug Fixes & Frozen Visual Presentation（2026-09-09）
+
+用户当前指令明确版本分工：V0.1.3 修复 + 冻结视觉实现；V0.1.4 基础音频；V0.1.5 最终调查 / 最终体验复核。旧文档缺少版本路线是同步缺口，不是规划未确认。
+
+本次从 main / dbf369a 的干净工作区开始，无子 Agent、worktree、依赖安装、Git 远端或正式素材。实现文件与可复现命令见 [实施记录](superpowers/plans/2026-09-09-v0.1.3-bugfix-visual-implementation.md)。
+
+- 几何：Paddle Y=537；Main 从场景实际碰撞面推导边界；Ball z_index=1。
+- 物理修复：弱 Wake 落地收敛到 y=564.92；异常越界恢复最近安全位置、移除外向速度，低 Vitality 地面逃逸回到稳定 RESTING。正常运动不依赖兜底。
+- 视觉：统一 token、青色 Core、连续径向 Glow、离散时间采样 Trail、Paddle 瞬时反馈、Dark panel 校准。
+- 通道：移除 Ball 独立亮暗事件脉冲，保留几何装饰；未迁移 Rules 职责。
+- 验证：235 基线 → bug fixes 274 / 场景738 → 最终确定性289 / 场景749；headless import、主场景1200帧退出0；Compatibility 三态基准及640×480至1440×1080四档渲染截图保存并检查。
+- 环境：默认用户日志路径曾触发 Godot 崩溃，改用仓库 .godot 日志恢复；根证书存储警告及 editor settings 无法保存提示仍存在，无网络任务，不修改系统；import 注册与解析完成。
+- 待确认：Rest/Wake 手感、底角压力下感受、离散 Trail 舒适度、零 Vitality 可见性、Paddle 反馈短促性；确认人用户。
+- 未解决：高速 Paddle sweep 仍未实施；configure() 开局副作用保持原状。它们不自动触发本轮范围扩展。
+
+当前停止点为 V0.1.3 人工试玩。未启动 V0.1.4 音频或 V0.1.5 最终体验复核。
+
+## 18. 用户试玩反馈后的 Wake 修复（2026-09-09）
+
+已确认：球视觉表现与边缘稳定度通过；重力260为用户实际试玩决定，改善整体纵向活动范围。Rest/Wake旧体验未通过：范围过近、弱输入抢先消费、球撞挡板下沿。
+
+本轮采用200 px中心范围、50 ms弱样本峰值采样、强输入立即提交、竖直系数0.70，保留0.12 s Rest、连续强度与0.15 Vitality恢复。所有Paddle碰撞保留，下沿阻挡属于物理结果；无collision exception、随机变化或必达顶板验收。独立DebugOverlay解决Ball覆盖调参面板；修正面板将速度上限520显示为521的步进取整问题。
+
+确定性325 / 真实场景803通过，含30/60/120 Hz左右划动、让开/未让开、落稳再唤醒；import、1200帧退出0，覆盖层截图检查通过。详见当前实施记录。Rest/Wake手感待用户复测，既有Paddle sweep与configure开局副作用未扩展修复；V0.1.4未启动。
+
+## 19. V0.1.4 Basic Audio Feedback（2026-09-09）
+
+用户已验收V0.1.3并授权最小音频反馈。调查Kenney Audio官方分类、Impact/Digital/Interface素材页；仅下载Impact Sounds原包并提取6个候选（每事件2个），CC0原许可及来源/哈希归档，无后期处理。
+
+BasicAudio节点通过surface_resolved和wake_impulse_applied接入，Paddle仅有效碰撞、Ground过滤微小法向运动、Wake仅提交时发声。三个单voice播放器、事件间隔与40 ms跨事件抑制避免密集堆叠；F2–F4切换、F5静音，4秒显示文件名，全部临时。
+
+确定性358、物理场景803、音频场景24通过，import/1200帧与6候选非headless播放正常。快速测试给予100 ms音频线程退出清理时间，避免测试过快退出的资源警告；生产不等待。既有环境根证书/用户编辑器配置提示未变。详情[V0.1.4记录](v0.1.4-basic-audio.md)。
+
+无已知阻塞接入问题；音量、尾音、重复舒适度与玩具感待用户实机判断。未启动V0.1.5或V0.2。
+
+## 20. 首次远端 checkpoint / V0.1.4 baseline（2026-09-09）
+
+本段替代§18–19的当前状态判断，保留其当时执行记录。用户已验收V0.1.3。V0.1.4已确认以最小音频验证电子玩具感：Paddle pepSound3弹起、Strong Wake同类更有能量、Weak Wake无专门音效、Ground forceField短片下沉，Wall/Top已接入。Paddle/Strong Wake/Wall通过，Ground A可用；最新固定音高1.5待单独试听。确定性381、物理场景803、音频场景38 checks通过。Paddle Resting Support仅为pending设计问题，未实现；V0.1.5未启动。
+
+同步README、治理入口、项目概览、音频记录、资产登记、V0.1.3规格/实施记录。新增LICENSE（代码及技术文档MIT）、ASSET_LICENSE.md（媒体排除与权利边界）、THIRD_PARTY_ASSETS.md（3个Kenney包、17原始OGG及4试听裁片、原许可与来源）。概念PNG上游权利尚未建立，不授予再使用权；原文件和归档副本保持不变。
+
+首次远端目标为https://github.com/Kandecho/Bounce-Lite.git；保留main原25个提交，不squash或重写，仅将本轮已授权工作追加为baseline提交。审查当前文件及待推送历史，未发现常见凭据模式或明显不应公开的大文件；最大历史资源约1.2 MB。只推main，不推本地Codex快照引用。新增忽略规则覆盖IDE私有配置、环境文件、本地路径配置、日志和临时输出；Godot导入配置及UID保留，.godot缓存和ZIP不提交。
+
+启动器移除硬编码机器路径，支持GODOT_CONSOLE、忽略的godot.local.txt及PATH；日志显式落到.gitignore覆盖的.godot。共享运行说明已改为可移植方式，历史环境证据中的旧绝对路径保留。
+
+本次基线验证：test_runner 381、physics_scenarios 803、audio_scenarios 38全部通过；headless import与主场景1200帧退出0，启动器--check通过。存在既有根证书存储及编辑器用户配置保存提示，无脚本/场景错误。没有新增玩法/音频行为修改；完整视觉截图未重跑。
+
+未解决：Paddle Resting Support、既有高速Paddle sweep和configure开局副作用；Ground最新音高及重复舒适度待听感确认；概念参考图权利来源待核实。未启动V0.1.5/V0.2。实际push结果与commit以Git历史和远端refs为准。
+
+补充退出证据：首次使用--fixed-fps 60加速1200帧运行虽退出0，但报告8个ObjectDB实例/3个资源退出时仍占用；随后按普通headless 1200帧并启用verbose复查，退出0且未复现该提示。音频场景测试自身包含线程清理等待；生产代码未加等待。快速进程退出时的资源清理时序保留为investigation，不能据一次复跑断言已修复。

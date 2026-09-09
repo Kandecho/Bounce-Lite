@@ -57,7 +57,7 @@ func run(suite: RefCounted) -> void:
 	ball.velocity = Vector2.RIGHT * 360.0
 	ball.advance_air_motion(0.1)
 	var full_vitality_gravity_delta := ball.velocity.y
-	suite.expect_float(full_vitality_gravity_delta, 52.0, 0.01,
+	suite.expect_float(full_vitality_gravity_delta, 26.0, 0.01,
 		"fixed gravity adds vertical speed in the air")
 	ball.vitality_model.set_vitality(0.25)
 	ball.velocity = Vector2.RIGHT * 360.0
@@ -154,7 +154,7 @@ func run(suite: RefCounted) -> void:
 	var resting_vitality: float = ball.vitality_model.current_vitality
 	ball.advance_resting_time(0.10)
 	suite.expect_false(ball.apply_resting_wake_impulse(
-		Vector2(500.0, 0.0), Vector2(480.0, 550.0)),
+		Vector2(500.0, 0.0), Vector2(480.0, 537.0)),
 		"strong Paddle input is rejected during the Rest window")
 	suite.expect_float(ball.velocity.length(), 0.0, 0.0001,
 		"Rest-window input cannot move the Ball")
@@ -163,27 +163,28 @@ func run(suite: RefCounted) -> void:
 
 	ball.advance_resting_time(0.02)
 	suite.expect_false(ball.apply_resting_wake_impulse(
-		Vector2(500.0, 0.0), Vector2(600.0, 550.0)),
+		Vector2(500.0, 0.0), Vector2(681.0, 537.0)),
 		"Paddle input outside the horizontal action window is rejected")
 	suite.expect_float(ball.velocity.length(), 0.0, 0.0001,
 		"out-of-range Paddle input cannot move the Ball")
 
 	suite.expect_false(ball.apply_resting_wake_impulse(
-		Vector2(100.0, 0.0), Vector2(480.0, 550.0)),
+		Vector2(100.0, 0.0), Vector2(480.0, 537.0)),
 		"light Paddle input does not exit RESTING")
+	ball.advance_resting_time(0.05)
 	suite.expect_equal(ball.vitality_model.state, vitality_script.ActivityState.RESTING,
 		"light Wake Impulse preserves the RESTING state")
 	suite.expect_float(ball.velocity.x, 18.0, 0.001,
 		"light Wake Impulse inherits a small horizontal component")
-	suite.expect_float(ball.velocity.y, -45.0, 0.001,
+	suite.expect_float(ball.velocity.y, -70.0, 0.001,
 		"light Wake Impulse is primarily upward")
 	suite.expect_float(ball.vitality_model.current_vitality, resting_vitality, 0.0001,
 		"light Wake Impulse does not restore Vitality")
 	ball.advance_air_motion(0.01)
-	suite.expect_float(ball.velocity.y, -39.8, 0.001,
+	suite.expect_float(ball.velocity.y, -67.4, 0.001,
 		"a weakly nudged RESTING Ball can temporarily run Physics")
 	var first_impulse_velocity := ball.velocity
-	ball.apply_resting_wake_impulse(Vector2(100.0, 0.0), Vector2(480.0, 550.0))
+	ball.apply_resting_wake_impulse(Vector2(100.0, 0.0), Vector2(480.0, 537.0))
 	suite.expect_float(ball.velocity.x, first_impulse_velocity.x, 0.0001,
 		"one continuous input cannot stack repeated horizontal Wake impulses")
 	suite.expect_float(ball.velocity.y, first_impulse_velocity.y, 0.0001,
@@ -201,13 +202,13 @@ func run(suite: RefCounted) -> void:
 	var vitality_before_strong_wake: float = ball.vitality_model.current_vitality
 	ball.advance_resting_time(0.12)
 	suite.expect_true(ball.apply_resting_wake_impulse(
-		Vector2(-500.0, 0.0), Vector2(480.0, 550.0)),
+		Vector2(-500.0, 0.0), Vector2(480.0, 537.0)),
 		"strong in-range Paddle input exits RESTING after the Rest window")
 	suite.expect_equal(ball.vitality_model.state, vitality_script.ActivityState.DECAYING,
 		"strong Wake returns to the normal loop through DECAYING")
 	suite.expect_float(ball.velocity.x, -90.0, 0.001,
 		"strong Wake inherits Paddle direction without aiming at the Ball")
-	suite.expect_float(ball.velocity.y, -225.0, 0.001,
+	suite.expect_float(ball.velocity.y, -350.0, 0.001,
 		"strong Wake remains primarily upward")
 	suite.expect_float(
 		ball.vitality_model.current_vitality - vitality_before_strong_wake,
@@ -217,7 +218,7 @@ func run(suite: RefCounted) -> void:
 	)
 	var velocity_after_wake := ball.velocity
 	suite.expect_false(ball.apply_resting_wake_impulse(
-		Vector2(500.0, 0.0), Vector2(480.0, 550.0)),
+		Vector2(500.0, 0.0), Vector2(480.0, 537.0)),
 		"Wake Impulse cannot affect a non-RESTING Ball")
 	suite.expect_float(ball.velocity.x, velocity_after_wake.x, 0.0001,
 		"normal motion is isolated from Resting Wake input")
@@ -236,7 +237,7 @@ func run(suite: RefCounted) -> void:
 		integrated_ball.velocity = Vector2(0.0, 300.0)
 		integrated_ball.resolve_surface_collision(
 			response_script.SurfaceKind.GROUND, Vector2.UP, false)
-		suite.expect_true(integrated_visuals.darken_pulse > 0.0,
+		suite.expect_true(integrated_visuals.deformation.y < 1.0,
 			"BallController forwards Ground feedback to BallVisuals")
 		integrated_ball.vitality_model.set_vitality(0.0)
 		integrated_ball.vitality_model.resolve_activity(true)
@@ -245,7 +246,7 @@ func run(suite: RefCounted) -> void:
 			integrated_ball.advance_resting_time(0.12)
 		if integrated_ball.has_method("apply_resting_wake_impulse"):
 			integrated_ball.apply_resting_wake_impulse(
-				Vector2(500.0, 0.0), Vector2(480.0, 550.0))
-		suite.expect_true(integrated_visuals.glow_pulse > 0.0,
+				Vector2(500.0, 0.0), Vector2(480.0, 537.0))
+		suite.expect_true(integrated_visuals.deformation.x < 1.0,
 			"BallController forwards Wake feedback to BallVisuals")
 	integrated_ball.free()

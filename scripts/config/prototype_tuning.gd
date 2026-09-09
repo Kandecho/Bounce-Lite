@@ -10,15 +10,16 @@ extends Resource
 @export_group("Physics")
 @export_range(1.0, 2000.0, 1.0) var initial_speed: float = 360.0
 @export_range(1.0, 2000.0, 1.0) var max_speed: float = 520.0
-@export_range(0.0, 3000.0, 1.0) var gravity_acceleration: float = 520.0
+@export_range(0.0, 3000.0, 1.0) var gravity_acceleration: float = 260.0
 
 @export_group("Resting Wake")
 @export_range(0.0, 1.0, 0.01) var wake_rest_delay_seconds: float = 0.12
 @export_range(0.0, 1.0, 0.01) var wake_horizontal_factor: float = 0.18
-@export_range(0.0, 2.0, 0.01) var wake_vertical_factor: float = 0.45
+@export_range(0.0, 2.0, 0.01) var wake_vertical_factor: float = 0.70
 @export_range(0.0, 1000.0, 1.0) var wake_activation_impulse: float = 180.0
 @export_range(0.0, 1.0, 0.01) var wake_vitality_restore_ratio: float = 0.15
-@export_range(0.0, 100.0, 1.0) var wake_horizontal_margin: float = 12.0
+@export_range(0.0, 500.0, 1.0) var wake_horizontal_range: float = 200.0
+@export_range(0.0, 0.1, 0.001) var wake_sample_seconds: float = 0.05
 
 @export_group("Surface Response")
 @export_range(0.0, 1.0, 0.001) var wall_restitution_min: float = 0.96
@@ -45,13 +46,7 @@ extends Resource
 
 @export_group("Ball Visuals")
 @export_range(2.0, 64.0, 1.0) var ball_radius: float = 16.0
-@export_range(1, 64, 1) var trail_max_samples: int = 16
-@export_range(1.0, 32.0, 1.0) var trail_sample_distance: float = 8.0
 @export_range(1.0, 60.0, 0.5) var feedback_recovery_speed: float = 18.0
 @export_range(0.5, 1.0, 0.01) var paddle_hit_squash: float = 0.70
 @export_range(0.5, 1.0, 0.01) var wall_hit_squash: float = 0.90
 @export_range(0.5, 1.0, 0.01) var ground_hit_squash: float = 0.76
-@export_range(0.0, 1.0, 0.01) var paddle_glow_pulse: float = 0.65
-@export_range(0.0, 1.0, 0.01) var wall_glow_pulse: float = 0.12
-@export_range(0.0, 1.0, 0.01) var ground_darken_pulse: float = 0.38
-@export_range(0.0, 1.5, 0.01) var wake_glow_pulse: float = 0.90

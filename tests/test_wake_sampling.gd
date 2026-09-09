@@ -1,0 +1,45 @@
+extends RefCounted
+
+func run(suite: RefCounted) -> void:
+	var ball = load("res://scripts/ball/ball_controller.gd").new()
+	ball.configure(load("res://scripts/config/prototype_tuning.gd").new())
+	ball.position = Vector2(480, 564.92)
+	ball.vitality_model.set_vitality(0.04)
+	ball.vitality_model.resolve_activity(true)
+	ball.advance_resting_time(0.12)
+	ball.apply_resting_wake_impulse(Vector2(30, 0), Vector2(650, 537))
+	suite.expect_false(ball.resting_wake_impulse_consumed, "small onset cannot consume Wake")
+	suite.expect_equal(ball.velocity, Vector2.ZERO, "sampling does not apply an early nudge")
+	ball.advance_resting_time(0.02)
+	suite.expect_true(ball.apply_resting_wake_impulse(Vector2(-500, 0), Vector2(650, 537)), "fast reversal within window activates at expanded range")
+	suite.expect_true(ball.velocity.y <= -300, "clear strong upward impulse")
+	suite.expect_true(ball.velocity.x < 0, "strongest sample preserves its direction")
+	suite.expect_equal(ball.get_collision_exceptions().size(), 0, "Wake never installs collision exceptions")
+	for hz in [30, 60, 120]:
+		ball.start_active(Vector2.UP)
+		ball.vitality_model.set_vitality(0.04)
+		ball.vitality_model.resolve_activity(true)
+		ball.advance_resting_time(0.12)
+		ball.apply_resting_wake_impulse(Vector2(100, 0), Vector2(480, 537))
+		var elapsed := 0.0
+		while elapsed + 0.000001 < 0.05:
+			suite.expect_false(ball.resting_wake_impulse_consumed, "weak input waits for sampling deadline")
+			ball.advance_resting_time(1.0 / hz)
+			elapsed += 1.0 / hz
+		suite.expect_true(ball.resting_wake_impulse_consumed, "weak input commits by next physics tick")
+		suite.expect_float(ball.velocity.y, -70, 0.001, "weak impulse is deterministic across tick rates")
+		suite.expect_true(ball.is_resting(), "weak response preserves Resting")
+		ball.start_active(Vector2.UP)
+		ball.vitality_model.set_vitality(0.04)
+		ball.vitality_model.resolve_activity(true)
+		ball.advance_resting_time(0.12)
+		ball.apply_resting_wake_impulse(Vector2(50, 0), Vector2(480, 537))
+		ball.apply_resting_wake_impulse(Vector2(50, 0), Vector2(681, 537))
+		ball.advance_resting_time(0.1)
+		suite.expect_equal(ball.velocity, Vector2.ZERO, "leaving range cancels stale sampling")
+		ball.apply_resting_wake_impulse(Vector2(50, 0), Vector2(480, 537))
+		ball.start_active(Vector2.UP)
+		var launch: Vector2 = ball.velocity
+		ball.advance_resting_time(0.1)
+		suite.expect_equal(ball.velocity, launch, "reset cannot replay a pending sample")
+	ball.free()

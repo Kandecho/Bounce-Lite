@@ -110,8 +110,8 @@ Window
 | A011 | Game Area Surface | 承载玩法对象和 HUD | REF001/REF002 | Not Produced | Yes | Light/Dark | Not Applicable | `≈(258,197,933,682) → (171,131,619,452)` | `light.panel` / `dark.panel` | Control/Panel + StyleBox | 已确认 | 统一几何；8–10 design px 圆角 |
 | A012 | Game Area Border | 标记玩法内容安全区 | REF001/REF002 | Not Produced | Yes | Light/Dark | Not Applicable | 同 A011；目标 1–2 design px | `light.panel-border` / `dark.panel-border` | StyleBox border | 已确认 | 对象效果默认不溢出到 Header/Footer |
 | A013 | Ball Core | 核心运动对象视觉 | REF001/REF002 | Not Produced | Yes | Shared core | Both | Light `≈50×50 → 33×33`；Dark `≈46×46 → 31×31`；目标直径约 32 | 见 `visual_spec.md` §8.5 | 程序化抗锯齿圆形 | 已确认 | 荧光青系，H 189 恒定，S/V 随 Vitality；概念图白球已被取代。图中位置是快照，不是固定出生位置 |
-| A014 | Ball Glow | 将 Ball 与背景分离并提供反馈 | REF001/REF002 合成效果 | Not Produced | Yes | Light/Dark | Both | Light 视觉包络约 55–60 design px；Dark 更低强度 | 见 `visual_spec.md` §8.5 | 运行时径向渐变贴图 + `draw_texture_rect`，无 Shader | 已确认 | **只表达 Vitality**。峰值在 `d=1.0r`，`(1-t)^1.6` 衰减至 `1.75r`，包络 56 px。当前实现为 73 px 四段硬边环，`待修正` |
-| A015 | Ball Trail | 表达移动方向和速度 | REF001 明确；REF002 未显示 | Not Produced | Yes | Light/Dark | Moving | Light Envelope `≈(602,359,134,111) → (399,238,89,74)`；约四段 | 固定为满 Vitality 的 Glow 色 | 离散残影，与 Glow 共用同一张径向渐变贴图 | 已确认 | **只表达 Velocity**。固定时间采样 `0.085 s`，`n ≤ 4`，间距 `max(speed × 0.085, 18)`。当前实现为连续双层折线，`待修正` |
+| A014 | Ball Glow | 将 Ball 与背景分离并提供反馈 | REF001/REF002 合成效果 | Not Produced | Yes | Light/Dark | Both | Light 视觉包络约 55–60 design px；Dark 更低强度 | 见 `visual_spec.md` §8.5 | 运行时径向渐变贴图 + `draw_texture_rect`，无 Shader | 已确认 | **只表达 Vitality**。峰值在 `d=1.0r`，`(1-t)^1.6` 衰减至 `1.75r`，包络 56 px。V0.1.3 已实现连续径向贴图，见 §8.2 |
+| A015 | Ball Trail | 表达移动方向和速度 | REF001 明确；REF002 未显示 | Not Produced | Yes | Light/Dark | Moving | Light Envelope `≈(602,359,134,111) → (399,238,89,74)`；约四段 | 固定为满 Vitality 的 Glow 色 | 离散残影，与 Glow 共用同一张径向渐变贴图 | 已确认 | **只表达 Velocity**。固定时间采样 `0.085 s`，`n ≤ 4`，间距 `max(speed × 0.085, 18)`。V0.1.3 已实现离散残影，见 §8.2 |
 | A016 | Ball Particles | 可选碰撞/运动强调 | 概念图没有可确认独立层 | Not Produced | No | Light/Dark | Moving candidate | 未出现；尺寸由未来事件规格决定 | 引用 Ball Effect Token | 不使用 | 已确认 | 三通道模型中没有 Particles 的位置；不实现 |
 | A017 | Paddle Core | 玩家控制对象视觉 | REF001/REF002 | Not Produced | Yes | Light/Dark | Both | Light `232×28 → 154×19`；Dark `220×26 → 146×17`；统一目标约 `150×18` | `paddle.idle` 见 `visual_spec.md` §8.5 | `Control/StyleBox` 或程序化矩形 | 已确认 | 胶囊形，圆角 9。常态为低明度基础色 `#45786E`，**不表达任何状态**；概念图 `#60F1BF` 已被取代 |
 | A018 | Paddle Glow | ~~强调 Paddle 和可控性~~ | REF001/REF002 合成效果 | Not Produced | No | 不适用 | 不适用 | 不生产 | 不适用 | 不实现 | 已废止 | `2026-09-08` 用户决定：Paddle 不使用常驻 Glow。Paddle 表达输入事件而非自身状态，常驻发光层会把它从轻交互接口推成独立 UI。替代项见 A035 / A036；编号保留不复用 |
@@ -128,7 +128,7 @@ Window
 | A019 | Timer Container | 提供 Timer 稳定背景 | REF001/REF002 | Not Produced | Yes | Light/Dark | Not Applicable | `≈(990,220,180,62) → (656,146,119,41)` | `light.hud-surface` / `dark.hud-surface` | Control/Panel + StyleBox | 已确认 | 正式视觉规格保留；V0.1 极简 HUD 不绘制容器 |
 | A020 | Clock Icon | 说明 Timer 语义 | REF001/REF002 | Not Produced | Yes | Light/Dark | Not Applicable | `≈(1017,236,28,28) → (674,156,19,19)` | `light.hud-icon` / `dark.hud-icon` | 矢量 Path、程序化 Line2D 或统一图标资产 | 已确认 | 正式视觉规格保留；V0.1 极简 HUD 不绘制图标 |
 | A021 | Timer Digits | 显示当前活跃时间 | REF001/REF002 + 用户规则 | Not Produced | Yes | Light/Dark | Not Applicable | `≈(1069,236,74,28) → (709,156,49,19)` | `light.text-hud` / `dark.text-hud` | V0.1：纯文字 Label，`TIME MM:SS` | 原型实现 | 从最近一次 Wake/Active 到 Rest 正计时；不参与失败、难度或成绩目标 |
-| A034 | Combo Text | 提供轻量连续接球反馈 | 用户 V0.1 规则 | Not Produced | No | Neutral prototype | Not Applicable | 左上纯文字；当前字号 17 design px | 临时中性文字色；正式主题需映射 `*.text-hud` | V0.1：纯文字 Label，`COMBO N` | 原型实现 | Paddle 命中 +1；Ground 清零；无排行榜或奖励系统 |
+| A034 | Combo Text | 提供轻量连续接球反馈 | 用户 V0.1 规则 | Not Produced | No | Neutral prototype | Not Applicable | 左上纯文字；当前字号 17 design px | V0.1.3 使用 `dark.text-secondary` | V0.1：纯文字 Label，`COMBO N` | 原型实现 | Paddle 命中 +1；Ground 清零；无排行榜或奖励系统 |
 
 ### 4.4 Start State
 
@@ -189,9 +189,9 @@ V0.1 选择实现路线时，按以下顺序评估：
 
 优先程序化或 UI/StyleBox 的元素：Window、Game Area、Traffic Light、Paddle、Timer Container、Divider。
 
-可能需要独立资产或 Shader 的元素：Environment Background、Ball Glow、Trail、Clock Icon。
+历史候选中的 Environment Background、Clock Icon 尚未制作；Ball Glow / Trail 已确认使用运行时径向贴图，无独立位图或 Shader。
 
-Particles 是可选项，不是 V0.1 默认必需。
+Particles 已由冻结视觉语言排除，不实现。
 
 ## 7. Phase 0 登记结论（历史基线）
 
@@ -203,7 +203,7 @@ Particles 是可选项，不是 V0.1 默认必需。
 - 正式素材：均未生产；
 - 状态视觉与字体方向：已由用户确认；具体字体文件授权归档和玩法交互映射在对应开发任务处理。
 
-## 8. V0.1.3 资产边界（`2026-09-08` 更新）
+## 8. V0.1.3 资产边界（`2026-09-09` 更新）
 
 - 当前视觉全部由 Godot 节点和程序绘制生成，没有新增 Sprite、Texture、字体或音频资产；
 - Ball Glow 与 Trail 残影使用**运行时生成**的径向渐变贴图（`GradientTexture2D`，`FILL_RADIAL`），属于程序化资产，不是位图素材，不需要 Shader；
@@ -224,18 +224,31 @@ Particles 是可选项，不是 V0.1 默认必需。
 
 A017 Paddle Core 不属于任何通道：它是形态，不表达状态。
 
-### 8.2 与当前实现的差距
+### 8.2 当前实现登记
 
-下列条目的规格已冻结，但当前运行时实现仍是旧版本，状态为 `待修正`：
+冻结视觉已于 2026-09-09 获用户授权并实现，后续V0.1.3整体已通过用户验收。“Not Produced”仍指未生产正式素材文件，不否定程序化实现。
 
-| Asset ID | 规格 | 当前实现 |
+| Asset ID | 当前实现 | 文件 |
 | --- | --- | --- |
-| A013 | 荧光青系，随 Vitality 变化 | 白色 `#F7FCFF` 固定 |
-| A014 | 连续衰减，包络 56 px | 四段硬边同心环，包络 73 px，无抗锯齿 |
-| A015 | 离散残影，时间采样 `0.085 s` | 连续双层折线，距离采样 `8 px` |
-| A017 | `#45786E` 低明度 | `#60F1BF` 高亮薄荷 |
-| A035 / A036 | 接触瞬间反馈 | 未实现 |
-| A018 | 已废止 | 仍绘制 5 px 常驻外扩层 |
-| A037 | Glow 状态地板 `0.25` | 由 Vitality 推导，休眠后趋近于零 |
+| A013 | H=189°、Vitality 色彩模型、抗锯齿、无高光点 | scripts/ball/ball_visuals.gd |
+| A014 | 连续径向 Glow，56 px 包络，单一 Vitality 驱动 | scripts/config/visual_tokens.gd、scripts/ball/ball_visuals.gd |
+| A015 | 0.085 s 时间采样、最多四个离散残影、固定满 Vitality Glow 色 | scripts/ball/ball_visuals.gd |
+| A017 | #45786E 基础色，150×18，中心 Y=537 | scripts/paddle/paddle_controller.gd、scenes/main.tscn |
+| A018 | 常驻外扩 Glow 已移除，不产生文件 | scripts/paddle/paddle_controller.gd |
+| A035 / A036 | 有效/无效接触、弱/强 Wake 的亮度闪现与局部扰动 | scripts/paddle/paddle_controller.gd、scripts/main.gd |
+| A037 | RESTING Glow=0.25、Core 固定状态色，零 Vitality 仍可见 | scripts/ball/ball_visuals.gd |
+| A038 | 保留 Ball 几何反馈；不加可选 Paddle squash | scripts/ball/ball_visuals.gd |
+| A011 / A012 | Dark panel=#171C26、边框=#3A4350 | scripts/config/visual_tokens.gd、scripts/main.gd |
 
-另：运行时校准底色为 `#090B0F` / `#11151C`，比 `dark.panel #171C26` 暗约三倍，光效强度结论无法迁移（`VL004`）。
+测试截图仅写入忽略目录 .godot/v013-{active,decaying,resting}-{width}x{height}.png，属于验证证据，不是运行时资产。该条为V0.1.3资产记录；后续V0.1.4导入音效见§9。
+
+## 9. V0.1.4 音频基线（2026-09-09）
+
+| 事件 | 默认A | 备选B |
+| --- | --- | --- |
+| Paddle Hit | Digital Audio / pepSound3.ogg | pepSound5.ogg |
+| Ground Hit | Sci-fi Sounds / forceField_000-pu-160ms.wav | forceField_001-pu-180ms.wav |
+| Strong Wake | Digital Audio / pepSound3.ogg | 无 |
+| Wall / Top | Digital Audio / pepSound3.ogg | pepSound1.ogg |
+
+Weak Wake无专门音效。全部音频来自Kenney CC0；17个原始OGG、4个最小裁片WAV已入库，其中历史试听素材保留但未接入。当前素材与参数见[V0.1.4基线](v0.1.4-basic-audio.md)；全部来源、包名、原文件和裁片映射见[第三方记录](../THIRD_PARTY_ASSETS.md)，许可边界见[资产许可](../ASSET_LICENSE.md)。没有建立正式资产生产流程。

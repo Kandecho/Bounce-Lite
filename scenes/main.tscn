@@ -1,6 +1,7 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
+[ext_resource type="Script" path="res://scripts/audio/basic_audio_feedback.gd" id="8_audio"]
 [ext_resource type="Script" path="res://scripts/ball/ball_controller.gd" id="2_ball"]
 [ext_resource type="Script" path="res://scripts/ball/ball_visuals.gd" id="3_visuals"]
 [ext_resource type="Script" path="res://scripts/paddle/paddle_controller.gd" id="4_paddle"]
@@ -88,6 +89,7 @@ metadata/surface_kind = 2
 shape = SubResource("Rectangle_horizontal")
 
 [node name="Ball" type="CharacterBody2D" parent="GameArea"]
+z_index = 1
 position = Vector2(480, 260)
 collision_layer = 2
 collision_mask = 5
@@ -100,7 +102,7 @@ shape = SubResource("Circle_ball")
 script = ExtResource("3_visuals")
 
 [node name="Paddle" type="CharacterBody2D" parent="GameArea"]
-position = Vector2(480, 550)
+position = Vector2(480, 537)
 collision_layer = 4
 collision_mask = 2
 script = ExtResource("4_paddle")
@@ -111,6 +113,9 @@ shape = SubResource("Rectangle_paddle")
 
 [node name="EndlessRules" type="Node" parent="."]
 script = ExtResource("5_rules")
+
+[node name="BasicAudio" type="Node" parent="."]
+script = ExtResource("8_audio")
 
 [node name="HUD" type="CanvasLayer" parent="."]
 script = ExtResource("6_hud")
@@ -134,7 +139,10 @@ theme_override_font_sizes/font_size = 17
 text = "TIME 00:00"
 horizontal_alignment = 2
 
-[node name="RuntimeTuningPanel" type="PanelContainer" parent="."]
+[node name="DebugOverlay" type="CanvasLayer" parent="."]
+layer = 10
+
+[node name="RuntimeTuningPanel" type="PanelContainer" parent="DebugOverlay"]
 visible = false
 offset_left = 618.0
 offset_top = 16.0
