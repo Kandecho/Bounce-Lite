@@ -3,7 +3,6 @@ extends RefCounted
 
 const PrototypeTuningScript = preload("res://scripts/config/prototype_tuning.gd")
 
-signal vitality_changed(previous: float, current: float)
 signal activity_state_changed(previous: ActivityState, current: ActivityState)
 
 enum ActivityState {
@@ -61,10 +60,7 @@ func vitality_ratio() -> float:
 
 
 func _set_vitality(value: float) -> void:
-	var previous := current_vitality
 	current_vitality = clampf(value, 0.0, max_vitality)
-	if not is_equal_approx(previous, current_vitality):
-		vitality_changed.emit(previous, current_vitality)
 
 
 func _set_state(value: ActivityState) -> void:

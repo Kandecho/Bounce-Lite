@@ -20,11 +20,28 @@ func _run() -> void:
 	paddle.set_physics_process(false)
 	await physics_frame
 	await physics_frame
+	# Developer time is independent of Rest, collisions and Wake; only delta advances it.
+	var panel = main.get_node("DebugOverlay/RuntimeTuningPanel")
+	panel.set_process(false)
+	panel.observation_seconds = 10.0
+	ball.position = Vector2(480, 564.92)
+	ball.vitality_model.set_vitality(0.04)
+	load("res://tests/test_support.gd").prepare_resting(ball)
+	panel.advance_observation_time(1.0)
+	suite.expect_float(panel.observation_seconds, 11.0, 0.0001, "RESTING does not pause developer time")
+	ball.advance_resting_time(0.12)
+	ball.apply_resting_interaction(25, paddle.position)
+	suite.expect_float(panel.observation_seconds, 11.0, 0.0001, "Wake never resets developer time")
+	var motion_before_clock: Vector2 = ball.velocity
+	var vitality_before_clock: float = ball.vitality_model.current_vitality
+	panel.advance_observation_time(1.0)
+	suite.expect_equal(ball.velocity, motion_before_clock, "developer time cannot change Physics")
+	suite.expect_float(ball.vitality_model.current_vitality, vitality_before_clock, 0.0001, "developer time cannot change Vitality")
 	# Real scene geometry, real move_and_collide, fixed time steps.
 	for start_x in [190.0, 480.0, 771.0]:
 		ball.position = Vector2(start_x, 564.92)
 		ball.vitality_model.set_vitality(0.04)
-		ball.vitality_model.resolve_activity(true)
+		load("res://tests/test_support.gd").prepare_resting(ball)
 		ball.advance_resting_time(0.12)
 		paddle.position.x = clampf(start_x, 250, 711)
 		await physics_frame
@@ -52,7 +69,7 @@ func _run() -> void:
 			ball.start_active(Vector2.UP)
 			ball.position = Vector2(480, 564.92)
 			ball.vitality_model.set_vitality(0.04)
-			ball.vitality_model.resolve_activity(true)
+			load("res://tests/test_support.gd").prepare_resting(ball)
 			ball.advance_resting_time(0.12)
 			paddle.position.x = 480 + direction * 130
 			paddle.configure(main.tuning, main.GAME_LEFT, main.GAME_RIGHT, 537)
@@ -78,7 +95,7 @@ func _run() -> void:
 		ball.position = Vector2(480, 564.92)
 		paddle.position.x = 480
 		ball.vitality_model.set_vitality(0.04)
-		ball.vitality_model.resolve_activity(true)
+		load("res://tests/test_support.gd").prepare_resting(ball)
 		ball.advance_resting_time(0.12)
 		contacts.clear()
 		await physics_frame
@@ -139,7 +156,7 @@ func _run() -> void:
 	for start_x in [190.0, 771.0]:
 		ball.position = Vector2(start_x, 564.92)
 		ball.vitality_model.set_vitality(0.02)
-		ball.vitality_model.resolve_activity(true)
+		load("res://tests/test_support.gd").prepare_resting(ball)
 		for frame in range(180):
 			await physics_frame
 			paddle.set_target_x(start_x if frame % 60 < 30 else 480.0)
@@ -192,7 +209,7 @@ func _run() -> void:
 	suite.expect_equal(ball.velocity, after_contact, "normal rebound is never doubled by same-tick input")
 	# A stopped escaped Ball must also be recovered before the RESTING early return.
 	ball.vitality_model.set_vitality(0.02)
-	ball.vitality_model.resolve_activity(true)
+	load("res://tests/test_support.gd").prepare_resting(ball)
 	ball.position = Vector2(900, 800)
 	ball._physics_process(1.0 / 60.0)
 	suite.expect_float(ball.position.y, 564.92, 0.01, "stationary escaped Ball is recovered")

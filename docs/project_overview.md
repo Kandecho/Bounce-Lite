@@ -1,5 +1,14 @@
 # Bounce Lite Project Overview
 
+## 当前状态：V0.1.6 Design Boundary Consolidation
+
+当前以 [V0.1.6 设计基线](design/design-baseline-v0.1.6.md)为判断依据。Activity 状态通知不改 Physics；Ground/Paddle 停稳由明确物理条件触发，先提交运动结果再进入 RESTING。Paddle 为 Surface + Interaction Medium，不是 Ball Controller。Vitality 影响运动维持能力，不规定方向，仍只经既有碰撞／Wake 事件变化。
+
+Combo 与其成绩逻辑已删除；Timer 只在 F1 开发面板显示累计过程时间，与游戏状态无绑定。默认画面无成绩或时间 HUD。configure 与 start_active 分离；普通反弹、恢复模型、方向、视觉和音频不扩展。实现、验证和人工待复核项见 [收口报告](reviews/v0.1.6-consolidation.md)。V0.2.0 未启动。
+
+下文阶段记录保留历史原意；曾批准的 Combo、活跃时间、旧 Wake 和概念状态 UI 不再构成当前实现要求。
+
+
 ## 1. 项目定位
 
 Bounce Lite 是一个轻量、单屏、低认知负担的桌面休息游戏，目标用户为轻量休闲桌面小游戏用户。概念图中的标语为：
@@ -20,7 +29,7 @@ Bounce Lite 是一个轻量、单屏、低认知负担的桌面休息游戏，�
 
 - 单一主要对象：Ball；
 - 单一直接控制对象：Paddle；
-- 视觉重点：克制的背景、青色 Ball、Vitality Glow、离散 Velocity Trail、瞬时 Paddle 输入反馈和简洁 Timer；
+- 视觉重点：克制的背景、青色 Ball、Vitality Glow、离散 Velocity Trail、瞬时 Paddle 真实碰撞反馈；开发 Timer 仅在 F1 中观察；
 - 情绪目标：轻松、安静、柔和、短时可进入；
 - 反馈原则：运动反馈应明确，但不以大量粒子或强烈闪烁制造负担；
 - 主题原则：Light 与 Dark 是视觉主题，Idle 与 Moving 是运动状态，两个维度独立。
@@ -45,10 +54,10 @@ Bounce Lite 是一个轻量、单屏、低认知负担的桌面休息游戏，�
 - 不采用单调递增的难度曲线；
 - 避免“越玩越快直到必然失败”的强制终局模式；
 - 难度可通过低强度、非单调的速度波动、轨迹变化、偶发事件或不确定性变化形成；
-- 失败体验应表达“这一次没有接住”，而不是“系统进入无法处理阶段”；
+- 接触与落地只呈现物理回应，不定义成功／失败结果；
 - V0.1 不设计排行榜、最高分压力或连续生存挑战等竞技目标，除非后续版本重新评估。
 
-## 6. 阶段路线
+## 6. 阶段路线（历史记录按当时决定保留，当前以 V0.1.6 为准）
 
 ### Phase 0 - Project Setup & Visual Specification
 
@@ -90,7 +99,7 @@ Phase 0 不创建 Godot 工程，不实现游戏内容。
 
 ### V0.1.2 - Vitality–Physics Separation
 
-用户已于 `2026-09-08` 批准本重构。当前实现范围为：
+用户已于 `2026-09-08` 批准本重构。当时实现范围为：
 
 - Velocity、Position、Gravity 与 Collision 属于 Physics；
 - Inflation/Elasticity、Bounce capability、ActivityState 与基础视觉强度属于 Vitality；
@@ -156,7 +165,7 @@ Renderer、平台、分辨率和缩放方式已写入工程基线。变更这些
 
 详细治理规则见根目录 `AGENTS.md`。
 
-## 9. 已确认视觉与主题策略
+## 9. Phase 0 视觉与主题策略（历史，不作为当前功能契约）
 
 - Start、Pause、Game Over 采用极简文字 UI；
 - 不使用按钮边框、卡片或复杂面板；
@@ -190,6 +199,6 @@ Phase 0 完成不等于 V0.1 自动开始。最终流程为：
 
 用户已验收V0.1.3。V0.1.4已确认以最小音频验证电子玩具感：Paddle pepSound3弹起、Strong Wake同类更有能量、Weak Wake无专门音效、Ground forceField短片下沉，Wall/Top已接入。Paddle/Strong Wake/Wall通过，Ground A可用；最新固定音高1.5待单独试听。确定性381、物理场景803、音频场景38 checks通过。Paddle Resting Support仅为pending设计问题，未实现；V0.1.5未启动。
 
-## V0.1.5 当前状态（2026-09-10）
+## V0.1.5 收口记录（历史，2026-09-10）
 
 Paddle作为合法支撑面，Activity/Support/Physics分离；低活力低速顶面可停稳，横移不自动承载，支撑丢失恢复重力。连续弱输入产生可见轻微几何响应，保持RESTING且不改变Velocity/Vitality；Strong阈值达标后恢复活力，必要时一次固定上跳，不继承Paddle水平速度。方案与实现见[V0.1.5实施记录](v0.1.5-paddle-interaction.md)。用户已验收总体体验；非碰撞Paddle闪动已按反馈移除，Paddle仅真实碰撞闪动。关键回归完成，V0.1.5 Paddle interaction model收口；不开展V0.2。

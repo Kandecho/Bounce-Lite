@@ -13,7 +13,7 @@ func run(suite: RefCounted) -> void:
 	suite.expect_not_null(ball, "scene owns a Ball")
 	if ball != null:
 		suite.expect_true(ball.has_method("apply_resting_interaction"),
-			"Ball exposes Resting Wake Impulse")
+			"Ball exposes scalar resting interaction")
 	suite.expect_not_null(main.get_node_or_null("GameArea/Ball/Visuals"),
 		"Ball owns procedural visuals")
 	var paddle := main.get_node_or_null("GameArea/Paddle")
@@ -21,13 +21,16 @@ func run(suite: RefCounted) -> void:
 	if paddle != null:
 		suite.expect_true(paddle.has_signal("interaction_sampled"),
 			"Paddle exposes continuous motion input")
-	suite.expect_not_null(main.get_node_or_null("EndlessRules"), "scene owns Endless rules")
-	suite.expect_not_null(main.get_node_or_null("HUD"), "scene owns a HUD")
-	suite.expect_not_null(main.get_node_or_null("HUD/ComboLabel"), "HUD owns Combo text")
-	suite.expect_not_null(main.get_node_or_null("HUD/TimerLabel"), "HUD owns Timer text")
 	var tuning_panel := main.get_node_or_null("DebugOverlay/RuntimeTuningPanel")
-	suite.expect_true(main.get_node("DebugOverlay").layer > main.get_node("HUD").layer,
-		"debug overlay draws above the whole game and HUD")
+	suite.expect_true(main.get_node("DebugOverlay").layer > 0,
+		"developer overlay draws above the game")
+	suite.expect_true(ball.process_physics_priority < paddle.process_physics_priority,
+		"Ball physics precedes Paddle input independently of tree order")
+	var tuning = load("res://scripts/config/prototype_tuning.gd").new()
+	suite.expect_float(ball.get_node("CollisionShape2D").shape.radius, tuning.ball_radius, 0.0001,
+		"physical and visual Ball geometry agree")
+	suite.expect_equal(paddle.get_node("CollisionShape2D").shape.size, tuning.paddle_size,
+		"physical and visual Paddle geometry agree")
 	suite.expect_not_null(tuning_panel, "scene owns a runtime tuning panel")
 	if tuning_panel != null:
 		suite.expect_false(tuning_panel.visible, "runtime tuning panel is hidden by default")

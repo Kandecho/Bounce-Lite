@@ -160,7 +160,7 @@ func run(suite: RefCounted) -> void:
 		suite.expect_true(integrated_visuals.deformation.y < 1.0,
 			"BallController forwards Ground feedback to BallVisuals")
 		integrated_ball.vitality_model.set_vitality(0.0)
-		integrated_ball.vitality_model.resolve_activity(true)
+		load("res://tests/test_support.gd").prepare_resting(integrated_ball)
 		integrated_ball.global_position = Vector2(480.0, 565.0)
 		if integrated_ball.has_method("advance_resting_time"):
 			integrated_ball.advance_resting_time(0.12)

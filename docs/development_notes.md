@@ -510,3 +510,20 @@ BasicAudio节点通过surface_resolved和wake_impulse_applied接入，Paddle仅�
 用户验收总体体验，要求先提交当前状态，再修复RESTING时Paddle非碰撞闪动并推送。检查点56c6bf8保存完整已验收实现。新增场景断言先复现6处弱/强Wake闪动；移除Main两条Paddle非碰撞视觉触发路径及Paddle废弃Wake反馈方法。真实接触反馈保留，球弱形变、Strong启动/Vitality/音效不变。
 
 关键回归：test_runner389、physics_scenarios847、audio_scenarios38通过；headless import、主场景1200帧退出0；Compatibility渲染完成，检查碰撞Paddle反馈。既有根证书读取/编辑器用户配置保存提示仍在，无新增脚本错误。V0.1.5 Paddle interaction model正式收口，不进入V0.2。
+
+## 24. V0.1.6 Design Boundary Consolidation（2026-09-10）
+
+按用户明确指令完成 Activity 通知与物理停稳边界修复，删除 Combo、旧 Rules 与 HUD；F1 内的开发计数器持续累计，不因休息暂停或 Wake 归零。configure 与显式 start_active 分开，移除无监听通知与旧规则接口，明确共享几何参数归属，并以物理优先级固定 Ball 在 Paddle 输入前处理。
+
+新边界回归先复现 11 项失败；实现后确定性394、物理场景851、音频场景38通过。headless import、主场景1200帧均退出0；六张Compatibility截图完成检查，默认无成绩HUD，F1开发计数器布局正常。原有效物理／音频断言保留；旧Combo／游戏计时断言按新契约删除，不以数量下降推断覆盖退化。
+
+设计原稿原字节归档至docs/design；Codex Audit原文保留，Claude Cross Review复制至docs/reviews并核对字节和SHA-256。Claude outputs探索素材和过程档案未删除。README、AGENTS及当前文档同步新契约，历史评审不回写。发现dbf369a提交message含临时Session引用，未改写Git历史，AI署名保留。详情见[V0.1.6收口报告](reviews/v0.1.6-consolidation.md)。本轮未提交／推送、不启动V0.2.0；人工复核待用户试玩。
+
+
+## 25. V0.1.6 历史说明清理与发布（2026-09-10）
+
+用户在第24节完成后明确授权：删除历史Session引用、全refs检查、更新报告、提交V0.1.6、push和tag。此前“不改写历史／不提交推送”是实施时点记录，本节为后续授权与处置。
+
+只移除原dbf369a的Session trailer，重建受影响的6个提交；30个可达提交逐个验证tree、author、committer及AI共同署名保持，未修改历史代码提交内容。原dbf369a映射为a172cc2，原0046ccc映射为d524a44。重写前后工作区及index内容相同；全refs提交message检查无Session trailer。回滚bundle仅存忽略的.local，不创建旧历史refs、不推工具快照。
+
+V0.1.6提交包含此前已验证的实现、正式设计文档与审计归档；本次发布只更新文档和Git元数据，未重新运行既有游戏测试。main使用显式旧远端哈希force-with-lease保护并发更新，版本标签采用v0.1.6。人工体验复核状态保留，V0.2.0不启动。

@@ -21,6 +21,13 @@ func run(suite: RefCounted) -> void:
 	var tuning: Resource = tuning_script.new()
 	var panel: Control = panel_script.new()
 	panel.configure(tuning)
+	panel.advance_observation_time(2.5)
+	suite.expect_float(panel.observation_seconds, 2.5, 0.0001,
+		"hidden developer counter accumulates elapsed time")
+	panel.configure(tuning)
+	panel.advance_observation_time(-1.0)
+	suite.expect_float(panel.observation_seconds, 2.5, 0.0001,
+		"configuration and invalid delta do not reset the counter")
 	suite.expect_float(panel._controls["max_speed"].value, tuning.max_speed, 0.001,
 		"panel displays the actual speed cap without step rounding")
 
@@ -94,6 +101,8 @@ func run(suite: RefCounted) -> void:
 	suite.expect_true(panel.visible, "F1 opens the runtime tuning panel")
 	suite.expect_true(panel.handle_toggle_event(f1), "a second F1 press is handled")
 	suite.expect_false(panel.visible, "a second F1 press closes the panel")
+	suite.expect_float(panel.observation_seconds, 2.5, 0.0001,
+		"toggling developer visibility does not reset elapsed time")
 
 	var f2 := InputEventKey.new()
 	f2.keycode = KEY_F2

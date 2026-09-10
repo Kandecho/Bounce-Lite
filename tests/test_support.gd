@@ -44,3 +44,12 @@ func print_summary() -> void:
 		print("TEST PASS: %d checks" % checks)
 	else:
 		print("TEST FAIL: %d of %d checks failed" % [failures, checks])
+
+
+static func prepare_resting(ball: CharacterBody2D) -> void:
+	# Test setup only, not a production settle path. Keep physical setup explicit.
+	ball.velocity = Vector2.ZERO
+	ball.rest_elapsed_time = 0.0
+	ball.wake_consumed = false
+	ball._clear_wake_sample()
+	ball.vitality_model.resolve_activity(true)

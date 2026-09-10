@@ -41,7 +41,7 @@ func _run() -> void:
 		suite.expect_equal(audio.play_counts[1], 0 if muted else 1, "one real Ground hit has one audio trigger")
 		# Continuous weak response is silent and does not consume strong eligibility.
 		ball.vitality_model.set_vitality(0.04)
-		ball.vitality_model.resolve_activity(true)
+		load("res://tests/test_support.gd").prepare_resting(ball)
 		ball.position = Vector2(480, 564.92)
 		ball.advance_resting_time(0.12)
 		ball.apply_resting_interaction(5.0, paddle.position)
@@ -85,7 +85,7 @@ func _run() -> void:
 		ball.velocity = Vector2(100, 5)
 		ball.resolve_surface_collision(Surface.SurfaceKind.GROUND, Vector2.UP, false)
 		suite.expect_equal(audio.play_counts, before, "tiny ground normal speed does not chatter")
-		snapshots.append([ball.position, ball.velocity, ball.vitality_model.current_vitality, ball.vitality_model.state, main.get_node("EndlessRules").combo])
+		snapshots.append([ball.position, ball.velocity, ball.vitality_model.current_vitality, ball.vitality_model.state])
 		if not muted:
 			suite.expect_true(audio.players[2].playing, "engine playback starts for committed Wake")
 			var key := InputEventKey.new()
@@ -105,7 +105,7 @@ func _run() -> void:
 			for player in audio.players:
 				suite.expect_false(player.playing, "mute stops existing voices immediately")
 		main.free()
-	suite.expect_equal(snapshots[0], snapshots[1], "audio on/off leaves physics vitality state and combo identical")
+	suite.expect_equal(snapshots[0], snapshots[1], "audio on/off leaves physics vitality and state identical")
 	suite.print_summary()
 	# Let the audio thread retire stopped voices before destroying the engine.
 	OS.delay_msec(100)

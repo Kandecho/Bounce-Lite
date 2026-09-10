@@ -6,19 +6,12 @@ const BallVitalityModelScript = preload("res://scripts/ball/ball_vitality_model.
 const SurfaceResponseModelScript = preload("res://scripts/physics/surface_response_model.gd")
 
 signal surface_resolved(result: RefCounted)
-signal surface_hit(kind: int, vitality_before: float, vitality_after: float)
-signal paddle_hit(vitality_before: float, vitality_after: float)
-signal vitality_changed(previous: float, current: float)
-signal activity_state_changed(previous: int, current: int)
-signal bounds_recovered(previous_position: Vector2, recovered_position: Vector2)
 signal paddle_contact(valid: bool, contact_position: Vector2)
 signal wake_committed(strength: float, activated: bool, ball_position: Vector2)
-signal weak_interaction(strength: float, ball_position: Vector2)
 
 enum SupportKind { NONE, GROUND, PADDLE }
 var support_kind: SupportKind = SupportKind.NONE
 var support_paddle: Node2D
-var interaction_strength := 0.0
 
 const MAX_COLLISIONS_PER_FRAME := 4
 const MOTION_EPSILON := 0.001
@@ -118,20 +111,18 @@ func recover_out_of_bounds() -> bool:
 	if (before.y < bounds.position.y and velocity.y < 0.0) or (before.y > bounds.end.y and velocity.y > 0.0):
 		velocity.y = 0.0
 	if below_ground and vitality_model.vitality_ratio() <= tuning.rest_vitality_ratio:
-		vitality_model.resolve_activity(true)
-		_settle_resting_motion()
+		_commit_resting_settle(SupportKind.GROUND)
 	# Never join motion history across an exceptional position correction.
 	var visuals := get_node_or_null("Visuals")
 	if visuals != null and visuals.has_method("clear_motion_history"):
 		visuals.clear_motion_history()
 	bounds_recovery_count += 1
-	bounds_recovered.emit(before, global_position)
 	_update_visuals()
 	return true
 
 
 func _settle_ground_position() -> void:
-	if not arena_bounds.has_area() or not is_resting():
+	if not arena_bounds.has_area():
 		return
 	var ground_y := safe_center_bounds().end.y
 	# Only snap a supported/already penetrated resting circle, never an airborne nudge.
@@ -142,19 +133,27 @@ func _settle_ground_position() -> void:
 
 func configure(source_tuning: Resource) -> void:
 	tuning = source_tuning if source_tuning != null else PrototypeTuningScript.new()
-	vitality_model = BallVitalityModelScript.new(tuning)
-	surface_response_model = SurfaceResponseModelScript.new(tuning)
-	vitality_model.activity_state_changed.connect(_on_vitality_state_changed)
+	# Configuration supplies dependencies; only start_active starts a new cycle.
+	if vitality_model == null:
+		vitality_model = BallVitalityModelScript.new(tuning)
+		vitality_model.activity_state_changed.connect(_on_vitality_state_changed)
+	else:
+		vitality_model.tuning = tuning
+		vitality_model.max_vitality = maxf(tuning.max_vitality, 0.001)
+		vitality_model.apply_delta(0.0)
+	if surface_response_model == null:
+		surface_response_model = SurfaceResponseModelScript.new(tuning)
+	else:
+		surface_response_model.tuning = tuning
 	var visuals := get_node_or_null("Visuals")
 	if visuals != null and visuals.has_method("configure"):
 		visuals.configure(tuning)
-	start_active(DEFAULT_DIRECTION)
+	_update_visuals()
 
 
 func start_active(initial_direction: Vector2) -> void:
 	if vitality_model == null or surface_response_model == null:
 		configure(tuning)
-		return
 	vitality_model.reset_active()
 	rest_elapsed_time = 0.0
 	wake_consumed = false
@@ -182,11 +181,7 @@ func resolve_surface_collision(kind: int, normal: Vector2, valid_paddle_hit: boo
 		and vitality_model.vitality_ratio() <= tuning.rest_vitality_ratio \
 		and is_instance_valid(support_paddle) \
 		and absf(global_position.x - support_paddle.global_position.x) <= tuning.paddle_size.x * 0.5 - 1.0:
-		vitality_model.resolve_activity(true)
-		_settle_resting_motion()
-		support_kind = SupportKind.PADDLE
-		if is_instance_valid(support_paddle):
-			global_position.y = _paddle_support_y()
+		_commit_resting_settle(SupportKind.PADDLE)
 		return
 	var was_resting := is_resting()
 	var effective_paddle_hit := valid_paddle_hit and not was_resting
@@ -202,25 +197,14 @@ func resolve_surface_collision(kind: int, normal: Vector2, valid_paddle_hit: boo
 	)
 	velocity = result.velocity_after.limit_length(tuning.max_speed)
 	vitality_model.apply_delta(result.vitality_delta)
-	if was_resting:
-		if result.effective_surface_kind == SurfaceResponseModelScript.SurfaceKind.GROUND \
-			and result.settle_allowed:
-			_settle_resting_motion()
-	else:
-		vitality_model.resolve_activity(result.settle_allowed)
-		if is_resting():
-			velocity = Vector2.ZERO
-	if is_resting() and result.effective_surface_kind == SurfaceResponseModelScript.SurfaceKind.GROUND and result.settle_allowed:
-		_settle_ground_position()
-	var vitality_after: float = vitality_model.current_vitality
+	# Surface response grants physical settle permission; Activity is committed last.
+	if result.settle_allowed and (was_resting or vitality_model.vitality_ratio() <= tuning.rest_vitality_ratio):
+		_commit_resting_settle(SupportKind.GROUND)
+	elif not was_resting:
+		vitality_model.resolve_activity(false)
 	_update_visuals()
 	surface_resolved.emit(result)
-	vitality_changed.emit(vitality_before, vitality_after)
 	_play_collision_feedback(result.effective_surface_kind, normal)
-	if result.valid_paddle_hit:
-		paddle_hit.emit(vitality_before, vitality_after)
-	else:
-		surface_hit.emit(result.effective_surface_kind, vitality_before, vitality_after)
 
 
 func advance_resting_time(delta: float) -> void:
@@ -243,19 +227,18 @@ func apply_resting_interaction(input_distance: float, paddle_position: Vector2) 
 	if rest_elapsed_time + 0.000001 < tuning.wake_rest_delay_seconds or input_distance <= 0.0:
 		return false
 	_interaction_distance += input_distance
-	interaction_strength = clampf(_interaction_distance / maxf(tuning.wake_interaction_distance, 0.001), 0.0, 1.0)
+	var interaction_strength := clampf(_interaction_distance / maxf(tuning.wake_interaction_distance, 0.001), 0.0, 1.0)
 	if interaction_strength + 0.000001 < 1.0:
 		var visuals := get_node_or_null("Visuals")
 		if visuals != null and visuals.has_method("play_weak_feedback"):
 			visuals.play_weak_feedback(interaction_strength)
-		weak_interaction.emit(interaction_strength, global_position)
 		return false
 	var needs_start: bool = support_kind != SupportKind.NONE and velocity.length() <= tuning.rest_settle_speed
 	_clear_wake_sample()
-	wake_consumed = true
 	var activated: bool = vitality_model.wake(vitality_model.current_vitality + vitality_model.max_vitality * tuning.wake_vitality_restore_ratio)
 	if not activated:
 		return false
+	wake_consumed = true
 	if needs_start:
 		# A discrete self-start, never proportional to input and never horizontal.
 		velocity.y = -tuning.wake_launch_speed
@@ -283,14 +266,22 @@ func _paddle_is_in_wake_range(paddle_x: float) -> bool:
 func _clear_wake_sample() -> void:
 	_wake_sample_elapsed = 0.0
 	_interaction_distance = 0.0
-	interaction_strength = 0.0
 
 
-func _settle_resting_motion() -> void:
-	_clear_wake_sample()
+func _commit_resting_settle(kind: SupportKind) -> void:
+	# Called only after Ground/Paddle settle eligibility or exceptional recovery.
+	# Apply the physical result before any Activity observer is notified.
 	velocity = Vector2.ZERO
+	if kind == SupportKind.PADDLE:
+		support_kind = kind
+		global_position.y = _paddle_support_y()
+	else:
+		_settle_ground_position()
+	# A new settled contact explicitly starts a fresh Interaction rest window.
+	_clear_wake_sample()
 	rest_elapsed_time = 0.0
 	wake_consumed = false
+	vitality_model.resolve_activity(true)
 
 
 func _safe_direction(value: Vector2) -> Vector2:
@@ -300,11 +291,9 @@ func _safe_direction(value: Vector2) -> Vector2:
 	return safe_direction
 
 
-func _on_vitality_state_changed(previous: int, current: int) -> void:
-	if current == BallVitalityModelScript.ActivityState.RESTING:
-		_settle_resting_motion()
+func _on_vitality_state_changed(_previous: int, _current: int) -> void:
+	# Notification only: never mutate Position, Velocity, Support or Interaction.
 	_update_visuals()
-	activity_state_changed.emit(previous, current)
 
 
 func _update_visuals() -> void:

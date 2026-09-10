@@ -9,7 +9,7 @@ func run(suite: RefCounted) -> void:
 			ball.start_active(Vector2.UP)
 			ball.position = Vector2(480, 564.92)
 			ball.vitality_model.set_vitality(0.04)
-			ball.vitality_model.resolve_activity(true)
+			load("res://tests/test_support.gd").prepare_resting(ball)
 			ball.advance_resting_time(0.12)
 			for index in range(12):
 				ball.apply_resting_interaction(50.0 / hz, Vector2(480 + direction * 150, 537))
@@ -22,7 +22,7 @@ func run(suite: RefCounted) -> void:
 	ball.start_active(Vector2.UP)
 	ball.position = Vector2(480, 564.92)
 	ball.vitality_model.set_vitality(0.04)
-	ball.vitality_model.resolve_activity(true)
+	load("res://tests/test_support.gd").prepare_resting(ball)
 	ball.advance_resting_time(0.12)
 	ball.apply_resting_interaction(10, Vector2(480, 537))
 	ball.apply_resting_interaction(0, Vector2(681, 537))

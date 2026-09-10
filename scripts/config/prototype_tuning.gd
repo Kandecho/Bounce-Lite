@@ -41,10 +41,15 @@ extends Resource
 
 @export_group("Paddle")
 @export_range(1.0, 60.0, 0.5) var paddle_smoothing: float = 18.0
+# Physical rectangle and rendered body; must match the scene RectangleShape2D.
 @export var paddle_size: Vector2 = Vector2(150.0, 18.0)
 
-@export_group("Ball Visuals")
+@export_group("Shared Geometry")
+# Physical circle radius and undeformed Core radius share one size by design.
+# Keep the scene CircleShape2D in sync; squash/stretch is visual-only.
 @export_range(2.0, 64.0, 1.0) var ball_radius: float = 16.0
+
+@export_group("Ball Visuals")
 @export_range(1.0, 60.0, 0.5) var feedback_recovery_speed: float = 18.0
 @export_range(0.5, 1.0, 0.01) var paddle_hit_squash: float = 0.70
 @export_range(0.5, 1.0, 0.01) var wall_hit_squash: float = 0.90

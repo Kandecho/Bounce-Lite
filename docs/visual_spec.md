@@ -1,5 +1,10 @@
 # Bounce Lite Visual Specification
 
+## V0.1.6 生命周期说明（2026-09-10）
+
+当前默认画面无 Combo 或时间 HUD；旧 Combo／HUD Timer／结果 UI 的规格和素材登记仅保留历史参考，不再作为当前生产要求。时间累计只在默认隐藏的 F1 开发面板显示 `DEV ELAPSED`，没有 Wake reset 或 RESTING pause。Ball / Glow / Trail / Paddle 的已验收外观不改。当前语义见 [V0.1.6 基线](design/design-baseline-v0.1.6.md)，变更见 [收口报告](reviews/v0.1.6-consolidation.md)。
+
+
 ## 1. 规格状态与用途
 
 本文件把 `day-raw.png` 与 `night-raw.png` 中的可见信息转化为生产规格，并记录用户在 V0.1 初始化前确认的视觉决策。它不授权生产正式素材或实现玩法。

@@ -114,6 +114,9 @@ const PARAMETER_SPECS: Array[Dictionary] = [
 	},
 ]
 
+var observation_seconds := 0.0
+var _observation_label: Label
+
 var tuning: Resource
 var _controls: Dictionary = {}
 var _specs_by_id: Dictionary = {}
@@ -129,6 +132,17 @@ func _init() -> void:
 func _ready() -> void:
 	_ensure_ui()
 	_sync_from_tuning()
+
+
+func _process(delta: float) -> void:
+	advance_observation_time(delta)
+
+
+func advance_observation_time(delta: float) -> void:
+	# Session observation only; no Ball, Activity, Vitality or Wake dependencies.
+	observation_seconds += maxf(delta, 0.0)
+	if is_instance_valid(_observation_label):
+		_observation_label.text = "DEV ELAPSED  %.2f s" % observation_seconds
 
 
 func configure(source_tuning: Resource) -> void:
@@ -206,6 +220,11 @@ func _ensure_ui() -> void:
 	hint.add_theme_font_size_override("font_size", 12)
 	hint.add_theme_color_override("font_color", Color(0.63, 0.69, 0.79))
 	content.add_child(hint)
+
+	_observation_label = Label.new()
+	_observation_label.add_theme_font_size_override("font_size", 13)
+	content.add_child(_observation_label)
+	advance_observation_time(0.0)
 
 	var active_group := ""
 	var grid: GridContainer

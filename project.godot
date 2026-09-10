@@ -12,7 +12,7 @@ run/main_scene="res://scenes/main.tscn"
 [bounce_lite]
 
 ui_title="Bouncing Ball"
-phase="v0.1.5-paddle-interaction"
+phase="v0.1.6-design-boundary-consolidation"
 target_platform="Windows"
 
 [display]

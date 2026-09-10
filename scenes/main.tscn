@@ -1,12 +1,10 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
 [ext_resource type="Script" path="res://scripts/audio/basic_audio_feedback.gd" id="8_audio"]
 [ext_resource type="Script" path="res://scripts/ball/ball_controller.gd" id="2_ball"]
 [ext_resource type="Script" path="res://scripts/ball/ball_visuals.gd" id="3_visuals"]
 [ext_resource type="Script" path="res://scripts/paddle/paddle_controller.gd" id="4_paddle"]
-[ext_resource type="Script" path="res://scripts/rules/endless_rules.gd" id="5_rules"]
-[ext_resource type="Script" path="res://scripts/ui/prototype_hud.gd" id="6_hud"]
 [ext_resource type="Script" path="res://scripts/dev/runtime_tuning_panel.gd" id="7_tuning_panel"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBox_game_area"]
@@ -89,6 +87,7 @@ metadata/surface_kind = 2
 shape = SubResource("Rectangle_horizontal")
 
 [node name="Ball" type="CharacterBody2D" parent="GameArea"]
+process_physics_priority = -10
 z_index = 1
 position = Vector2(480, 260)
 collision_layer = 2
@@ -111,33 +110,8 @@ metadata/surface_kind = 3
 [node name="CollisionShape2D" type="CollisionShape2D" parent="GameArea/Paddle"]
 shape = SubResource("Rectangle_paddle")
 
-[node name="EndlessRules" type="Node" parent="."]
-script = ExtResource("5_rules")
-
 [node name="BasicAudio" type="Node" parent="."]
 script = ExtResource("8_audio")
-
-[node name="HUD" type="CanvasLayer" parent="."]
-script = ExtResource("6_hud")
-
-[node name="ComboLabel" type="Label" parent="HUD"]
-offset_left = 190.0
-offset_top = 91.0
-offset_right = 390.0
-offset_bottom = 122.0
-theme_override_colors/font_color = Color(0.75, 0.8, 0.9, 0.82)
-theme_override_font_sizes/font_size = 17
-text = "COMBO 0"
-
-[node name="TimerLabel" type="Label" parent="HUD"]
-offset_left = 650.0
-offset_top = 91.0
-offset_right = 771.0
-offset_bottom = 122.0
-theme_override_colors/font_color = Color(0.88, 0.91, 0.97, 0.9)
-theme_override_font_sizes/font_size = 17
-text = "TIME 00:00"
-horizontal_alignment = 2
 
 [node name="DebugOverlay" type="CanvasLayer" parent="."]
 layer = 10

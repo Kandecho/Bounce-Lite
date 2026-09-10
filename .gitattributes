@@ -10,3 +10,8 @@
 
 # Preserve upstream license files byte-for-byte, including original whitespace.
 assets/audio/*/License.txt -text -whitespace
+
+# Immutable source/review archives retain their recorded SHA-256 bytes.
+docs/design/design-baseline-v0.1.x.md -text -whitespace
+docs/reviews/v0.1.6-audit.md -text -whitespace
+docs/reviews/v0.1.6-cross-review.md -text -whitespace

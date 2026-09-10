@@ -1,5 +1,10 @@
 # Bounce Lite Asset Registry
 
+## V0.1.6 生命周期说明（2026-09-10）
+
+当前默认画面无 Combo 或时间 HUD；旧 Combo／HUD Timer／结果 UI 的规格和素材登记仅保留历史参考，不再作为当前生产要求。时间累计只在默认隐藏的 F1 开发面板显示 `DEV ELAPSED`，没有 Wake reset 或 RESTING pause。Ball / Glow / Trail / Paddle 的已验收外观不改。当前语义见 [V0.1.6 基线](design/design-baseline-v0.1.6.md)，变更见 [收口报告](reviews/v0.1.6-consolidation.md)。
+
+
 ## 1. 登记规则
 
 本登记表记录视觉元素的生产规格，不代表对应文件已经生产。Phase 0 不制作正式素材。
