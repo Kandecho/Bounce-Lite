@@ -74,7 +74,10 @@ func _physics_process(delta: float) -> void:
 			and normal.y < -0.5
 		)
 		var motion_before := remaining_motion.length()
-		resolve_surface_collision(kind, normal, valid_paddle_hit)
+		var contact_offset := 0.0
+		if valid_paddle_hit and collider is Node2D:
+			contact_offset = (collision.get_position().x - collider.global_position.x) / maxf(tuning.paddle_size.x * 0.5, 1.0)
+		resolve_surface_collision(kind, normal, valid_paddle_hit, contact_offset)
 		if kind == SurfaceResponseModelScript.SurfaceKind.PADDLE and support_kind != SupportKind.PADDLE:
 			paddle_contact.emit(valid_paddle_hit, collision.get_position())
 		if velocity.length_squared() <= MOTION_EPSILON * MOTION_EPSILON:
@@ -172,7 +175,7 @@ func advance_air_motion(delta: float) -> void:
 	velocity = velocity.limit_length(tuning.max_speed)
 
 
-func resolve_surface_collision(kind: int, normal: Vector2, valid_paddle_hit: bool) -> void:
+func resolve_surface_collision(kind: int, normal: Vector2, valid_paddle_hit: bool, contact_offset: float = 0.0) -> void:
 	if vitality_model == null or surface_response_model == null:
 		return
 	# Low-energy top contact is support, not a repeatedly rewarded hit.
@@ -193,7 +196,8 @@ func resolve_surface_collision(kind: int, normal: Vector2, valid_paddle_hit: boo
 		vitality_model.vitality_ratio(),
 		vitality_before,
 		vitality_model.max_vitality,
-		effective_paddle_hit
+		effective_paddle_hit,
+		contact_offset
 	)
 	velocity = result.velocity_after.limit_length(tuning.max_speed)
 	vitality_model.apply_delta(result.vitality_delta)

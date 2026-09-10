@@ -20,7 +20,7 @@ Bounce Lite 希望让屏幕中的互动拥有真实玩具的触感：操作简�
 
 当前为 **V0.1.6 可玩原型**，已收口 Activity / Physics 边界并移除成绩型显示，保留核心交互、冻结视觉和基础音效。当前提供 Godot 工程源码，主要面向 Windows 试玩。
 
-**V0.2 正在进行体验空间搜索规划**：探索哪些事件会让玩家产生“我和它在玩”的感觉。[设计原则](docs/design/v0.2-exploration-principles.md)已确认，[首批实验计划](docs/exploration/v0.2-exploration-plan.md)已建立；具体实验尚未实施，当前可玩内容仍为 V0.1.6。
+**当前分支是 E01 接触语言实验**：基于 V0.1.6，真实顶面接触位置会有限影响反弹倾向。运行方式同下；**F7 切换实验／原版接触规则**，标题栏显示当前版本。见[E01 试玩与验证记录](docs/exploration/e01-contact-language.md)。实验待用户体验判断，main 游戏基线未改变。
 
 F1 打开开发调参与 `DEV ELAPSED` 观察计数器；计数器持续累计，不因休息暂停或 Wake 归零，默认不显示在游戏画面。
 
@@ -53,7 +53,7 @@ F1 打开开发调参与 `DEV ELAPSED` 观察计数器；计数器持续累计�
 ## 文档
 
 - [main 设计基线](docs/design/design-baseline-v0.1.6.md)：V0.1.6 当前实现职责与边界。
-- [V0.2 探索原则](docs/design/v0.2-exploration-principles.md)与[探索计划](docs/exploration/v0.2-exploration-plan.md)：已确认的判断基础与待试玩假设，实施尚未启动。
+- [V0.2 探索原则](docs/design/v0.2-exploration-principles.md)与[探索计划](docs/exploration/v0.2-exploration-plan.md)：已确认的判断基础与待试玩假设；当前开始 E01。
 - [V0.1.6 收口报告](docs/reviews/v0.1.6-consolidation.md)：改动、验证与保留限制。
 - [文档导航](docs/README.md)：正式文档、审计与历史过程档案。
 - [项目概览](docs/project_overview.md)：产品方向、版本路线与当前状态。

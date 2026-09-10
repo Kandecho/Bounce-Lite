@@ -15,6 +15,7 @@ var tuning: Resource = PrototypeTuningScript.new()
 
 func _ready() -> void:
 	DisplayServer.window_set_title("Bouncing Ball")
+	_set_e01_enabled(not OS.get_cmdline_user_args().has("--e01-baseline"))
 	$Background.color = Tokens.DARK_WINDOW
 	var panel_style: StyleBoxFlat = $GameArea/Panel.get_theme_stylebox("panel").duplicate()
 	panel_style.bg_color = Tokens.DARK_PANEL
@@ -41,3 +42,15 @@ func _ready() -> void:
 
 func _on_paddle_interaction_sampled(input_distance: float, paddle_position: Vector2) -> void:
 	ball.apply_resting_interaction(input_distance, paddle_position)
+
+
+func _set_e01_enabled(enabled: bool) -> void:
+	tuning.e01_contact_enabled = enabled
+	DisplayServer.window_set_title("Bouncing Ball | E01 " + ("contact" if enabled else "baseline") + " | F7 compare")
+	print("E01: ", "contact" if enabled else "baseline", " (F7 switches future contacts only)")
+
+
+func _unhandled_key_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_F7:
+		_set_e01_enabled(not tuning.e01_contact_enabled)
+		get_viewport().set_input_as_handled()

@@ -1,5 +1,7 @@
 # Bounce Lite Agent Governance
 
+> 当前分支状态（2026-09-10）：用户已要求提交规划文档后创建分支开始探索。规划已提交为 `46fea98`；当前 `codex/exp-001-contact-language` 实施 E01，记录见 [E01 接触语言](docs/exploration/e01-contact-language.md)。下文“停在实施前／仅规划”为上一轮规划阶段记录，已被本次用户启动指令取代。实验未获人工体验验收，不合入 main。
+
 ## 适用范围与当前状态
 
 适用于本仓库全部子目录。当前 main 可玩基线为 **V0.1.6 — Design Boundary Consolidation**，实现与验证见 [收口报告](docs/reviews/v0.1.6-consolidation.md)。当前工作为 **V0.2 体验空间搜索规划**：用户已确认[探索设计原则](docs/design/v0.2-exploration-principles.md)，要求建立[探索计划](docs/exploration/v0.2-exploration-plan.md)，并明确停在具体实施之前。规划已授权，实验实施尚未启动；本轮不创建实验分支、不改游戏代码。
@@ -94,6 +96,7 @@ current user instruction > current active repository documentation > historical 
 - docs/README.md：文档生命周期与归档导航。
 - docs/design/v0.2-exploration-principles.md：用户已确认的探索判断依据；规划已授权，实施未启动。
 - docs/exploration/v0.2-exploration-plan.md：首批体验假设、对照、观察、分支与筛选计划；不是已确认的功能清单。
+- docs/exploration/e01-contact-language.md：当前分支首个可玩实验、F7 对照方式及验证记录；待用户试玩。
 - docs/design/design-baseline-v0.1.6.md：main 实现契约；v0.1.x 原稿字节保留。
 - docs/reviews/v0.1.6-consolidation.md：本轮实施、验证及已知限制；历史审计不回写。
 

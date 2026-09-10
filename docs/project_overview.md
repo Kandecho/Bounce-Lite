@@ -1,5 +1,7 @@
 # Bounce Lite Project Overview
 
+> 2026-09-10 分支状态：用户已要求提交规划并开始探索；规划提交 `46fea98`，当前分支 `codex/exp-001-contact-language` 已实现[E01 接触语言片段](exploration/e01-contact-language.md)，待用户试玩。下文规划阶段的“未启动”说明保留其时点，当前状态以本条及实验记录为准。main 游戏代码未改变，E02–E04 未在本分支实施。
+
 ## 当前状态：main 为 V0.1.6；V0.2 体验空间搜索规划
 
 main 的现有实现以 [V0.1.6 设计基线](design/design-baseline-v0.1.6.md)为依据。Activity 状态通知不改 Physics；Ground/Paddle 停稳由明确物理条件触发，先提交运动结果再进入 RESTING。Paddle 为 Surface + Interaction Medium，不是 Ball Controller。Vitality 影响运动维持能力，不规定方向，仍只经既有碰撞／Wake 事件变化。

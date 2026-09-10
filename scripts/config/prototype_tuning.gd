@@ -1,6 +1,10 @@
 class_name PrototypeTuning
 extends Resource
 
+# E01 branch only. Main opts in; false retains the V0.1.6 comparison.
+var e01_contact_enabled: bool = false
+var e01_contact_angle_degrees: float = 18.0
+
 @export_group("Vitality")
 @export_range(0.001, 100.0, 0.001) var max_vitality: float = 1.0
 @export_range(0.0, 1.0, 0.001) var active_vitality_ratio: float = 0.70

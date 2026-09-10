@@ -25,7 +25,8 @@ func resolve(
 	vitality_ratio_before: float,
 	vitality_before: float,
 	max_vitality: float,
-	valid_paddle_hit: bool
+	valid_paddle_hit: bool,
+	contact_offset: float = 0.0
 ) -> RefCounted:
 	var result: RefCounted = SurfaceCollisionResultScript.new()
 	result.surface_kind = surface_kind
@@ -53,6 +54,14 @@ func resolve(
 	if result.valid_paddle_hit:
 		result.velocity_after += result.normal * tuning.paddle_impulse
 	result.velocity_after = result.velocity_after.limit_length(tuning.max_speed)
+	# E01: a bounded bias of the ordinary outgoing motion, never a target angle.
+	# Only real, descending, near-flat top contacts participate.
+	if tuning.e01_contact_enabled and result.valid_paddle_hit \
+		and result.normal.y < -0.9 and velocity_before.y > 0.0 and contact_offset != 0.0:
+		var ordinary_angle := atan2(result.velocity_after.x, -result.velocity_after.y)
+		var bias := clampf(contact_offset, -1.0, 1.0) * deg_to_rad(clampf(tuning.e01_contact_angle_degrees, 0.0, 25.0))
+		var angle := clampf(ordinary_angle + bias, -deg_to_rad(80.0), deg_to_rad(80.0))
+		result.velocity_after = Vector2(sin(angle), -cos(angle)) * result.velocity_after.length()
 
 	result.vitality_delta = _vitality_delta_for(
 		result.effective_surface_kind,
