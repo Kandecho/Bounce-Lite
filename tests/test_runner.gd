@@ -3,6 +3,7 @@ extends SceneTree
 const TestSupport = preload("res://tests/test_support.gd")
 
 const TEST_PATHS: Array[String] = [
+	"res://tests/test_paddle_support.gd",
 	"res://tests/test_basic_audio.gd",
 	"res://tests/test_wake_sampling.gd",
 	"res://tests/test_ball_vitality_model.gd",

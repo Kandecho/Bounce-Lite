@@ -12,7 +12,7 @@ run/main_scene="res://scenes/main.tscn"
 [bounce_lite]
 
 ui_title="Bouncing Ball"
-phase="v0.1.4-basic-audio-feedback"
+phase="v0.1.5-paddle-interaction"
 target_platform="Windows"
 
 [display]

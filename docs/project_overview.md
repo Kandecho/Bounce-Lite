@@ -107,7 +107,7 @@ Phase 0 不创建 Godot 工程，不实现游戏内容。
 
 用户已于 `2026-09-08` 批准本轮改动。V0.1.3 保留既有状态体系：低 Vitality、低速度但尚未停稳的球继续使用 `DECAYING` 和正常 Physics Loop；只有低 Vitality 且 Ground 响应允许稳定时才进入 `RESTING`。
 
-进入 `RESTING` 后先经过可调的短暂休息窗口。窗口结束后，只有横向接近球的 Paddle 运动才产生 Wake Impulse。冲量强度连续映射 Paddle 水平速度，方向以向上为主并少量继承 Paddle 水平移动方向：弱冲量允许滚动或小幅移动但保持 `RESTING`；强冲量恢复少量 Vitality 并进入 `DECAYING`。Wake Impulse 与正常 Paddle Surface Response 是两个独立入口。
+以下为V0.1.3历史Wake规则，已由文末V0.1.5契约替代：进入 `RESTING` 后先经过可调的短暂休息窗口。窗口结束后，只有横向接近球的 Paddle 运动才产生 Wake Impulse。冲量强度连续映射 Paddle 水平速度，方向以向上为主并少量继承 Paddle 水平移动方向：弱冲量允许滚动或小幅移动但保持 `RESTING`；强冲量恢复少量 Vitality 并进入 `DECAYING`。Wake Impulse 与正常 Paddle Surface Response 是两个独立入口。
 
 V0.1.3 的关键 Wake 参数已集中到 `PrototypeTuning`，并接入 F1 运行时调参面板；不保存调参结果。
 
@@ -119,7 +119,7 @@ V0.1.3 的关键 Wake 参数已集中到 `PrototypeTuning`，并接入 F1 运行
 
 ### V0.1.5 - Final Investigation / Final Experience Review
 
-版本范围已由用户于 2026-09-09 确认：最终调查与整体体验复核。未启动；具体发现不提前转为 V0.1.3 功能扩展。
+版本范围为最终调查与整体体验复核。2026-09-10用户已授权实现Paddle支撑与Wake模型修正，见文末当前状态。
 
 其他模式、主题切换、更多平台和发布流程仍需另行授权。
 
@@ -184,8 +184,12 @@ Phase 0 完成不等于 V0.1 自动开始。最终流程为：
 
 该确认门已于 `2026-09-08` 通过；V0.1、V0.1.1、V0.1.2 与获批的 V0.1.3 核心实现均已进入机器验证流程。每次机器验证只证明确定性规则和工程可运行，不能替代人工体验验收。
 
-当前以用户最新授权为准：用户已验收V0.1.3。V0.1.4已确认以最小音频验证电子玩具感：Paddle pepSound3弹起、Strong Wake同类更有能量、Weak Wake无专门音效、Ground forceField短片下沉，Wall/Top已接入。Paddle/Strong Wake/Wall通过，Ground A可用；最新固定音高1.5待单独试听。确定性381、物理场景803、音频场景38 checks通过。Paddle Resting Support仅为pending设计问题，未实现；V0.1.5未启动。见 [音频基线](v0.1.4-basic-audio.md)。
+2026-09-09基线记录（后续状态见文末V0.1.5）：用户已验收V0.1.3。V0.1.4已确认以最小音频验证电子玩具感：Paddle pepSound3弹起、Strong Wake同类更有能量、Weak Wake无专门音效、Ground forceField短片下沉，Wall/Top已接入。Paddle/Strong Wake/Wall通过，Ground A可用；最新固定音高1.5待单独试听。确定性381、物理场景803、音频场景38 checks通过。Paddle Resting Support仅为pending设计问题，未实现；V0.1.5未启动。见 [音频基线](v0.1.4-basic-audio.md)。
 
-## V0.1.4 当前状态（2026-09-09）
+## V0.1.4 历史基线（2026-09-09）
 
 用户已验收V0.1.3。V0.1.4已确认以最小音频验证电子玩具感：Paddle pepSound3弹起、Strong Wake同类更有能量、Weak Wake无专门音效、Ground forceField短片下沉，Wall/Top已接入。Paddle/Strong Wake/Wall通过，Ground A可用；最新固定音高1.5待单独试听。确定性381、物理场景803、音频场景38 checks通过。Paddle Resting Support仅为pending设计问题，未实现；V0.1.5未启动。
+
+## V0.1.5 当前状态（2026-09-10）
+
+Paddle作为合法支撑面，Activity/Support/Physics分离；低活力低速顶面可停稳，横移不自动承载，支撑丢失恢复重力。连续弱输入产生可见轻微几何响应，保持RESTING且不改变Velocity/Vitality；Strong阈值达标后恢复活力，必要时一次固定上跳，不继承Paddle水平速度。方案与实现见[V0.1.5实施记录](v0.1.5-paddle-interaction.md)。已进入实现与验证，手感待人工试玩；不开展V0.2。

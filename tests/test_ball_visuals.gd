@@ -42,6 +42,16 @@ func run(suite: RefCounted) -> void:
 	suite.expect_float(visuals.glow_alpha_at_radius(1.0), 0.25, 0.00001, "Glow peaks at circle edge")
 	suite.expect_true(visuals.glow_alpha_at_radius(1.2) > visuals.glow_alpha_at_radius(1.4),
 		"Glow decreases continuously outside Core")
+	visuals.set_motion(Vector2.ZERO)
+	visuals.play_weak_feedback(0.2)
+	var weak_shape: Vector2 = visuals.deformation
+	visuals.play_weak_feedback(0.8)
+	suite.expect_true(visuals.deformation.y < weak_shape.y, "stronger weak input gives larger geometric response")
+	suite.expect_equal(visuals.core_color(), rest_color, "weak interaction does not change vitality color")
+	suite.expect_float(visuals.glow_peak(), 0.25, 0.0001, "weak interaction does not pulse Glow")
+	suite.expect_true(visuals.trail_ghosts().is_empty(), "stationary weak response creates no trail")
+	visuals.advance_feedback(2.0)
+	suite.expect_float(visuals.deformation.y, 1.0, 0.0001, "weak response relaxes after input stops")
 	for frame_rate in [30, 60, 120]:
 		visuals.clear_motion_history()
 		visuals.set_motion(Vector2(520, 0))

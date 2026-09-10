@@ -4,7 +4,8 @@ extends CharacterBody2D
 const PrototypeTuningScript = preload("res://scripts/config/prototype_tuning.gd")
 const Tokens = preload("res://scripts/config/visual_tokens.gd")
 
-signal motion_sampled(paddle_velocity: Vector2, paddle_position: Vector2)
+signal interaction_sampled(input_distance: float, paddle_position: Vector2)
+var _pending_input_distance := 0.0
 
 var tuning: Resource = PrototypeTuningScript.new()
 var left_bound: float = 0.0
@@ -79,6 +80,7 @@ func configure(source_tuning: Resource, left: float, right: float, y_position: f
 	fixed_y = y_position
 	position.y = fixed_y
 	target_x = clampf(position.x, _minimum_center_x(), _maximum_center_x())
+	_pending_input_distance = 0.0
 	queue_redraw()
 
 
@@ -88,7 +90,9 @@ func set_horizontal_bounds(left: float, right: float) -> void:
 
 
 func set_target_x(value: float) -> void:
-	target_x = clampf(value, _minimum_center_x(), _maximum_center_x())
+	var next_target := clampf(value, _minimum_center_x(), _maximum_center_x())
+	_pending_input_distance += absf(next_target - target_x)
+	target_x = next_target
 
 
 func advance_motion(delta: float) -> void:
@@ -101,8 +105,8 @@ func advance_motion(delta: float) -> void:
 	position.x = clampf(position.x, _minimum_center_x(), _maximum_center_x())
 	position.y = fixed_y
 	velocity = Vector2((position.x - previous_x) / delta, 0.0)
-	if not velocity.is_zero_approx():
-		motion_sampled.emit(velocity, global_position)
+	interaction_sampled.emit(_pending_input_distance, global_position)
+	_pending_input_distance = 0.0
 
 
 func _minimum_center_x() -> float:

@@ -17,14 +17,16 @@ func run(suite: RefCounted) -> void:
 
 	var tuning: Resource = tuning_script.new()
 	var paddle: CharacterBody2D = paddle_script.new()
+	paddle.position.x = 480.0
 	paddle.configure(tuning, 171.0, 790.0, 537.0)
 	var motion_samples: Array = []
-	var has_motion_signal := paddle.has_signal("motion_sampled")
+	var has_motion_signal := paddle.has_signal("interaction_sampled")
 	suite.expect_true(has_motion_signal,
-		"Paddle exposes actual motion samples instead of a binary Wake gesture")
+		"Paddle exposes fresh scalar target input separately from physical velocity")
 	if has_motion_signal:
-		paddle.connect("motion_sampled", func(sample_velocity: Vector2, sample_position: Vector2) -> void:
-			motion_samples.append([sample_velocity, sample_position])
+		paddle.connect("interaction_sampled", func(sample_distance: float, sample_position: Vector2) -> void:
+			if sample_distance > 0.0:
+				motion_samples.append([sample_distance, sample_position])
 		)
 
 	paddle.position = Vector2(480.0, 537.0)
@@ -38,14 +40,24 @@ func run(suite: RefCounted) -> void:
 		"Paddle velocity reflects actual horizontal movement")
 	if has_motion_signal:
 		suite.expect_equal(motion_samples.size(), 1,
-			"one Paddle update publishes one non-zero motion sample")
+			"one new target publishes one non-zero interaction sample")
 		if motion_samples.size() == 1:
-			suite.expect_float(motion_samples[0][0].x, paddle.velocity.x, 0.001,
-				"motion sample carries actual Paddle velocity")
-			suite.expect_float(motion_samples[0][0].y, 0.0, 0.001,
-				"motion sample remains horizontal")
-		paddle.set_target_x(paddle.position.x)
+			suite.expect_float(motion_samples[0][0], 235.0, 0.001,
+				"motion sample carries fresh clamped target distance")
+
 		paddle.advance_motion(0.1)
 		suite.expect_equal(motion_samples.size(), 1,
-			"stationary Paddle updates do not publish Wake input")
+			"unchanged target does not publish fresh interaction")
+	paddle.set_target_x(500.0)
+	paddle.advance_motion(1.0 / 60.0)
+	var sample_count := motion_samples.size()
+	paddle.advance_motion(1.0 / 60.0)
+	suite.expect_true(absf(paddle.velocity.x) > 0.0, "Paddle smoothing is still physically moving")
+	suite.expect_equal(motion_samples.size(), sample_count, "smoothing tail is not fresh interaction")
+	paddle.set_target_x(2000.0)
+	paddle.advance_motion(1.0 / 60.0)
+	sample_count = motion_samples.size()
+	paddle.set_target_x(3000.0)
+	paddle.advance_motion(1.0 / 60.0)
+	suite.expect_equal(motion_samples.size(), sample_count, "movement beyond clamped target cannot farm interaction")
 	paddle.free()

@@ -35,11 +35,9 @@ func run(suite: RefCounted) -> void:
 		"panel omits launch-only Initial speed")
 	suite.expect_true(panel.has_parameter("wake_rest_delay_seconds"),
 		"panel exposes the Rest window")
-	suite.expect_true(panel.has_parameter("wake_horizontal_factor"),
-		"panel exposes Wake horizontal inheritance")
-	suite.expect_true(panel.has_parameter("wake_vertical_factor"),
+	suite.expect_true(panel.has_parameter("wake_launch_speed"),
 		"panel exposes Wake lift strength")
-	suite.expect_true(panel.has_parameter("wake_activation_impulse"),
+	suite.expect_true(panel.has_parameter("wake_interaction_distance"),
 		"panel exposes the discrete Wake threshold")
 	suite.expect_true(panel.has_parameter("wake_vitality_restore_ratio"),
 		"panel exposes partial Wake Vitality recovery")
@@ -53,17 +51,14 @@ func run(suite: RefCounted) -> void:
 	suite.expect_float(tuning.max_speed, 640.0, 0.001,
 		"Max velocity edit updates the shared tuning resource")
 	panel.set_parameter_value("wake_rest_delay_seconds", 0.18)
-	panel.set_parameter_value("wake_horizontal_factor", 0.22)
-	panel.set_parameter_value("wake_vertical_factor", 0.55)
-	panel.set_parameter_value("wake_activation_impulse", 210.0)
+	panel.set_parameter_value("wake_launch_speed", 350.0)
+	panel.set_parameter_value("wake_interaction_distance", 15.0)
 	panel.set_parameter_value("wake_vitality_restore_ratio", 0.18)
 	suite.expect_float(tuning.wake_rest_delay_seconds, 0.18, 0.0001,
 		"Rest window edits update shared tuning")
-	suite.expect_float(tuning.wake_horizontal_factor, 0.22, 0.0001,
-		"Wake horizontal edits update shared tuning")
-	suite.expect_float(tuning.wake_vertical_factor, 0.55, 0.0001,
+	suite.expect_float(tuning.wake_launch_speed, 350.0, 0.0001,
 		"Wake lift edits update shared tuning")
-	suite.expect_float(tuning.wake_activation_impulse, 210.0, 0.001,
+	suite.expect_float(tuning.wake_interaction_distance, 15.0, 0.001,
 		"Wake threshold edits update shared tuning")
 	suite.expect_float(tuning.wake_vitality_restore_ratio, 0.18, 0.0001,
 		"Wake Vitality edits update shared tuning")

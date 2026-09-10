@@ -12,7 +12,13 @@ signal vitality_changed(previous: float, current: float)
 signal activity_state_changed(previous: int, current: int)
 signal bounds_recovered(previous_position: Vector2, recovered_position: Vector2)
 signal paddle_contact(valid: bool, contact_position: Vector2)
-signal wake_impulse_applied(strength: float, activated: bool, ball_position: Vector2)
+signal wake_committed(strength: float, activated: bool, ball_position: Vector2)
+signal weak_interaction(strength: float, ball_position: Vector2)
+
+enum SupportKind { NONE, GROUND, PADDLE }
+var support_kind: SupportKind = SupportKind.NONE
+var support_paddle: Node2D
+var interaction_strength := 0.0
 
 const MAX_COLLISIONS_PER_FRAME := 4
 const MOTION_EPSILON := 0.001
@@ -22,9 +28,9 @@ var tuning: Resource = PrototypeTuningScript.new()
 var vitality_model: RefCounted
 var surface_response_model: RefCounted
 var rest_elapsed_time: float = 0.0
-var resting_wake_impulse_consumed := false
+var wake_consumed := false
 var _wake_sample_elapsed := 0.0
-var _wake_sample_impulse := Vector2.ZERO
+var _interaction_distance := 0.0
 var arena_bounds := Rect2()
 var bounds_recovery_count: int = 0
 # Godot contact recovery can stop within its 0.08 px safe margin. Do not turn
@@ -46,9 +52,10 @@ func _physics_process(delta: float) -> void:
 		velocity = Vector2.ZERO
 		_update_visuals()
 		return
-	advance_resting_time(delta)
 	recover_out_of_bounds()
-	if is_resting() and velocity.length_squared() <= MOTION_EPSILON * MOTION_EPSILON:
+	_refresh_support()
+	advance_resting_time(delta)
+	if is_resting() and support_kind != SupportKind.NONE and velocity.length_squared() <= MOTION_EPSILON * MOTION_EPSILON:
 		velocity = Vector2.ZERO
 		_settle_ground_position()
 		_update_visuals()
@@ -75,7 +82,7 @@ func _physics_process(delta: float) -> void:
 		)
 		var motion_before := remaining_motion.length()
 		resolve_surface_collision(kind, normal, valid_paddle_hit)
-		if kind == SurfaceResponseModelScript.SurfaceKind.PADDLE:
+		if kind == SurfaceResponseModelScript.SurfaceKind.PADDLE and support_kind != SupportKind.PADDLE:
 			paddle_contact.emit(valid_paddle_hit, collision.get_position())
 		if velocity.length_squared() <= MOTION_EPSILON * MOTION_EPSILON:
 			break
@@ -130,6 +137,7 @@ func _settle_ground_position() -> void:
 	# Only snap a supported/already penetrated resting circle, never an airborne nudge.
 	if global_position.y >= ground_y - 0.5 and velocity.y >= 0.0:
 		global_position.y = ground_y
+		support_kind = SupportKind.GROUND
 
 
 func configure(source_tuning: Resource) -> void:
@@ -149,7 +157,8 @@ func start_active(initial_direction: Vector2) -> void:
 		return
 	vitality_model.reset_active()
 	rest_elapsed_time = 0.0
-	resting_wake_impulse_consumed = false
+	wake_consumed = false
+	support_kind = SupportKind.NONE
 	_clear_wake_sample()
 	velocity = _safe_direction(initial_direction) * tuning.initial_speed
 	_update_visuals()
@@ -158,7 +167,7 @@ func start_active(initial_direction: Vector2) -> void:
 func advance_air_motion(delta: float) -> void:
 	if vitality_model == null or delta <= 0.0:
 		return
-	if is_resting() and velocity.length_squared() <= MOTION_EPSILON * MOTION_EPSILON:
+	if is_resting() and support_kind != SupportKind.NONE and velocity.length_squared() <= MOTION_EPSILON * MOTION_EPSILON:
 		return
 	velocity.y += tuning.gravity_acceleration * delta
 	velocity = velocity.limit_length(tuning.max_speed)
@@ -166,6 +175,18 @@ func advance_air_motion(delta: float) -> void:
 
 func resolve_surface_collision(kind: int, normal: Vector2, valid_paddle_hit: bool) -> void:
 	if vitality_model == null or surface_response_model == null:
+		return
+	# Low-energy top contact is support, not a repeatedly rewarded hit.
+	if kind == SurfaceResponseModelScript.SurfaceKind.PADDLE and normal.y < -0.5 \
+		and velocity.y >= 0.0 and velocity.length() <= tuning.rest_settle_speed \
+		and vitality_model.vitality_ratio() <= tuning.rest_vitality_ratio \
+		and is_instance_valid(support_paddle) \
+		and absf(global_position.x - support_paddle.global_position.x) <= tuning.paddle_size.x * 0.5 - 1.0:
+		vitality_model.resolve_activity(true)
+		_settle_resting_motion()
+		support_kind = SupportKind.PADDLE
+		if is_instance_valid(support_paddle):
+			global_position.y = _paddle_support_y()
 		return
 	var was_resting := is_resting()
 	var effective_paddle_hit := valid_paddle_hit and not was_resting
@@ -206,63 +227,46 @@ func advance_resting_time(delta: float) -> void:
 	if not is_resting() or delta <= 0.0:
 		return
 	rest_elapsed_time += delta
-	if not _wake_sample_impulse.is_zero_approx():
+	if _interaction_distance > 0.0:
 		_wake_sample_elapsed += delta
 		if _wake_sample_elapsed + 0.000001 >= tuning.wake_sample_seconds:
-			_commit_wake_impulse(_wake_sample_impulse)
+			_clear_wake_sample()
 
 
-func apply_resting_wake_impulse(
-	paddle_velocity: Vector2,
-	paddle_position: Vector2
-) -> bool:
-	if vitality_model == null or not is_resting():
+func apply_resting_interaction(input_distance: float, paddle_position: Vector2) -> bool:
+	if vitality_model == null or not is_resting() or wake_consumed:
 		return false
-	if resting_wake_impulse_consumed:
-		return false
-	if rest_elapsed_time + 0.000001 < tuning.wake_rest_delay_seconds:
-		return false
+	_refresh_support()
 	if not _paddle_is_in_wake_range(paddle_position.x):
 		_clear_wake_sample()
 		return false
-	var paddle_speed := absf(paddle_velocity.x)
-	if is_zero_approx(paddle_speed):
+	if rest_elapsed_time + 0.000001 < tuning.wake_rest_delay_seconds or input_distance <= 0.0:
 		return false
-
-	var impulse := Vector2(
-		paddle_velocity.x * tuning.wake_horizontal_factor,
-		-paddle_speed * tuning.wake_vertical_factor
-	).limit_length(tuning.max_speed)
-	# Strong intent responds immediately. Small onset samples get a bounded
-	# opportunity to strengthen; preserve the peak sample's signed direction.
-	if impulse.length() + 0.000001 >= tuning.wake_activation_impulse:
-		return _commit_wake_impulse(impulse)
-	if impulse.length_squared() > _wake_sample_impulse.length_squared():
-		_wake_sample_impulse = impulse
-	if tuning.wake_sample_seconds <= 0.0:
-		return _commit_wake_impulse(_wake_sample_impulse)
-	return false
-
-
-func _commit_wake_impulse(impulse: Vector2) -> bool:
-	_clear_wake_sample()
-	resting_wake_impulse_consumed = true
-	velocity = (velocity + impulse).limit_length(tuning.max_speed)
-
-	var activated := false
-	if impulse.length() + 0.000001 >= tuning.wake_activation_impulse:
-		var restored_vitality: float = (
-			vitality_model.current_vitality
-			+ vitality_model.max_vitality * tuning.wake_vitality_restore_ratio
-		)
-		activated = vitality_model.wake(restored_vitality)
-	_update_visuals()
-	if activated:
+	_interaction_distance += input_distance
+	interaction_strength = clampf(_interaction_distance / maxf(tuning.wake_interaction_distance, 0.001), 0.0, 1.0)
+	if interaction_strength + 0.000001 < 1.0:
 		var visuals := get_node_or_null("Visuals")
-		if visuals != null and visuals.has_method("play_wake_feedback"):
-			visuals.play_wake_feedback()
-	wake_impulse_applied.emit(impulse.length(), activated, global_position)
-	return activated
+		if visuals != null and visuals.has_method("play_weak_feedback"):
+			visuals.play_weak_feedback(interaction_strength)
+		weak_interaction.emit(interaction_strength, global_position)
+		return false
+	var needs_start: bool = support_kind != SupportKind.NONE and velocity.length() <= tuning.rest_settle_speed
+	_clear_wake_sample()
+	wake_consumed = true
+	var activated: bool = vitality_model.wake(vitality_model.current_vitality + vitality_model.max_vitality * tuning.wake_vitality_restore_ratio)
+	if not activated:
+		return false
+	if needs_start:
+		# A discrete self-start, never proportional to input and never horizontal.
+		velocity.y = -tuning.wake_launch_speed
+		velocity = velocity.limit_length(tuning.max_speed)
+	support_kind = SupportKind.NONE
+	_update_visuals()
+	var visuals := get_node_or_null("Visuals")
+	if visuals != null and visuals.has_method("play_wake_feedback"):
+		visuals.play_wake_feedback()
+	wake_committed.emit(1.0, true, global_position)
+	return true
 
 
 func is_resting() -> bool:
@@ -278,14 +282,15 @@ func _paddle_is_in_wake_range(paddle_x: float) -> bool:
 
 func _clear_wake_sample() -> void:
 	_wake_sample_elapsed = 0.0
-	_wake_sample_impulse = Vector2.ZERO
+	_interaction_distance = 0.0
+	interaction_strength = 0.0
 
 
 func _settle_resting_motion() -> void:
 	_clear_wake_sample()
 	velocity = Vector2.ZERO
 	rest_elapsed_time = 0.0
-	resting_wake_impulse_consumed = false
+	wake_consumed = false
 
 
 func _safe_direction(value: Vector2) -> Vector2:
@@ -322,3 +327,27 @@ func _play_collision_feedback(kind: int, normal: Vector2) -> void:
 	var visuals := get_node_or_null("Visuals")
 	if visuals != null and visuals.has_method("play_collision_feedback"):
 		visuals.play_collision_feedback(kind, normal)
+
+
+func configure_support(paddle: Node2D) -> void:
+	support_paddle = paddle
+
+
+func _paddle_support_y() -> float:
+	return support_paddle.global_position.y - tuning.paddle_size.y * 0.5 - tuning.ball_radius - safe_margin
+
+
+func _refresh_support() -> void:
+	if not is_resting() or velocity.length_squared() > MOTION_EPSILON * MOTION_EPSILON:
+		support_kind = SupportKind.NONE
+		return
+	var previous := support_kind
+	support_kind = SupportKind.NONE
+	if arena_bounds.has_area() and absf(global_position.y - safe_center_bounds().end.y) <= 0.5:
+		support_kind = SupportKind.GROUND
+	elif is_instance_valid(support_paddle) \
+		and absf(global_position.x - support_paddle.global_position.x) <= tuning.paddle_size.x * 0.5 - 1.0 \
+		and absf(global_position.y - _paddle_support_y()) <= 0.5:
+		support_kind = SupportKind.PADDLE
+	if previous != SupportKind.NONE and support_kind == SupportKind.NONE:
+		_clear_wake_sample()

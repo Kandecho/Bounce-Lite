@@ -39,18 +39,18 @@ func _run() -> void:
 			audio.advance_time(1.0 / 60)
 			ball._physics_process(1.0 / 60)
 		suite.expect_equal(audio.play_counts[1], 0 if muted else 1, "one real Ground hit has one audio trigger")
-		# Accepted weak Wake emits only on commit, never on raw input or a state change.
+		# Continuous weak response is silent and does not consume strong eligibility.
 		ball.vitality_model.set_vitality(0.04)
 		ball.vitality_model.resolve_activity(true)
 		ball.position = Vector2(480, 564.92)
 		ball.advance_resting_time(0.12)
-		ball.apply_resting_wake_impulse(Vector2(100, 0), paddle.position)
+		ball.apply_resting_interaction(5.0, paddle.position)
 		suite.expect_equal(audio.play_counts[2], 0, "pending weak input is silent")
 		ball.advance_resting_time(0.05)
 		suite.expect_equal(audio.play_counts[2], 0, "weak Wake commit has no dedicated cue")
-		ball.apply_resting_wake_impulse(Vector2(500, 0), paddle.position)
-		suite.expect_equal(audio.play_counts[2], 0, "consumed Wake cannot replay audio")
-		# Weak Wake still produces physical contact audio; no global weak-state mute.
+		ball.apply_resting_interaction(2.0, paddle.position)
+		suite.expect_equal(audio.play_counts[2], 0, "repeated weak response remains silent")
+		# Real motion while RESTING still produces contact audio; weak feedback does not globally mute collisions.
 		var contact_counts: Array = audio.play_counts.duplicate()
 		audio.advance_time(0.2)
 		ball.velocity = Vector2(0, 60)
@@ -67,7 +67,7 @@ func _run() -> void:
 		suite.expect_equal(audio.play_counts[1], contact_counts[1] + (0 if muted else 1), "weak Wake Ground contact remains audible")
 		ball.advance_resting_time(0.12)
 		audio.advance_time(0.2)
-		ball.apply_resting_wake_impulse(Vector2(500, 0), paddle.position)
+		ball.apply_resting_interaction(25.0, paddle.position)
 		suite.expect_equal(audio.play_counts[2], 0 if muted else 1, "strong Wake sounds once despite state and visual signals")
 		var before: Array = audio.play_counts.duplicate()
 		audio.advance_time(0.2)

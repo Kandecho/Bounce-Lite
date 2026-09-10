@@ -45,6 +45,10 @@ func _capture() -> void:
 	visuals.set_vitality(0.0, 2)
 	paddle.advance_feedback(0.2)
 	await _save("v013-resting")
+	visuals.play_weak_feedback(0.9)
+	await _save("v015-weak-ground")
+	ball.position = Vector2(480, 511.92)
+	await _save("v015-weak-paddle")
 	# Put both game objects underneath the developer panel to expose layer regressions.
 	main.get_node("DebugOverlay/RuntimeTuningPanel").show()
 	ball.position = Vector2(700, 300)

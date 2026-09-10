@@ -14,9 +14,8 @@ extends Resource
 
 @export_group("Resting Wake")
 @export_range(0.0, 1.0, 0.01) var wake_rest_delay_seconds: float = 0.12
-@export_range(0.0, 1.0, 0.01) var wake_horizontal_factor: float = 0.18
-@export_range(0.0, 2.0, 0.01) var wake_vertical_factor: float = 0.70
-@export_range(0.0, 1000.0, 1.0) var wake_activation_impulse: float = 180.0
+@export_range(1.0, 100.0, 0.5) var wake_interaction_distance: float = 12.5
+@export_range(1.0, 1000.0, 1.0) var wake_launch_speed: float = 350.0
 @export_range(0.0, 1.0, 0.01) var wake_vitality_restore_ratio: float = 0.15
 @export_range(0.0, 500.0, 1.0) var wake_horizontal_range: float = 200.0
 @export_range(0.0, 0.1, 0.001) var wake_sample_seconds: float = 0.05

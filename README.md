@@ -18,7 +18,7 @@ Bounce Lite 希望让屏幕中的互动拥有真实玩具的触感：输入直�
 
 ## 当前状态
 
-当前为 **V0.1.4 可玩原型**，已具备核心交互、视觉反馈和基础音效，仍在打磨整体体验。当前提供 Godot 工程源码，主要面向 Windows 试玩。
+当前为 **V0.1.5 开发中的可玩原型**，已具备核心交互、视觉反馈和基础音效，仍在打磨整体体验。当前提供 Godot 工程源码，主要面向 Windows 试玩。
 
 详细进度与版本路线见[项目概览](docs/project_overview.md)。
 
@@ -49,6 +49,7 @@ Bounce Lite 希望让屏幕中的互动拥有真实玩具的触感：输入直�
 ## 文档
 
 - [项目概览](docs/project_overview.md)：产品方向、版本路线与当前状态。
+- [Paddle 与 Wake](docs/v0.1.5-paddle-interaction.md)：当前交互方案与试玩重点。
 - [视觉规格](docs/visual_spec.md)：视觉语言与反馈设计。
 - [基础音频](docs/v0.1.4-basic-audio.md)：声音方向、试玩操作与验证入口。
 - [开发记录](docs/development_notes.md)：实现及验证历史。

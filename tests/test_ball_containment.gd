@@ -52,8 +52,8 @@ func run(suite: RefCounted) -> void:
 	ball.velocity = Vector2(18, 40)
 	ball.resolve_surface_collision(Response.SurfaceKind.GROUND, Vector2.UP, false)
 	suite.expect_float(ball.position.y, 564.92, 0.01, "weak Wake landing repairs penetration")
-	suite.expect_false(ball.resting_wake_impulse_consumed, "settle rearms one-shot Wake")
+	suite.expect_false(ball.wake_consumed, "settle rearms one-shot Wake")
 	ball.advance_resting_time(0.12)
-	suite.expect_true(ball.apply_resting_wake_impulse(Vector2(500, 0), Vector2(480, 537)),
+	suite.expect_true(ball.apply_resting_interaction(25.0, Vector2(480, 537)),
 		"repaired resting ball can be strongly woken again")
 	ball.free()

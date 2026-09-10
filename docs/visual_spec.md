@@ -540,3 +540,7 @@ Start、Pause、Game Over 采用极简文字 UI。状态层保持透明，不新
 Glow 不受事件亮暗脉冲或速度影响；Ball 仅保留几何形变。Trail 使用固定时间采样历史，按路径插值落实最低 18 px 间距，最多四个可见残影；无足够历史时不虚构轨迹。Paddle 可选 squash 未实施。RESTING Core 与 Glow 使用状态常量，避免零 Vitality 消失。
 
 实际运行时 ACTIVE / DECAYING / RESTING 截图已检查，语义、手感与舒适度仍待用户试玩。详细实现与测试见 [当前 V0.1.3 spec](superpowers/specs/2026-09-09-v0.1.3-bugfix-visual-design.md)。
+
+## V0.1.5 弱交互几何反馈（2026-09-10）
+
+用户批准连续weak interaction→连续轻微响应→离散Strong Wake。弱响应仅Core最多6%竖向压缩、横向最多3%展开，随输入强度变化并按既有恢复曲线回弹；不移动Ball物理位置或碰撞形状，不改变Core颜色/Glow强度，不产生静止Trail。Paddle沿用短瞬时反馈；Strong保持既有几何反馈。该几何装饰不改变Vitality/Velocity/Interaction三通道归属。实际可感知程度待试玩。

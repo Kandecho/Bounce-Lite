@@ -28,7 +28,7 @@ func _run() -> void:
 		ball.advance_resting_time(0.12)
 		paddle.position.x = clampf(start_x, 250, 711)
 		await physics_frame
-		ball.apply_resting_wake_impulse(Vector2(100 if start_x < 500 else -100, 0), paddle.position)
+		ball.apply_resting_interaction(5.0, paddle.position)
 		ball.advance_resting_time(0.05)
 		suite.expect_true(paddle.feedback_strength() >= 0.15 and paddle.feedback_strength() <= 0.45,
 			"accepted weak Wake reaches Paddle feedback through Main")
@@ -40,8 +40,8 @@ func _run() -> void:
 		suite.expect_true(ball.is_resting(), "weak Wake settles without activation")
 		suite.expect_float(ball.position.y, 564.92, 0.1, "weak Wake returns to legal ground tangent")
 		suite.expect_equal(ball.velocity, Vector2.ZERO, "weak Wake fully settles")
-		suite.expect_false(ball.resting_wake_impulse_consumed, "scene settle rearms Wake")
-		suite.expect_true(ball.apply_resting_wake_impulse(Vector2(500, 0), Vector2(ball.position.x, 537)),
+		suite.expect_false(ball.wake_consumed, "scene settle rearms Wake")
+		suite.expect_true(ball.apply_resting_interaction(25.0, Vector2(ball.position.x, 537)),
 			"strong Wake remains available after scene settle")
 		suite.expect_float(paddle.feedback_strength(), 0.85, 0.001,
 			"strong Wake reaches Paddle feedback through Main")
@@ -54,10 +54,11 @@ func _run() -> void:
 			ball.vitality_model.resolve_activity(true)
 			ball.advance_resting_time(0.12)
 			paddle.position.x = 480 + direction * 130
+			paddle.configure(main.tuning, main.GAME_LEFT, main.GAME_RIGHT, 537)
 			paddle.set_target_x(paddle.position.x + direction)
 			await physics_frame
 			paddle.advance_motion(1.0 / hz)
-			suite.expect_false(ball.resting_wake_impulse_consumed, "small swipe onset remains available")
+			suite.expect_false(ball.wake_consumed, "small swipe onset remains available")
 			ball._physics_process(1.0 / hz)
 			paddle.set_target_x(paddle.position.x + direction * 50)
 			paddle.advance_motion(1.0 / hz)
@@ -80,16 +81,59 @@ func _run() -> void:
 		ball.advance_resting_time(0.12)
 		contacts.clear()
 		await physics_frame
-		ball.apply_resting_wake_impulse(Vector2(500, 0), paddle.position)
+		ball.apply_resting_interaction(25.0, paddle.position)
 		for frame in range(hz * 8):
 			await physics_frame
 			ball._physics_process(1.0 / hz)
 		suite.expect_true(contacts.has(false), "overhead Paddle retains real underside collision")
 		suite.expect_true(ball.is_resting(), "blocked launch eventually settles back to Resting")
 		suite.expect_equal(ball.velocity, Vector2.ZERO, "blocked launch does not chatter indefinitely")
-		suite.expect_false(ball.resting_wake_impulse_consumed, "blocked launch rearms after settling")
+		suite.expect_false(ball.wake_consumed, "blocked launch rearms after settling")
 		suite.expect_equal(ball.get_collision_exceptions().size(), 0, "blocked launch has no collision exception")
-		suite.expect_true(ball.apply_resting_wake_impulse(Vector2(-500, 0), Vector2(310, 537)), "next Wake remains available after blocked launch")
+		suite.expect_true(ball.apply_resting_interaction(25.0, Vector2(310, 537)), "next Wake remains available after blocked launch")
+	# Paddle is real support: low-energy top arrival settles without repeat events.
+	for hz in [30, 60, 120]:
+		ball.start_active(Vector2.UP)
+		paddle.position.x = 480
+		ball.position = Vector2(480, 510.92)
+		ball.vitality_model.set_vitality(0.04)
+		ball.velocity = Vector2(0, 20)
+		contacts.clear()
+		for frame in range(hz):
+			await physics_frame
+			ball._physics_process(1.0 / hz)
+		suite.expect_equal(ball.support_kind, ball.SupportKind.PADDLE, "low-energy arrival rests on Paddle")
+		suite.expect_true(ball.is_resting(), "Paddle support has independent resting activity")
+		suite.expect_equal(ball.velocity, Vector2.ZERO, "Paddle rest does not micro-bounce")
+		suite.expect_true(contacts.is_empty(), "support does not emit repeated collision feedback")
+		suite.expect_float(ball.vitality_model.current_vitality, 0.04, 0.0001, "support does not reward or wear vitality")
+		var x_before: float = ball.position.x
+		paddle.position.x += 20
+		await physics_frame
+		ball._physics_process(1.0 / hz)
+		suite.expect_float(ball.position.x, x_before, 0.0001, "Paddle translation does not carry Ball")
+		suite.expect_equal(ball.support_kind, ball.SupportKind.PADDLE, "overlapping support persists")
+		paddle.position.x += 120
+		await physics_frame
+		ball._physics_process(1.0 / hz)
+		suite.expect_equal(ball.support_kind, ball.SupportKind.NONE, "departed Paddle releases support")
+		suite.expect_true(ball.velocity.y > 0, "zero-velocity resting Ball falls when unsupported")
+		suite.expect_float(ball.vitality_model.current_vitality, 0.04, 0.0001, "support loss is physics, not vitality recovery")
+		# Settle again, then weak response and one strong restart from Paddle.
+		paddle.position.x = 480
+		ball.position = Vector2(480, 510.92)
+		ball.velocity = Vector2(0, 20)
+		for frame in range(hz):
+			await physics_frame
+			ball._physics_process(1.0 / hz)
+		ball.apply_resting_interaction(3, paddle.position)
+		suite.expect_equal(ball.velocity, Vector2.ZERO, "Paddle weak feedback is non-launching")
+		suite.expect_true(ball.apply_resting_interaction(30, paddle.position), "Paddle supports a fresh strong Wake")
+		suite.expect_equal(ball.velocity, Vector2(0, -350), "Paddle restart equals Ground restart")
+		for frame in range(hz / 5):
+			await physics_frame
+			ball._physics_process(1.0 / hz)
+		suite.expect_true(ball.position.y < 500, "Paddle-supported strong Wake leaves support normally")
 	# Bottom corners with repeatedly driven Paddle. Recovery must not become the normal path.
 	for start_x in [190.0, 771.0]:
 		ball.position = Vector2(start_x, 564.92)
@@ -134,6 +178,17 @@ func _run() -> void:
 	suite.expect_false(contacts.has(true), "underside contact is never an effective Paddle hit")
 	suite.expect_true(ball.vitality_model.current_vitality <= 0.20,
 		"underside contact cannot restore Vitality")
+	# A real valid Paddle hit resolves before input; no second launch/reward.
+	ball.start_active(Vector2.DOWN)
+	paddle.position.x = 480
+	ball.position = Vector2(480, 510)
+	ball.vitality_model.set_vitality(0.2)
+	ball.velocity = Vector2(0, 200)
+	await physics_frame
+	ball._physics_process(1.0 / 60)
+	var after_contact: Vector2 = ball.velocity
+	suite.expect_false(ball.apply_resting_interaction(100, paddle.position), "normal contact cannot also commit Wake")
+	suite.expect_equal(ball.velocity, after_contact, "normal rebound is never doubled by same-tick input")
 	# A stopped escaped Ball must also be recovered before the RESTING early return.
 	ball.vitality_model.set_vitality(0.02)
 	ball.vitality_model.resolve_activity(true)

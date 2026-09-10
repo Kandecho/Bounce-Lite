@@ -143,6 +143,13 @@ func play_collision_feedback(kind: int, normal: Vector2) -> void:
 	queue_redraw()
 
 
+func play_weak_feedback(strength: float) -> void:
+	# Small geometric response only: no velocity, glow pulse or trail.
+	var amount := clampf(strength, 0.0, 1.0) * 0.06
+	deformation = Vector2(1.0 + amount * 0.5, 1.0 - amount)
+	queue_redraw()
+
+
 func play_wake_feedback() -> void:
 	deformation = Vector2(0.82, 0.82)
 	queue_redraw()
