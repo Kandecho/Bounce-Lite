@@ -1,10 +1,14 @@
 # Bounce Lite Project Overview
 
-## 当前状态：V0.1.6 Design Boundary Consolidation
+## 当前状态：main 为 V0.1.6；V0.2 体验空间搜索规划
 
-当前以 [V0.1.6 设计基线](design/design-baseline-v0.1.6.md)为判断依据。Activity 状态通知不改 Physics；Ground/Paddle 停稳由明确物理条件触发，先提交运动结果再进入 RESTING。Paddle 为 Surface + Interaction Medium，不是 Ball Controller。Vitality 影响运动维持能力，不规定方向，仍只经既有碰撞／Wake 事件变化。
+main 的现有实现以 [V0.1.6 设计基线](design/design-baseline-v0.1.6.md)为依据。Activity 状态通知不改 Physics；Ground/Paddle 停稳由明确物理条件触发，先提交运动结果再进入 RESTING。Paddle 为 Surface + Interaction Medium，不是 Ball Controller。Vitality 影响运动维持能力，不规定方向，仍只经既有碰撞／Wake 事件变化。
 
-Combo 与其成绩逻辑已删除；Timer 只在 F1 开发面板显示累计过程时间，与游戏状态无绑定。默认画面无成绩或时间 HUD。configure 与 start_active 分离；普通反弹、恢复模型、方向、视觉和音频不扩展。实现、验证和人工待复核项见 [收口报告](reviews/v0.1.6-consolidation.md)。V0.2.0 未启动。
+Combo 与其成绩逻辑已删除；Timer 只在 F1 开发面板显示累计过程时间，与游戏状态无绑定。默认画面无成绩或时间 HUD。configure 与 start_active 分离；本轮规划不改普通反弹、恢复模型、方向、视觉和音频。实现、验证和人工待复核项见 [收口报告](reviews/v0.1.6-consolidation.md)。
+
+用户已确认 [V0.2 探索原则](design/v0.2-exploration-principles.md)，并要求建立[第一阶段探索计划](exploration/v0.2-exploration-plan.md)，停在具体实施之前。探索问题是“什么样的事件，会让玩家产生我和它在玩的感觉”；以接触语言、共同改变第三对象、停顿连续感及世界介入等不同假设展开搜索。允许玩家自发目标与奖励，不引入系统强制任务；不提前固化 wake／rebounce 状态或正式架构。
+
+当前规划已建立，实验分支、代码和试玩均未启动。后续实验全部在分支进行，经实际体验作保留／变形／搁置判断，再挑选符合核心关系的部分进入 main；不预先承诺 V0.2.0 功能清单。下文产品描述、机制限制及版本记录以其阶段为准，不将旧版机制冻结自动施加给新探索。
 
 下文阶段记录保留历史原意；曾批准的 Combo、活跃时间、旧 Wake 和概念状态 UI 不再构成当前实现要求。
 

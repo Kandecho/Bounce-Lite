@@ -2,7 +2,9 @@
 
 ## 适用范围与当前状态
 
-适用于本仓库全部子目录。当前阶段为 **V0.1.6 — Design Boundary Consolidation**。用户已授权 C1 修复、Combo 完整移除、Timer 转开发计数器、低风险健康度清理与文档归档；不新增玩法。当前设计依据为 [V0.1.6 Design Baseline](docs/design/design-baseline-v0.1.6.md)，实现和验证见 [收口报告](docs/reviews/v0.1.6-consolidation.md)。
+适用于本仓库全部子目录。当前 main 可玩基线为 **V0.1.6 — Design Boundary Consolidation**，实现与验证见 [收口报告](docs/reviews/v0.1.6-consolidation.md)。当前工作为 **V0.2 体验空间搜索规划**：用户已确认[探索设计原则](docs/design/v0.2-exploration-principles.md)，要求建立[探索计划](docs/exploration/v0.2-exploration-plan.md)，并明确停在具体实施之前。规划已授权，实验实施尚未启动；本轮不创建实验分支、不改游戏代码。
+
+[V0.1.6 Design Baseline](docs/design/design-baseline-v0.1.6.md)继续说明 main 的现有实现；V0.2 探索以新原则为判断依据，不把旧版机制与冻结参数自动视为实验禁区。历史 C1 修复、Combo 移除、开发计时器和归档工作保持已完成状态。
 
 用户已验收 V0.1.3（包括 Rest/Wake 修复），明确授权 V0.1.4：从 Kenney CC0 Audio 素材选择少量候选并接入当前事件，验证触发与叠音后交由用户实机试听。当前授权优先于历史禁止音频的阶段说明。
 
@@ -12,7 +14,20 @@
 - V0.1.4：basic audio feedback；已形成远端基线，方向已确认，Ground 最新音高待试听。
 - V0.1.5：final investigation / final experience review；Paddle支撑与连续弱交互/离散强Wake已授权，总体体验已获用户验收，非碰撞Paddle闪动修复后关键回归通过。
 
-- V0.1.6：Activity 通知不改物理；物理停稳后提交 RESTING。Combo 已移除；计时器仅为 F1 默认隐藏的开发观察工具。V0.2.0 未授权。
+- V0.1.6：Activity 通知不改物理；物理停稳后提交 RESTING。Combo 已移除；计时器仅为 F1 默认隐藏的开发观察工具。
+- V0.2：设计原则已确认，体验空间搜索计划已建立；具体实验及 V0.2.0 正式版本实施尚未启动。
+
+## V0.2 探索判断与授权边界
+
+- 核心是与具有自主性的对象共同互动。可学习规律、可感知影响是必要条件；球不是玩家控制器，挡板不是遥控器，结果不能完全由玩家输入决定。先建立规律，再判断是否需要随机变化。
+- 允许目标、奖励、能量对象及明确效果；玩家自发目标属于互动。禁止系统要求必须收集、数值评价或完成清单，不将奖励本身等同于任务。
+- 从希望玩家经历的瞬间出发，每项实验优先验证一个体验假设。第一阶段按区分不同设计方向的价值排序，不按最低工程成本排序。
+- 行为提供投射空间；不以人格、解释性文字或明确情绪给球定性。第三对象和世界介入与接触语言、停顿关系同样值得探索。
+- 不预先固化 wake／rebounce 机制边界，不因语义差异提前增加状态层；是否存在体验区别先由试玩判断。
+- 后续获准实施的实验全部在分支进行，允许临时事件、参数、行为、视觉反馈和不优雅的代码。不预建通用事件系统、行为树、复杂调度或为未来扩展提前抽象。在已授权实验范围内自主选择常规细节，不逐项请求参数确认。
+- 下文 main 的机制与视觉契约是对照基准；实验有意偏离时记录差异，不自动修改 main。工程环境、文件安全及具体任务授权继续适用。
+- 结果为保留／变形／搁置；未试玩不作体验结论。用户实际体验后选取最符合核心关系的部分进入 main，不能按完成度或代码量筛选。
+- 本轮仅规划。用户要求开始实验之前，不因本文记录了允许的实验自由度就提前实施。
 
 ## 指令、授权与资料
 
@@ -25,7 +40,7 @@ current user instruction > current active repository documentation > historical 
 - 当前有效文档见下方导航；Phase 0 和 V0.1/V0.1.2 计划仅保留历史基线。
 - 参考图片、附件、审查意见和候选方案不自动构成执行授权。
 - 在已授权范围内自主完成常规实现选择、相关修复、必要验证和文档同步，不逐项请求确认。
-- 若需要扩大范围、改变已冻结设计契约、产品方向、技术路线、平台、分辨率、名称、验收标准或版本规划，暂停该项并说明冲突及依据；其他不受影响的工作继续。
+- 若需要超出已授权范围、改变核心原则、main 已冻结设计契约、技术路线、平台、分辨率、名称、验收标准或正式版本规划，暂停该项并说明冲突及依据；其他不受影响的工作继续。后续已授权实验内的临时机制／参数偏离按探索原则记录，不据旧版参数冻结逐项追加确认。
 - 机器测试与渲染证据不能替代用户体验验收。
 
 ## 开始与结束工作
@@ -34,7 +49,7 @@ current user instruction > current active repository documentation > historical 
 
 结束前检查实际差异，确认没有越权修改或覆盖用户工作。报告实际修改、验证结果、未解决问题、人工试玩项及下一阶段启动判断。仅检查过历史记录时，不声称本轮测试通过。
 
-## 当前产品与技术契约
+## main 当前产品与技术契约（V0.1.6）
 
 - Project Name：Bounce Lite；UI Title：Bouncing Ball。
 - Windows / Godot 4.7 / GDScript / Compatibility / 960×720 / 4:3 等比缩放。
@@ -51,7 +66,7 @@ current user instruction > current active repository documentation > historical 
 - 不保留 Combo UI、计数、清零、成绩或对应规则测试。Timer 仅在默认隐藏的 F1 开发面板累计过程时间，不绑定 Activity/Vitality/Interaction，不因 RESTING 暂停或 Wake 归零；不持久化参数或观察时间。
 - ball_radius 为物理圆与未形变 Core 的共享半径，paddle_size 为物理矩形与外观共享尺寸；场景形状与 tuning 必须一致，几何回归锁定此约束。
 
-## 冻结视觉与范围
+## main 冻结视觉与范围（V0.1.6）
 
 - Ball Core / Glow 表达 Vitality，保留 RESTING 固定底光与状态色的已验收特例；Trail 只表达 Velocity；Paddle Feedback 只来自真实碰撞。禁止合并为统一 activity 值。
 - 荧光青 Ball、连续径向 Glow、离散时间采样 Trail、Paddle 瞬时反馈、Dark token 校准属于 V0.1.3 已授权范围。
@@ -77,7 +92,9 @@ current user instruction > current active repository documentation > historical 
 ## 当前有效文档与验证入口
 
 - docs/README.md：文档生命周期与归档导航。
-- docs/design/design-baseline-v0.1.6.md：当前设计判断依据；v0.1.x 原稿字节保留。
+- docs/design/v0.2-exploration-principles.md：用户已确认的探索判断依据；规划已授权，实施未启动。
+- docs/exploration/v0.2-exploration-plan.md：首批体验假设、对照、观察、分支与筛选计划；不是已确认的功能清单。
+- docs/design/design-baseline-v0.1.6.md：main 实现契约；v0.1.x 原稿字节保留。
 - docs/reviews/v0.1.6-consolidation.md：本轮实施、验证及已知限制；历史审计不回写。
 
 - README.md：GitHub项目介绍、简短状态及运行入口。
@@ -96,4 +113,4 @@ Godot console 路径由本机 GODOT_CONSOLE 或忽略的 .local/godot.local.txt 
 
 ## 人工试听门
 
-V0.1.3及V0.1.4历史验收保留；重力260保持。当前V0.1.5采用Support NONE/GROUND/PADDLE，低速低活力顶面停稳、不承载横移、失去支撑恢复重力。输入为新目标位移，200 px范围/0.12 s休息/50 ms窗口，初始阈值12.5 px。弱交互连续几何响应、不改速度/活力、不发Wake声；Strong一次恢复0.15活力，必要时固定向上350，不继承水平速度。原0.18/0.70冲量映射已由用户新指令取代。Paddle碰撞始终有效。用户已验收总体体验；Paddle只在真实碰撞时闪动，弱交互/Strong Wake均不触发Paddle闪动。V0.1.5 Paddle interaction model已收口；V0.1.6改动的机器验证与人工待复核项见收口报告。V0.2未授权。
+V0.1.3及V0.1.4历史验收保留；main重力260保持。main沿用V0.1.5的Support NONE/GROUND/PADDLE，低速低活力顶面停稳、不承载横移、失去支撑恢复重力。输入为新目标位移，200 px范围/0.12 s休息/50 ms窗口，初始阈值12.5 px。弱交互连续几何响应、不改速度/活力、不发Wake声；Strong一次恢复0.15活力，必要时固定向上350，不继承水平速度。原0.18/0.70冲量映射已由用户新指令取代。Paddle碰撞始终有效。用户已验收总体体验；Paddle只在真实碰撞时闪动，弱交互/Strong Wake均不触发Paddle闪动。V0.1.5 Paddle interaction model已收口；V0.1.6改动的机器验证与人工待复核项见收口报告。V0.2探索原则与计划见上方导航，具体实施未启动。
