@@ -10,7 +10,7 @@
 
 - V0.1.3：bug fixes + frozen visual presentation implementation。
 - V0.1.4：basic audio feedback；已形成远端基线，方向已确认，Ground 最新音高待试听。
-- V0.1.5：final investigation / final experience review；Paddle支撑与连续弱交互/离散强Wake已授权，人工体验待确认。
+- V0.1.5：final investigation / final experience review；Paddle支撑与连续弱交互/离散强Wake已授权，总体体验已获用户验收，非碰撞Paddle闪动修复后关键回归通过。
 
 ## 指令、授权与资料
 
@@ -84,4 +84,4 @@ Godot console 路径由本机 GODOT_CONSOLE 或忽略的 .local/godot.local.txt 
 
 ## 人工试听门
 
-V0.1.3及V0.1.4历史验收保留；重力260保持。当前V0.1.5采用Support NONE/GROUND/PADDLE，低速低活力顶面停稳、不承载横移、失去支撑恢复重力。输入为新目标位移，200 px范围/0.12 s休息/50 ms窗口，初始阈值12.5 px。弱交互连续几何响应、不改速度/活力、不发Wake声；Strong一次恢复0.15活力，必要时固定向上350，不继承水平速度。原0.18/0.70冲量映射已由用户新指令取代。Paddle碰撞始终有效。实现与机器验证不替代人工试玩；V0.2未授权。
+V0.1.3及V0.1.4历史验收保留；重力260保持。当前V0.1.5采用Support NONE/GROUND/PADDLE，低速低活力顶面停稳、不承载横移、失去支撑恢复重力。输入为新目标位移，200 px范围/0.12 s休息/50 ms窗口，初始阈值12.5 px。弱交互连续几何响应、不改速度/活力、不发Wake声；Strong一次恢复0.15活力，必要时固定向上350，不继承水平速度。原0.18/0.70冲量映射已由用户新指令取代。Paddle碰撞始终有效。用户已验收总体体验；Paddle只在真实碰撞时闪动，弱交互/Strong Wake均不触发Paddle闪动。V0.1.5 Paddle interaction model已收口，V0.2未授权。

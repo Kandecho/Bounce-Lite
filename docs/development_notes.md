@@ -504,3 +504,9 @@ BasicAudio节点通过surface_resolved和wake_impulse_applied接入，Paddle仅�
 弱输入提供随强度变化的Core轻微形变及Paddle瞬时反馈，不改Velocity/Vitality、不播放Wake音效、不消费Strong资格。新目标位移在50 ms内累计，阈值12.5 px；Strong恢复0.15最大Vitality，必要时一次固定向上350，无水平速度注入。Paddle低能量顶面可停稳，不承载横移；支撑丢失即恢复重力，且先清除旧输入累计再处理新输入。普通SurfaceResponseModel、BallVitalityModel及音频素材/参数保持。
 
 验证：确定性393、物理场景847、音频场景38通过；headless import/1200帧退出0；Compatibility弱反馈Ground/Paddle截图检查完成。环境根证书和编辑器本地配置保存提示仍存在。本轮未新增生产依赖，无音频处理链；日志/截图未纳入Git。待人工确认弱反馈强度、Strong阈值与固定起跳手感、Paddle支撑和不承载横移体验。未自动提交/推送，不进入V0.2。
+
+## 23. V0.1.5 Paddle interaction model 收口（2026-09-10）
+
+用户验收总体体验，要求先提交当前状态，再修复RESTING时Paddle非碰撞闪动并推送。检查点56c6bf8保存完整已验收实现。新增场景断言先复现6处弱/强Wake闪动；移除Main两条Paddle非碰撞视觉触发路径及Paddle废弃Wake反馈方法。真实接触反馈保留，球弱形变、Strong启动/Vitality/音效不变。
+
+关键回归：test_runner389、physics_scenarios847、audio_scenarios38通过；headless import、主场景1200帧退出0；Compatibility渲染完成，检查碰撞Paddle反馈。既有根证书读取/编辑器用户配置保存提示仍在，无新增脚本错误。V0.1.5 Paddle interaction model正式收口，不进入V0.2。

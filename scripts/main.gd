@@ -39,7 +39,6 @@ func _ready() -> void:
 	ball.surface_hit.connect(_on_ball_surface_hit)
 	ball.activity_state_changed.connect(_on_ball_activity_state_changed)
 	paddle.interaction_sampled.connect(_on_paddle_interaction_sampled)
-	ball.weak_interaction.connect(_on_weak_interaction)
 	ball.paddle_contact.connect(paddle.play_collision_feedback)
 	ball.wake_committed.connect(_on_wake_committed)
 	ball.surface_resolved.connect($BasicAudio.on_surface_resolved)
@@ -68,11 +67,6 @@ func _on_paddle_interaction_sampled(input_distance: float, paddle_position: Vect
 	ball.apply_resting_interaction(input_distance, paddle_position)
 
 
-func _on_weak_interaction(strength: float, ball_position: Vector2) -> void:
-	paddle.play_wake_feedback(strength, 1.0, false, ball_position)
-
-
-func _on_wake_committed(strength: float, activated: bool, ball_position: Vector2) -> void:
+func _on_wake_committed(_strength: float, activated: bool, _ball_position: Vector2) -> void:
 	if activated:
 		rules.begin_wake_cycle()
-	paddle.play_wake_feedback(strength, 1.0, activated, ball_position)

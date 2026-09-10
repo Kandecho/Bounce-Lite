@@ -543,4 +543,4 @@ Glow 不受事件亮暗脉冲或速度影响；Ball 仅保留几何形变。Trai
 
 ## V0.1.5 弱交互几何反馈（2026-09-10）
 
-用户批准连续weak interaction→连续轻微响应→离散Strong Wake。弱响应仅Core最多6%竖向压缩、横向最多3%展开，随输入强度变化并按既有恢复曲线回弹；不移动Ball物理位置或碰撞形状，不改变Core颜色/Glow强度，不产生静止Trail。Paddle沿用短瞬时反馈；Strong保持既有几何反馈。该几何装饰不改变Vitality/Velocity/Interaction三通道归属。实际可感知程度待试玩。
+用户批准连续weak interaction→连续轻微响应→离散Strong Wake。弱响应仅Core最多6%竖向压缩、横向最多3%展开，随输入强度变化并按既有恢复曲线回弹；不移动Ball物理位置或碰撞形状，不改变Core颜色/Glow强度，不产生静止Trail。Paddle仅真实碰撞沿用短瞬时反馈，弱交互和Strong Wake均不触发Paddle闪动；Strong保持球的既有几何反馈。该几何装饰不改变Vitality/Velocity/Interaction三通道归属。总体体验已获用户验收；碰撞专属Paddle闪动按后续反馈收口。

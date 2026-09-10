@@ -39,12 +39,6 @@ func play_collision_feedback(valid: bool, contact_position: Vector2) -> void:
 	_begin_feedback(1.0 if valid else 0.28, 0.22 if valid else 0.12, contact_position, not valid)
 
 
-func play_wake_feedback(impulse: float, threshold: float, activated: bool, ball_position: Vector2) -> void:
-	var strength := 0.85 if activated else lerpf(0.15, 0.45, clampf(impulse / maxf(threshold, 0.001), 0.0, 1.0))
-	_begin_feedback(strength, 0.26 if activated else 0.15,
-		Vector2(ball_position.x, global_position.y - tuning.paddle_size.y * 0.5), false)
-
-
 func _begin_feedback(strength: float, duration: float, contact: Vector2, invalid: bool) -> void:
 	_feedback_peak = strength
 	_feedback_duration = duration

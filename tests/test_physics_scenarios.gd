@@ -28,10 +28,11 @@ func _run() -> void:
 		ball.advance_resting_time(0.12)
 		paddle.position.x = clampf(start_x, 250, 711)
 		await physics_frame
+		paddle.advance_feedback(1.0)
 		ball.apply_resting_interaction(5.0, paddle.position)
 		ball.advance_resting_time(0.05)
-		suite.expect_true(paddle.feedback_strength() >= 0.15 and paddle.feedback_strength() <= 0.45,
-			"accepted weak Wake reaches Paddle feedback through Main")
+		suite.expect_float(paddle.feedback_strength(), 0.0, 0.0001,
+			"weak interaction never flashes Paddle")
 		for frame in range(120):
 			await physics_frame
 			ball._physics_process(1.0 / 60.0)
@@ -43,8 +44,8 @@ func _run() -> void:
 		suite.expect_false(ball.wake_consumed, "scene settle rearms Wake")
 		suite.expect_true(ball.apply_resting_interaction(25.0, Vector2(ball.position.x, 537)),
 			"strong Wake remains available after scene settle")
-		suite.expect_float(paddle.feedback_strength(), 0.85, 0.001,
-			"strong Wake reaches Paddle feedback through Main")
+		suite.expect_float(paddle.feedback_strength(), 0.0, 0.0001,
+			"strong Wake never flashes Paddle without collision")
 	# Actual smoothed swipes: tiny onset, then a fast motion away from the launch path.
 	for hz in [30, 60, 120]:
 		for direction in [-1.0, 1.0]:

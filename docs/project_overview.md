@@ -192,4 +192,4 @@ Phase 0 完成不等于 V0.1 自动开始。最终流程为：
 
 ## V0.1.5 当前状态（2026-09-10）
 
-Paddle作为合法支撑面，Activity/Support/Physics分离；低活力低速顶面可停稳，横移不自动承载，支撑丢失恢复重力。连续弱输入产生可见轻微几何响应，保持RESTING且不改变Velocity/Vitality；Strong阈值达标后恢复活力，必要时一次固定上跳，不继承Paddle水平速度。方案与实现见[V0.1.5实施记录](v0.1.5-paddle-interaction.md)。已进入实现与验证，手感待人工试玩；不开展V0.2。
+Paddle作为合法支撑面，Activity/Support/Physics分离；低活力低速顶面可停稳，横移不自动承载，支撑丢失恢复重力。连续弱输入产生可见轻微几何响应，保持RESTING且不改变Velocity/Vitality；Strong阈值达标后恢复活力，必要时一次固定上跳，不继承Paddle水平速度。方案与实现见[V0.1.5实施记录](v0.1.5-paddle-interaction.md)。用户已验收总体体验；非碰撞Paddle闪动已按反馈移除，Paddle仅真实碰撞闪动。关键回归完成，V0.1.5 Paddle interaction model收口；不开展V0.2。
