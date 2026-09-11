@@ -1,6 +1,6 @@
 # Bounce Lite Development Notes
 
-> 2026-09-11 当前进度：`codex/exp-v02-shared-world` 已进入完整可玩片段实现。高推理主代理定义与检验，低推理子代理实现和修复；E01 有限影响获用户实测认可。最新机制、验证、问题处置与试玩项集中记录在[V0.2 共享小世界](exploration/v0.2-shared-world.md)，下文历史结论按记录时点理解。
+> 2026-09-11 当前进度：现场核对至 `793c361`，中心色 UI 与全客户区场地已实现；随机出现及 Continue／Wake 后续调整尚未实施。设计依据为 [V0.2.0 Design Note](design/v0.2.0-design-note.md)，[后续计划](exploration/v0.2.0-follow-up-plan.md)已落盘；实施和分平台证据集中在[V0.2 共享小世界](exploration/v0.2-shared-world.md)。本轮仅同步文档，未新增游戏测试结果。下文历史结论按记录时点理解。
 
 ## 1. 记录范围
 

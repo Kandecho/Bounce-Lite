@@ -1,8 +1,8 @@
 # Bounce Lite Agent Governance
 
-适用于本仓库全部子目录。更新：2026-09-11。当前阶段为 **V0.2 完整可玩片段原型**；用户已授权开始实现，优先创造让玩家愿意停留几分钟的共同互动，不追求设置界面或全量产品 UI。
+适用于本仓库全部子目录。更新：2026-09-11。当前阶段为 **V0.2.0 原型后续调整**；完整原型、中心色 UI 和全客户区场地已实现。目标仍是让玩家愿意停留几分钟的共同互动，不追求设置界面或全量产品 UI。当前用户任务仅为同步文档与落盘计划，不在本轮启动后续代码实施。
 
-当前分支：`codex/exp-v02-shared-world`，基于 E01 `b9a03f2`。E01 有限接触影响已获用户实测认可，可保留；这不代表完整原型或其所有参数已获验收。main 可玩代码仍是 V0.1.6，原型不自动合入或推送。
+当前分支：`codex/exp-v02-shared-world`；文档同步起点为 `793c361`，最近运行时变更为 `54627e9`。E01 有限接触影响已获用户实测认可，可保留；最新 UI、场地及后续组合仍待体验。main 可玩代码仍是 V0.1.6，原型不自动合入或推送。
 
 ## 当前依据与历史关系
 
@@ -10,24 +10,29 @@
 
 current user instruction > current active repository documentation > historical / proposal material
 
-- [完整原型设计与实施口径](docs/design/v0.2-full-prototype.md)是当前创作与协作依据；[实施记录](docs/exploration/v0.2-shared-world.md)记录实际实现和证据。
+- [V0.2.0 Design Note](docs/design/v0.2.0-design-note.md)是当前设计入口；[后续实施计划](docs/exploration/v0.2.0-follow-up-plan.md)展开阶段任务与验证；[实施记录](docs/exploration/v0.2-shared-world.md)按提交和平台区分实际实现与证据。设计目标和计划不等于已实现。
+- Design Note 第 5 节中的建议与第 6 节的待探索项不自动成为已确认规格。先执行已定方向，实施时可自主选择、记录和验证临时参数；不能要求用户逐一设计行为，也不能把临时选择写成用户决定。
+- [原始设计思路](docs/design/design-idea-v0.2.0.md)按原字节保留，属于历史来源；其中关于“玩家离开”等表达以新 Design Note 的“不检测观看”口径为准。
 - [V0.1.6 基线](docs/design/design-baseline-v0.1.6.md)说明 main 已实现的契约；[收口报告](docs/reviews/v0.1.6-consolidation.md)保留验证时点。
-- [早期探索原则](docs/design/v0.2-exploration-principles.md)和[逐项实验计划](docs/exploration/v0.2-exploration-plan.md)保留为历史参照，当前已转为完整形态探索。
-- 旧版的“仅规划”“禁止默认子代理”“视听冻结”“每实验一个假设”及机制／参数／架构类型限制，不再约束当前已授权原型。旧 AGENTS 记录保留在 Git 历史，不继续叠加相互矛盾的现行规则。
+- [早期探索原则](docs/design/v0.2-exploration-principles.md)、[逐项实验计划](docs/exploration/v0.2-exploration-plan.md)和[完整原型阶段口径](docs/design/v0.2-full-prototype.md)保留为历史参照。
+- 旧版的“禁止默认子代理”“视听冻结”“每实验一个假设”及历史机制限制不重新生效；完整原型阶段“仅两项硬边界”的表述也不能覆盖后来确认的 lifecycle、观看语义及事件规则。旧 AGENTS 保留在 Git 历史，不叠加相互矛盾的现行规则。
 - 参考图、附件、审查意见和候选方案不自行扩大授权；当前用户授权覆盖的常规设计与实现选择自主推进，不逐项请求确认。
 
-## 两项设计硬边界
+## 当前设计与职责约定
 
-1. **Interaction / Physics 职责分离。** 交互与行为整理输入、形成意图、提出明确请求；Physics 负责真实运动、碰撞、支撑及运动结果。Activity 通知和 Feedback 不暗中改变运动。两层允许通过显式事件交互；现有类名、状态枚举、参数、公式或代码调用顺序不自动成为新增硬边界。
-2. **球是提供想象空间的对象。** 不将其做成照料型桌面宠物，也不把它简化为供玩家完全操纵的机械装置。行为与后续结果应留有解释空间。
-
-其他历史体验方向，例如可学习、克制、玩家自发目标和无任务压力，是当前创作的重要参照，不额外扩充为本次两项边界之外的绝对否决条款。
+- **职责分离。** Physics 提交运动、碰撞与支撑；Interaction 整理挡板介入、意图及 Wake 请求；Behavior 判断倾向、生命周期与 Continue；Feedback 只呈现结果。跨层采用显式请求，Activity 通知不暗中改运动。Behavior 是否独立成代码层留待合入 main 时评估，不为文档分类预建架构。
+- **球保留想象空间。** 表现行为，不解释内心；既不是桌面宠物，也不是可完全操纵的机械工具。
+- **不检测观看。** 无输入只是输入事实，不等于玩家离开、在看或不在场；不据此命名或触发存在性状态。
+- **生命周期固定。** ACTIVE → DECAYING → RESTING → Wake 或 Continue → ACTIVE。Wake 由挡板动作直接触发、推力强；Continue 由球停稳后发起、推力弱，玩家互动关系决定资格。围绕时间与空间调整，不通过改起跳来绕过挡板底面。
+- **挡板是 Surface 与介入中介。** 保留 E01 的有限接触影响；后续输入判断基于挡板动作并与设备解耦。“有效动作”的具体判定仍待实施探索，现有目标位置位移累计不能宣称已完成该目标。
+- **事件可学习，目标由玩家发起。** 随机用于世界对象的出现时间、位置和停留时间，对象出现后的规则保持稳定。无分数、Combo、失败状态或完成清单，不让能量块成为必须收集的资源。
+- 当前实现和目标的差异见后续计划，不以修改说明文字冒充已经完成代码调整。
 
 ## 创作与实施自由度
 
 - 机制数量和工程成本不先限制整体构想；选择能共同形成可玩瞬间的事件、行为与环境，而非堆积功能数量。
 - 音效、视觉、动画、光效、配色、参数、对象及恢复方式可自主选择、修改和组合，不沿用旧候选数量或资产形式限制。
-- 不为 wake／rebounce 的语义差异预先固定状态结构。可使用临时实现，也可为当前实际需要建立结构；不以工程形式是否优雅衡量原型价值。
+- 在已定 lifecycle 内探索 Wake／Continue 的资格、时间与表现；RESTING 的体验细分不自动要求新增状态枚举。可使用临时实现，不以工程形式是否优雅衡量原型价值。
 - 以完整体验片段检验组合效果，不要求所有组成机制先分别获用户验收。产品设置、全量 UI、发布包装不是本轮重点。
 - 保留简单对照和可返回版本，以便之后移除、替换和反向分析。
 
@@ -56,12 +61,13 @@ current user instruction > current active repository documentation > historical 
 - 视觉改动执行实际渲染捕获并检查截图，动态事件另以实际演化证据验证。阶段交付运行 headless import 和主场景 1200 帧，并检查完整片段的事件可达性和节奏。
 - Godot console 路径从 `GODOT_CONSOLE`、忽略的 `.local/godot.local.txt` 或 PATH 获取。自动化日志显式写入仓库 `.godot/`，不写用户全局设置；必要的临时配置仅影响检验进程。
 - 机器验证、主代理技术／视觉观察和用户体验结论分开记录。主代理不能用截图或测试宣布伙伴感成立，不能把历史测试冒充本轮执行。
+- 纯文档任务检查差异、相对链接、状态与来源一致性；不机械重跑游戏测试。引用既有测试必须注明提交、平台与执行时点。
 - 原型交付后由用户实际体验，再反向分析保留、变形或搁置哪些部分；不按完成度、代码量或投入成本决定进入 main。
 
 ## 文档入口
 
 - [文档导航](docs/README.md)、[项目概览](docs/project_overview.md)
-- [当前完整原型口径](docs/design/v0.2-full-prototype.md)、[当前实施记录](docs/exploration/v0.2-shared-world.md)
+- [当前设计笔记](docs/design/v0.2.0-design-note.md)、[后续实施计划](docs/exploration/v0.2.0-follow-up-plan.md)、[当前实施记录](docs/exploration/v0.2-shared-world.md)
 - [E01 与用户反馈](docs/exploration/e01-contact-language.md)
 - [main 设计基线](docs/design/design-baseline-v0.1.6.md)、[main 验证报告](docs/reviews/v0.1.6-consolidation.md)
 - 历史物理／交互、视觉和音频记录见文档导航，按其版本与顶部状态理解。

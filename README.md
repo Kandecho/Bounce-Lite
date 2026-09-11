@@ -12,7 +12,7 @@ Bounce Lite 希望让屏幕中的互动拥有真实玩具的触感：操作简�
 
 - **接住与弹起**：用挡板与球互动，观察真实接触后的反弹。挡板移动方向不直接传给球。
 - **停下与唤醒**：球会逐渐失去活力、进入休息；在附近移动挡板，可以让它重新活动。
-- **看见与听见反馈**：荧光青球体、光晕与残影呈现活力和运动，简短的电子音效回应弹起与落地。
+- **看见与听见反馈**：明亮球核心、青色光晕与残影呈现活力和运动；挡板在实际传递活力后变暗，简短音效回应碰撞与世界事件。
 
 它追求的是随手玩一会儿的轻松感，以及“再拨一下会怎样”的好奇心。
 
@@ -20,7 +20,9 @@ Bounce Lite 希望让屏幕中的互动拥有真实玩具的触感：操作简�
 
 当前分支为 **V0.2「共享小世界」可玩原型**。玩家通过挡板接触球，球可以拨动转子、改变局部气流、触碰补能对象；最近有互动时，短暂停顿后还可能继续一段。优先探索一个愿意停留几分钟的片段，没有加入设置界面或全量 UI。
 
-分支 `codex/exp-v02-shared-world` 从已获用户实测认可的 E01 有限接触影响展开；main 仍为 V0.1.6。完整组合尚待用户体验，不自动合入 main。运行和检验细节见[原型记录](docs/exploration/v0.2-shared-world.md)。
+分支 `codex/exp-v02-shared-world` 从已获用户实测认可的 E01 有限接触影响展开；main 仍为 V0.1.6。最新已实现中心色 UI 与全客户区场地，默认窗口 640×480；对象仍固定摆放。完整组合待实机体验，不自动合入 main。当前依据见[V0.2.0 设计笔记](docs/design/v0.2.0-design-note.md)，实际证据见[原型记录](docs/exploration/v0.2-shared-world.md)。
+
+[后续计划](docs/exploration/v0.2.0-follow-up-plan.md)已落盘：先随机出现，再调整 Continue 资格与 Wake／Continue 表现，最后完整试玩。这些后续变更尚未实施；计划中的临时数值和候选判定不视为已确认规格。
 
 F1 打开开发调参与 `DEV ELAPSED` 观察计数器；计数器持续累计，不因休息暂停或 Wake 归零，默认不显示在游戏画面。
 
@@ -48,16 +50,16 @@ F1 打开开发调参与 `DEV ELAPSED` 观察计数器；计数器持续累计�
 
 ## 技术栈
 
-使用 **Godot 4.7 / GDScript / Compatibility 渲染器**。画面以 960×720、4:3 为设计基准，窗口缩放时保持比例。画面由程序绘制；基础音效使用 Kenney 素材，世界事件使用原创合成音。
+使用 **Godot 4.7 / GDScript / Compatibility 渲染器**。逻辑视口为 960×720，默认窗口为 640×480，窗口缩放时保持 4:3。画面由程序绘制；基础音效使用 Kenney 素材，世界事件使用原创合成音。
 
 ## 文档
 
 - [main 设计基线](docs/design/design-baseline-v0.1.6.md)：V0.1.6 当前实现职责与边界。
-- [V0.2 当前设计](docs/design/v0.2-full-prototype.md)与[原型记录](docs/exploration/v0.2-shared-world.md)：实施口径、实际机制、验证和待体验项。
+- [V0.2.0 当前设计](docs/design/v0.2.0-design-note.md)、[后续计划](docs/exploration/v0.2.0-follow-up-plan.md)与[原型记录](docs/exploration/v0.2-shared-world.md)：分别说明判断依据、待实施任务和实际验证。
 - [V0.1.6 收口报告](docs/reviews/v0.1.6-consolidation.md)：改动、验证与保留限制。
 - [文档导航](docs/README.md)：正式文档、审计与历史过程档案。
 - [项目概览](docs/project_overview.md)：产品方向、版本路线与当前状态。
-- [Paddle 与 Wake](docs/v0.1.5-paddle-interaction.md)：当前交互方案与试玩重点。
+- [V0.1.5 Paddle 与 Wake](docs/v0.1.5-paddle-interaction.md)：历史交互基准，当前差异见原型记录。
 - [视觉规格](docs/visual_spec.md)：视觉语言与反馈设计。
 - [基础音频](docs/v0.1.4-basic-audio.md)：声音方向、试玩操作与验证入口。
 - [开发记录](docs/development_notes.md)：实现及验证历史。

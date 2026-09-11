@@ -1,6 +1,6 @@
 # Bounce Lite Visual Specification
 
-> 2026-09-11 当前分支说明：V0.2 已获自主视听创作授权。本文件保留 V0.1 规格及历史验收；当前世界对象与反馈的实际外观见[共享小世界记录](exploration/v0.2-shared-world.md)，不再将下文冻结要求作为新原型的额外硬边界。
+> 2026-09-11 当前分支说明：本文件保留 V0.1 规格及历史验收。当前依据为 [V0.2.0 Design Note](design/v0.2.0-design-note.md)，实际已实现方案 B、挡板传能变暗和全客户区场地，见[共享小世界记录](exploration/v0.2-shared-world.md)。Wake／Continue 表现交换仍在[后续计划](exploration/v0.2.0-follow-up-plan.md)中；下文冻结规格不覆盖当前决定。
 
 ## V0.1.6 生命周期说明（2026-09-10）
 

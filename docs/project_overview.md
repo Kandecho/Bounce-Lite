@@ -1,6 +1,6 @@
 # Bounce Lite Project Overview
 
-> 2026-09-11 当前状态：用户已授权充分展开 V0.2 原型，音效与视觉可自主调整，优先可玩片段。当前分支 `codex/exp-v02-shared-world` 从 E01 `b9a03f2` 展开；E01 有限影响经用户实测可以保留。见[当前设计口径](design/v0.2-full-prototype.md)和[共享小世界记录](exploration/v0.2-shared-world.md)。main 游戏代码仍为 V0.1.6。下文规划和版本限制保留历史时点，不覆盖当前授权。
+> 2026-09-11 当前状态：`codex/exp-v02-shared-world` 已在完整原型上实现中心色 UI 与全客户区场地，文档同步起点为 `793c361`。当前依据为 [V0.2.0 Design Note](design/v0.2.0-design-note.md)，后续顺序和验证见[实施计划](exploration/v0.2.0-follow-up-plan.md)，实际改动和证据见[共享小世界记录](exploration/v0.2-shared-world.md)。随机出现、Continue 资格及 Wake／Continue 表现调整尚未实施；最新组合待实机体验。main 游戏代码仍为 V0.1.6。下文保留历史时点，不覆盖当前设计。
 
 ## V0.1.6 基线与早期 V0.2 规划记录（历史）
 
