@@ -35,7 +35,7 @@ func _capture() -> void:
 	visuals.advance_motion_history(Vector2(65, 325), 0.0)
 	for frame in range(60):
 		visuals.advance_motion_history(Vector2(65 + 490.0 * (frame + 1) / 60, 325), 1.0 / 60)
-	paddle.play_collision_feedback(true, Vector2(480, 528))
+	paddle.play_energy_transfer(0.2)
 	await _save("v013-active")
 	visuals.set_vitality(0.4, 1)
 	paddle.advance_feedback(0.14)

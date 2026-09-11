@@ -16,6 +16,7 @@ const TEST_PATHS: Array[String] = [
 	"res://tests/test_ball_controller.gd",
 	"res://tests/test_ball_containment.gd",
 	"res://tests/test_ball_visuals.gd",
+	"res://tests/test_paddle_energy_feedback.gd",
 	"res://tests/test_runtime_tuning_panel.gd",
 	"res://tests/test_scene_smoke.gd",
 ]

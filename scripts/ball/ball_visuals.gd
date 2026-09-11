@@ -54,18 +54,22 @@ func core_color() -> Color:
 	return Tokens.core_color(_visual_vitality())
 
 
+# Scheme B: Glow hue/saturation stay at full-Vitality cyan; Vitality moves
+# only its brightness (peak alpha) and envelope radius.
 func glow_color() -> Color:
-	return Tokens.glow_color(_visual_vitality())
+	return Tokens.glow_color(1.0)
 
 
 func glow_peak() -> float:
-	if activity_state == BallVitalityModelScript.ActivityState.RESTING:
-		return 0.25
-	return lerpf(0.25, 0.85, vitality_ratio)
+	return Tokens.glow_alpha(_visual_vitality())
+
+
+func glow_envelope() -> float:
+	return Tokens.glow_envelope(_visual_vitality())
 
 
 func glow_alpha_at_radius(radius: float) -> float:
-	return glow_peak() * pow(1.0 - clampf((radius - 1.0) / 0.75, 0.0, 1.0), 1.6)
+	return glow_peak() * Tokens.glow_profile(radius, glow_envelope())
 
 
 func trail_color() -> Color:
@@ -165,11 +169,12 @@ func advance_feedback(delta: float) -> void:
 func _draw() -> void:
 	_draw_trail()
 	var radius: float = tuning.ball_radius
-	var envelope: float = radius * Tokens.GLOW_RADIUS
+	var envelope_ratio := glow_envelope()
+	var envelope: float = radius * envelope_ratio
 	# Glow's profile and envelope are independent of collision deformation.
 	var glow := glow_color()
 	glow.a = glow_peak()
-	draw_texture_rect(Tokens.radial_texture(), Rect2(Vector2.ONE * -envelope, Vector2.ONE * envelope * 2.0), false, glow)
+	draw_texture_rect(Tokens.glow_texture(envelope_ratio), Rect2(Vector2.ONE * -envelope, Vector2.ONE * envelope * 2.0), false, glow)
 	draw_set_transform(Vector2.ZERO, 0.0, deformation)
 	draw_circle(Vector2.ZERO, radius, core_color(), true, -1.0, true)
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)

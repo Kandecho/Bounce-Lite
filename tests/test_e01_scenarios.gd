@@ -51,7 +51,7 @@ func _run() -> void:
 				suite.expect_float(outgoing.x, 0.0, 0.001, "baseline and center remain vertical for vertical arrival")
 			suite.expect_true(outgoing.y < 0, "real contact escapes upward")
 			suite.expect_float(ball.vitality_model.current_vitality, 1, 0.001, "real contact retains baseline recovery")
-			suite.expect_true(paddle.feedback_strength() > 0, "existing true-contact feedback remains connected")
+			suite.expect_true(paddle.dim_strength() > 0, "true-contact energy transfer reaches the Paddle")
 	if velocities.size() == 6:
 		suite.expect_float(velocities[3].length(), velocities[0].length(), 0.001, "experiment does not add contact energy")
 		suite.expect_float(velocities[3].x, -velocities[5].x, 0.001, "mirrored contacts have mirrored bias")
@@ -68,7 +68,7 @@ func _run() -> void:
 	suite.expect_equal(ball.velocity, before_velocity, "comparison switch cannot change current motion")
 	suite.expect_equal(ball.position, before_position, "comparison switch cannot reposition Ball")
 	suite.expect_float(ball.vitality_model.current_vitality, before_vitality, 0.0001, "comparison switch cannot reward")
-	suite.expect_float(paddle.feedback_strength(), 0, 0.0001, "comparison switch cannot flash Paddle")
+	suite.expect_float(paddle.dim_strength(), 0, 0.0001, "comparison switch cannot dim Paddle")
 	key.echo = true
 	main._unhandled_key_input(key)
 	suite.expect_false(main.tuning.e01_contact_enabled, "key repeat does not toggle repeatedly")

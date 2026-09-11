@@ -52,7 +52,7 @@ func _ready() -> void:
 		ball.resume_committed.connect(_on_resume_committed)
 
 	paddle.interaction_sampled.connect(_on_paddle_interaction_sampled)
-	ball.paddle_contact.connect(paddle.play_collision_feedback)
+	ball.paddle_energy_transferred.connect(paddle.play_energy_transfer)
 	ball.surface_resolved.connect($BasicAudio.on_surface_resolved)
 	ball.wake_committed.connect($BasicAudio.on_wake_committed)
 

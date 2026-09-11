@@ -10,6 +10,8 @@ signal surface_resolved(result: RefCounted)
 signal paddle_contact(valid: bool, contact_position: Vector2)
 signal wake_committed(strength: float, activated: bool, ball_position: Vector2)
 signal resume_committed(ball_position: Vector2)
+# Feedback notification: Vitality the Paddle actually handed over (valid hit or Wake).
+signal paddle_energy_transferred(amount: float)
 
 var play_rhythm: RefCounted = PlayRhythm.new()
 var play_world: Object
@@ -290,6 +292,7 @@ func resolve_surface_collision(kind: int, normal: Vector2, valid_paddle_hit: boo
 	)
 	velocity = result.velocity_after.limit_length(tuning.max_speed)
 	vitality_model.apply_delta(result.vitality_delta)
+	var transferred: float = vitality_model.current_vitality - vitality_before
 	# Surface response grants physical settle permission; Activity is committed last.
 	if result.settle_allowed and (was_resting or vitality_model.vitality_ratio() <= tuning.rest_vitality_ratio):
 		_commit_resting_settle(SupportKind.GROUND)
@@ -297,6 +300,8 @@ func resolve_surface_collision(kind: int, normal: Vector2, valid_paddle_hit: boo
 		vitality_model.resolve_activity(false)
 	_update_visuals()
 	surface_resolved.emit(result)
+	if result.valid_paddle_hit and transferred > 0.0:
+		paddle_energy_transferred.emit(transferred)
 	_play_collision_feedback(result.effective_surface_kind, normal)
 
 
@@ -328,9 +333,11 @@ func apply_resting_interaction(input_distance: float, paddle_position: Vector2) 
 		return false
 	var needs_start: bool = support_kind != SupportKind.NONE and velocity.length() <= tuning.rest_settle_speed
 	_clear_wake_sample()
+	var vitality_before_wake: float = vitality_model.current_vitality
 	var activated: bool = vitality_model.wake(vitality_model.current_vitality + vitality_model.max_vitality * tuning.wake_vitality_restore_ratio)
 	if not activated:
 		return false
+	var wake_transferred: float = vitality_model.current_vitality - vitality_before_wake
 	wake_consumed = true
 	if needs_start:
 		# A discrete self-start, never proportional to input and never horizontal.
@@ -342,6 +349,8 @@ func apply_resting_interaction(input_distance: float, paddle_position: Vector2) 
 	if visuals != null and visuals.has_method("play_wake_feedback"):
 		visuals.play_wake_feedback()
 	wake_committed.emit(1.0, true, global_position)
+	if wake_transferred > 0.0:
+		paddle_energy_transferred.emit(wake_transferred)
 	return true
 
 
