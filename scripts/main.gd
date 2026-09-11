@@ -3,8 +3,10 @@ extends Node2D
 const PrototypeTuningScript = preload("res://scripts/config/prototype_tuning.gd")
 const Tokens = preload("res://scripts/config/visual_tokens.gd")
 
-const GAME_LEFT := 175.0
-const GAME_RIGHT := 786.0
+# World objects appear only inside this region: away from the side walls and top,
+# and kept clear of the Paddle band so the Ball can pass between them.
+const SPAWN_MARGIN := 72.0
+const SPAWN_PADDLE_CLEARANCE := 96.0
 
 var tuning: Resource = PrototypeTuningScript.new()
 var play_world: Node2D
@@ -22,26 +24,24 @@ func _ready() -> void:
 	if tuning.shared_world_enabled:
 		tuning.paddle_vitality_restore = 0.30
 	_update_title()
-	$Background.color = Tokens.DARK_WINDOW
-	var panel_style: StyleBoxFlat = $GameArea/Panel.get_theme_stylebox("panel").duplicate()
-	panel_style.bg_color = Tokens.DARK_PANEL
-	panel_style.border_color = Tokens.DARK_PANEL_BORDER
-	$GameArea/Panel.add_theme_stylebox_override("panel", panel_style)
+	# The whole visible client area is the world; no framed panel.
+	$Background.color = Tokens.WORLD_BACKGROUND
+	RenderingServer.set_default_clear_color(Tokens.WORLD_BACKGROUND)
 	runtime_tuning_panel.configure(tuning)
-	paddle.configure(tuning, GAME_LEFT, GAME_RIGHT, paddle.position.y)
-	ball.configure(tuning)
-	ball.configure_support(paddle)
-	# Use the inner collision faces, not the decorative Panel or Paddle bounds.
+	# Use the inner collision faces, which sit exactly on the viewport edges.
 	var left: float = $GameArea/LeftWall.position.x + $GameArea/LeftWall/CollisionShape2D.shape.size.x * 0.5
 	var right: float = $GameArea/RightWall.position.x - $GameArea/RightWall/CollisionShape2D.shape.size.x * 0.5
 	var top: float = $GameArea/Top.position.y + $GameArea/Top/CollisionShape2D.shape.size.y * 0.5
 	var bottom: float = $GameArea/Ground.position.y - $GameArea/Ground/CollisionShape2D.shape.size.y * 0.5
+	paddle.configure(tuning, left, right, paddle.position.y)
+	ball.configure(tuning)
+	ball.configure_support(paddle)
 	ball.configure_arena(Rect2(Vector2(left, top), Vector2(right - left, bottom - top)))
 	if tuning.shared_world_enabled:
 		play_world = load("res://scripts/world/play_world.gd").new()
 		play_world.name = "PlayWorld"
 		$GameArea.add_child(play_world)
-		play_world.configure(tuning, ball.arena_bounds)
+		play_world.configure(tuning, ball.arena_bounds, spawn_region())
 		ball.configure_world(play_world)
 		world_feedback = load("res://scripts/world/world_feedback.gd").new()
 		world_feedback.name = "WorldFeedback"
@@ -57,6 +57,16 @@ func _ready() -> void:
 	ball.wake_committed.connect($BasicAudio.on_wake_committed)
 
 	ball.start_active(Vector2(0.62, 1.0))
+
+
+func spawn_region() -> Rect2:
+	var arena: Rect2 = ball.arena_bounds
+	var paddle_top: float = paddle.position.y - tuning.paddle_size.y * 0.5
+	var region_top := arena.position.y + SPAWN_MARGIN
+	return Rect2(
+		Vector2(arena.position.x + SPAWN_MARGIN, region_top),
+		Vector2(arena.size.x - SPAWN_MARGIN * 2.0, paddle_top - SPAWN_PADDLE_CLEARANCE - region_top)
+	)
 
 
 func _on_paddle_interaction_sampled(input_distance: float, paddle_position: Vector2) -> void:

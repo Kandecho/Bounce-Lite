@@ -41,14 +41,17 @@ func _run() -> void:
 	main._physics_process(1.0 / 60.0)
 	suite.expect_true(main.world_feedback.muted, "world feedback follows F5 mute source")
 	# Reproduce the moving paddle corner pinning a circle against the right wall.
-	ball.global_position = Vector2(769.879, 521.3489)
+	# Recorded in the old framed arena (right face 788, Paddle y 537); shifted rigidly
+	# so the same wall/corner relationship holds in the full client-area world.
+	var shift := Vector2(ball.arena_bounds.end.x - 788.0, paddle.position.y - 537.0)
+	ball.global_position = Vector2(769.879, 521.3489) + shift
 	ball.velocity = Vector2(-336.4177, -153.487)
 	ball.vitality_model.set_vitality(0.7)
 	ball.support_kind = ball.SupportKind.NONE
-	paddle.position = Vector2(690.6726, 537.0)
+	paddle.position = Vector2(690.6726, 537.0) + shift
 	await physics_frame
 	ball._physics_process(1.0 / 60.0)
-	paddle.position.x = 695.9411
+	paddle.position.x = 695.9411 + shift.x
 	await physics_frame
 	ball._physics_process(1.0 / 60.0)
 	suite.expect_equal(ball.bounds_recovery_count, 0, "moving paddle corner cannot eject ball through right wall")

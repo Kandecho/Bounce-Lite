@@ -22,8 +22,9 @@ func _run() -> void:
 		audio.set_muted(muted)
 		await physics_frame
 		await physics_frame
+		var ground_y: float = ball.safe_center_bounds().end.y
 		# Real descending Paddle collision, with both visual and domain signals emitted.
-		ball.position = Vector2(480, 480)
+		ball.position = Vector2(480, paddle.position.y - 57.0)
 		ball.vitality_model.set_vitality(0.2)
 		ball.velocity = Vector2(0, 200)
 		for frame in range(15):
@@ -32,7 +33,7 @@ func _run() -> void:
 			ball._physics_process(1.0 / 60)
 		suite.expect_equal(audio.play_counts[0], 0 if muted else 1, "one real Paddle hit has one audio trigger")
 		# Real Ground hit away from the Paddle.
-		ball.position = Vector2(250, 540)
+		ball.position = Vector2(250, ground_y - 25.0)
 		ball.velocity = Vector2(0, 100)
 		for frame in range(20):
 			await physics_frame
@@ -42,7 +43,7 @@ func _run() -> void:
 		# Continuous weak response is silent and does not consume strong eligibility.
 		ball.vitality_model.set_vitality(0.04)
 		load("res://tests/test_support.gd").prepare_resting(ball)
-		ball.position = Vector2(480, 564.92)
+		ball.position = Vector2(480, ground_y)
 		ball.advance_resting_time(0.12)
 		ball.apply_resting_interaction(5.0, paddle.position)
 		suite.expect_equal(audio.play_counts[2], 0, "pending weak input is silent")

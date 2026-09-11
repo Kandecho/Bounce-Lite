@@ -4,9 +4,9 @@ extends RefCounted
 # V0.2 UI trial: Scheme B "constant bright Core + dual-channel Glow"
 # (artifact: Bounce Lite 活力视觉编码). Ball and Paddle share the 189° center hue.
 # Trail (Velocity channel) keeps the frozen 1.75r profile and full-Vitality color.
-const DARK_WINDOW := Color("242b37")
-const DARK_PANEL := Color("171c26")
-const DARK_PANEL_BORDER := Color("3a4350")
+# The whole client area is the world; its ground is the former panel color,
+# so earlier contrast figures stay valid.
+const WORLD_BACKGROUND := Color("171c26")
 const TEXT_PRIMARY := Color("ffffff")
 const TEXT_SECONDARY := Color("aaafbb")
 const BALL_HUE := 189.0 / 360.0

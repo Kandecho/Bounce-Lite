@@ -20,14 +20,17 @@ var enabled := true
 var _time := 0.0
 var _impact := 0.0
 var _charge_flash := 0.0
-var _arena := Rect2(173, 133, 615, 448)
+var _arena := Rect2(0, 0, 960, 720)
+var spawn_region := Rect2(72, 72, 816, 393)
 var _rotor: StaticBody2D
 var _charge: Area2D
 
-func configure(_tuning: Resource, arena_bounds: Rect2) -> void:
+func configure(_tuning: Resource, arena_bounds: Rect2, valid_spawn_region := Rect2()) -> void:
 	_arena = arena_bounds
-	rotor_position = _arena.position + _arena.size * Vector2(0.296, 0.451)
-	charge_position = _arena.position + _arena.size * Vector2(0.719, 0.44)
+	spawn_region = valid_spawn_region if valid_spawn_region.has_area() else arena_bounds
+	# Fixed placements for now, expressed inside the valid spawn region.
+	rotor_position = spawn_region.position + spawn_region.size * Vector2(0.27, 0.62)
+	charge_position = spawn_region.position + spawn_region.size * Vector2(0.73, 0.60)
 	if is_instance_valid(_rotor):
 		_rotor.position = to_local(rotor_position)
 		_charge.position = to_local(charge_position)

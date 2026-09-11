@@ -23,13 +23,14 @@ func _run() -> void:
 		if result.valid_paddle_hit:
 			results.append(result))
 	await physics_frame
+	var paddle_y: float = paddle.position.y
 	var velocities: Array[Vector2] = []
 	for enabled in [false, true]:
 		main._set_e01_enabled(enabled)
 		for offset in [-45.0, 0.0, 45.0]:
-			paddle.position = Vector2(480, 537)
+			paddle.position = Vector2(480, paddle_y)
 			ball.start_active(Vector2.DOWN)
-			ball.position = Vector2(480 + offset, 480)
+			ball.position = Vector2(480 + offset, paddle_y - 57.0)
 			ball.velocity = Vector2(0, 220)
 			ball.vitality_model.set_vitality(0.4)
 			results.clear()
