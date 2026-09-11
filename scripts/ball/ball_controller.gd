@@ -4,10 +4,15 @@ extends CharacterBody2D
 const PrototypeTuningScript = preload("res://scripts/config/prototype_tuning.gd")
 const BallVitalityModelScript = preload("res://scripts/ball/ball_vitality_model.gd")
 const SurfaceResponseModelScript = preload("res://scripts/physics/surface_response_model.gd")
+const PlayRhythm = preload("res://scripts/ball/play_rhythm.gd")
 
 signal surface_resolved(result: RefCounted)
 signal paddle_contact(valid: bool, contact_position: Vector2)
 signal wake_committed(strength: float, activated: bool, ball_position: Vector2)
+signal resume_committed(ball_position: Vector2)
+
+var play_rhythm: RefCounted = PlayRhythm.new()
+var play_world: Object
 
 enum SupportKind { NONE, GROUND, PADDLE }
 var support_kind: SupportKind = SupportKind.NONE
@@ -46,8 +51,10 @@ func _physics_process(delta: float) -> void:
 		_update_visuals()
 		return
 	recover_out_of_bounds()
+	_resolve_paddle_wall_pinch()
 	_refresh_support()
 	advance_resting_time(delta)
+	advance_play_rhythm(delta)
 	if is_resting() and support_kind != SupportKind.NONE and velocity.length_squared() <= MOTION_EPSILON * MOTION_EPSILON:
 		velocity = Vector2.ZERO
 		_settle_ground_position()
@@ -87,6 +94,7 @@ func _physics_process(delta: float) -> void:
 			/ maxf(motion_before, MOTION_EPSILON)
 		)
 		remaining_motion = velocity * delta * remaining_fraction
+	_resolve_shallow_ground_contact()
 	recover_out_of_bounds()
 	_update_visuals()
 	_record_motion(delta)
@@ -94,6 +102,48 @@ func _physics_process(delta: float) -> void:
 
 func configure_arena(inner_faces: Rect2) -> void:
 	arena_bounds = inner_faces
+
+
+func _resolve_shallow_ground_contact() -> void:
+	if not arena_bounds.has_area() or velocity.y <= 0.0:
+		return
+	var penetration: float = global_position.y + tuning.ball_radius - arena_bounds.end.y
+	if penetration < 0.0 or penetration > 0.5:
+		return
+	# Near-tangent subpixel motion can miss the engine sweep at the ground plane.
+	# This is the same real surface contact and response, not a bounds recovery.
+	global_position.y = arena_bounds.end.y - tuning.ball_radius - safe_margin
+	resolve_surface_collision(SurfaceResponseModelScript.SurfaceKind.GROUND, Vector2.UP, false)
+
+
+func _resolve_paddle_wall_pinch() -> void:
+	if not is_instance_valid(support_paddle) or not arena_bounds.has_area():
+		return
+	var half: Vector2 = tuning.paddle_size * 0.5
+	var offset := global_position - support_paddle.global_position
+	var closest := offset.clamp(-half, half)
+	var separation := offset - closest
+	var radius: float = tuning.ball_radius + safe_margin
+	if separation.length_squared() >= radius * radius or absf(offset.x) < half.x:
+		return
+	var bounds := safe_center_bounds()
+	var side := signf(offset.x)
+	var side_exit: float = support_paddle.global_position.x + side * (half.x + radius)
+	if side_exit >= bounds.position.x and side_exit <= bounds.end.x:
+		return
+	# The moving rectangle overlaps the circle, but its side exit is behind a wall.
+	# Resolve this actual contact along the available top/bottom arc instead of
+	# letting the engine's nearest-point recovery push through the wall.
+	var vertical_side := -1.0 if offset.y <= 0.0 else 1.0
+	var edge_distance := maxf(absf(offset.x) - half.x, 0.0)
+	var vertical_clearance := sqrt(maxf(radius * radius - edge_distance * edge_distance, 0.0))
+	global_position.y = support_paddle.global_position.y + vertical_side * (half.y + vertical_clearance + 0.01)
+	# Preserve the circle-corner normal; shallow side contact is not a top hit.
+	var normal := Vector2(side * edge_distance, vertical_side * vertical_clearance).normalized()
+	if velocity.dot(normal) < 0.0:
+		var valid := normal.y < -0.5 and velocity.y > 0.0 and not is_resting()
+		resolve_surface_collision(SurfaceResponseModelScript.SurfaceKind.PADDLE, normal, valid, offset.x / half.x)
+		paddle_contact.emit(valid, global_position - normal * tuning.ball_radius)
 
 
 func safe_center_bounds() -> Rect2:
@@ -158,6 +208,7 @@ func start_active(initial_direction: Vector2) -> void:
 	if vitality_model == null or surface_response_model == null:
 		configure(tuning)
 	vitality_model.reset_active()
+	play_rhythm = PlayRhythm.new()
 	rest_elapsed_time = 0.0
 	wake_consumed = false
 	support_kind = SupportKind.NONE
@@ -172,7 +223,45 @@ func advance_air_motion(delta: float) -> void:
 	if is_resting() and support_kind != SupportKind.NONE and velocity.length_squared() <= MOTION_EPSILON * MOTION_EPSILON:
 		return
 	velocity.y += tuning.gravity_acceleration * delta
+	if tuning.shared_world_enabled and is_instance_valid(play_world):
+		var environment: Vector2 = play_world.sample_acceleration(global_position, velocity)
+		if environment.is_finite():
+			velocity += environment * delta
 	velocity = velocity.limit_length(tuning.max_speed)
+
+
+func configure_world(world: Object) -> void:
+	play_world = world
+
+
+func note_player_input(distance: float) -> void:
+	if tuning.shared_world_enabled:
+		play_rhythm.note_input(distance)
+
+
+func receive_world_vitality(amount: float) -> void:
+	if not tuning.shared_world_enabled or vitality_model == null or not is_finite(amount):
+		return
+	# An offer changes energy only. A supported resting ball awaits an explicit start.
+	vitality_model.apply_delta(clampf(amount, 0.0, vitality_model.max_vitality))
+	if not is_resting():
+		vitality_model.resolve_activity(false)
+	_update_visuals()
+
+
+func advance_play_rhythm(delta: float) -> void:
+	if not tuning.shared_world_enabled:
+		return
+	var settled := is_resting() and support_kind != SupportKind.NONE and velocity.is_zero_approx()
+	if not play_rhythm.advance(delta, settled):
+		return
+	# Physics explicitly accepts the request, commits motion, then publishes Activity.
+	velocity = Vector2(0.0, -290.0).limit_length(tuning.max_speed)
+	support_kind = SupportKind.NONE
+	vitality_model.wake(vitality_model.current_vitality + vitality_model.max_vitality * 0.22)
+	wake_consumed = true
+	_update_visuals()
+	resume_committed.emit(global_position)
 
 
 func resolve_surface_collision(kind: int, normal: Vector2, valid_paddle_hit: bool, contact_offset: float = 0.0) -> void:

@@ -1,119 +1,67 @@
 # Bounce Lite Agent Governance
 
-> 当前分支状态（2026-09-10）：用户已要求提交规划文档后创建分支开始探索。规划已提交为 `46fea98`；当前 `codex/exp-001-contact-language` 实施 E01，记录见 [E01 接触语言](docs/exploration/e01-contact-language.md)。下文“停在实施前／仅规划”为上一轮规划阶段记录，已被本次用户启动指令取代。实验未获人工体验验收，不合入 main。
+适用于本仓库全部子目录。更新：2026-09-11。当前阶段为 **V0.2 完整可玩片段原型**；用户已授权开始实现，优先创造让玩家愿意停留几分钟的共同互动，不追求设置界面或全量产品 UI。
 
-## 适用范围与当前状态
+当前分支：`codex/exp-v02-shared-world`，基于 E01 `b9a03f2`。E01 有限接触影响已获用户实测认可，可保留；这不代表完整原型或其所有参数已获验收。main 可玩代码仍是 V0.1.6，原型不自动合入或推送。
 
-适用于本仓库全部子目录。当前 main 可玩基线为 **V0.1.6 — Design Boundary Consolidation**，实现与验证见 [收口报告](docs/reviews/v0.1.6-consolidation.md)。当前工作为 **V0.2 体验空间搜索规划**：用户已确认[探索设计原则](docs/design/v0.2-exploration-principles.md)，要求建立[探索计划](docs/exploration/v0.2-exploration-plan.md)，并明确停在具体实施之前。规划已授权，实验实施尚未启动；本轮不创建实验分支、不改游戏代码。
-
-[V0.1.6 Design Baseline](docs/design/design-baseline-v0.1.6.md)继续说明 main 的现有实现；V0.2 探索以新原则为判断依据，不把旧版机制与冻结参数自动视为实验禁区。历史 C1 修复、Combo 移除、开发计时器和归档工作保持已完成状态。
-
-用户已验收 V0.1.3（包括 Rest/Wake 修复），明确授权 V0.1.4：从 Kenney CC0 Audio 素材选择少量候选并接入当前事件，验证触发与叠音后交由用户实机试听。当前授权优先于历史禁止音频的阶段说明。
-
-已确认版本记录与当前范围：
-
-- V0.1.3：bug fixes + frozen visual presentation implementation。
-- V0.1.4：basic audio feedback；已形成远端基线，方向已确认，Ground 最新音高待试听。
-- V0.1.5：final investigation / final experience review；Paddle支撑与连续弱交互/离散强Wake已授权，总体体验已获用户验收，非碰撞Paddle闪动修复后关键回归通过。
-
-- V0.1.6：Activity 通知不改物理；物理停稳后提交 RESTING。Combo 已移除；计时器仅为 F1 默认隐藏的开发观察工具。
-- V0.2：设计原则已确认，体验空间搜索计划已建立；具体实验及 V0.2.0 正式版本实施尚未启动。
-
-## V0.2 探索判断与授权边界
-
-- 核心是与具有自主性的对象共同互动。可学习规律、可感知影响是必要条件；球不是玩家控制器，挡板不是遥控器，结果不能完全由玩家输入决定。先建立规律，再判断是否需要随机变化。
-- 允许目标、奖励、能量对象及明确效果；玩家自发目标属于互动。禁止系统要求必须收集、数值评价或完成清单，不将奖励本身等同于任务。
-- 从希望玩家经历的瞬间出发，每项实验优先验证一个体验假设。第一阶段按区分不同设计方向的价值排序，不按最低工程成本排序。
-- 行为提供投射空间；不以人格、解释性文字或明确情绪给球定性。第三对象和世界介入与接触语言、停顿关系同样值得探索。
-- 不预先固化 wake／rebounce 机制边界，不因语义差异提前增加状态层；是否存在体验区别先由试玩判断。
-- 后续获准实施的实验全部在分支进行，允许临时事件、参数、行为、视觉反馈和不优雅的代码。不预建通用事件系统、行为树、复杂调度或为未来扩展提前抽象。在已授权实验范围内自主选择常规细节，不逐项请求参数确认。
-- 下文 main 的机制与视觉契约是对照基准；实验有意偏离时记录差异，不自动修改 main。工程环境、文件安全及具体任务授权继续适用。
-- 结果为保留／变形／搁置；未试玩不作体验结论。用户实际体验后选取最符合核心关系的部分进入 main，不能按完成度或代码量筛选。
-- 本轮仅规划。用户要求开始实验之前，不因本文记录了允许的实验自由度就提前实施。
-
-## 指令、授权与资料
+## 当前依据与历史关系
 
 在平台 system / developer 指令之下，项目判断采用：
 
 current user instruction > current active repository documentation > historical / proposal material
 
-- 用户当前直接请求优先于旧阶段文件、审查建议和技能工作流。
-- 当前用户设计基线已正式归档至 docs/design/；新版本决定优先于历史审计建议。
-- 当前有效文档见下方导航；Phase 0 和 V0.1/V0.1.2 计划仅保留历史基线。
-- 参考图片、附件、审查意见和候选方案不自动构成执行授权。
-- 在已授权范围内自主完成常规实现选择、相关修复、必要验证和文档同步，不逐项请求确认。
-- 若需要超出已授权范围、改变核心原则、main 已冻结设计契约、技术路线、平台、分辨率、名称、验收标准或正式版本规划，暂停该项并说明冲突及依据；其他不受影响的工作继续。后续已授权实验内的临时机制／参数偏离按探索原则记录，不据旧版参数冻结逐项追加确认。
-- 机器测试与渲染证据不能替代用户体验验收。
+- [完整原型设计与实施口径](docs/design/v0.2-full-prototype.md)是当前创作与协作依据；[实施记录](docs/exploration/v0.2-shared-world.md)记录实际实现和证据。
+- [V0.1.6 基线](docs/design/design-baseline-v0.1.6.md)说明 main 已实现的契约；[收口报告](docs/reviews/v0.1.6-consolidation.md)保留验证时点。
+- [早期探索原则](docs/design/v0.2-exploration-principles.md)和[逐项实验计划](docs/exploration/v0.2-exploration-plan.md)保留为历史参照，当前已转为完整形态探索。
+- 旧版的“仅规划”“禁止默认子代理”“视听冻结”“每实验一个假设”及机制／参数／架构类型限制，不再约束当前已授权原型。旧 AGENTS 记录保留在 Git 历史，不继续叠加相互矛盾的现行规则。
+- 参考图、附件、审查意见和候选方案不自行扩大授权；当前用户授权覆盖的常规设计与实现选择自主推进，不逐项请求确认。
 
-## 开始与结束工作
+## 两项设计硬边界
 
-开始前确认工作区路径、相关文件和 Git 状态；识别并保护用户已有修改，明确本次文件范围。编辑前读取文件当前内容。搜索及命令优先使用明确的仓库路径，避免依赖不可靠的默认目录。
+1. **Interaction / Physics 职责分离。** 交互与行为整理输入、形成意图、提出明确请求；Physics 负责真实运动、碰撞、支撑及运动结果。Activity 通知和 Feedback 不暗中改变运动。两层允许通过显式事件交互；现有类名、状态枚举、参数、公式或代码调用顺序不自动成为新增硬边界。
+2. **球是提供想象空间的对象。** 不将其做成照料型桌面宠物，也不把它简化为供玩家完全操纵的机械装置。行为与后续结果应留有解释空间。
 
-结束前检查实际差异，确认没有越权修改或覆盖用户工作。报告实际修改、验证结果、未解决问题、人工试玩项及下一阶段启动判断。仅检查过历史记录时，不声称本轮测试通过。
+其他历史体验方向，例如可学习、克制、玩家自发目标和无任务压力，是当前创作的重要参照，不额外扩充为本次两项边界之外的绝对否决条款。
 
-## main 当前产品与技术契约（V0.1.6）
+## 创作与实施自由度
 
-- Project Name：Bounce Lite；UI Title：Bouncing Ball。
-- Windows / Godot 4.7 / GDScript / Compatibility / 960×720 / 4:3 等比缩放。
-- 放松型 Endless 数字玩具；鼠标控制 Paddle 水平运动；无固定局时、必败曲线或竞技压力。
-- CharacterBody2D Ball、固定重力 260 px/s²、局部 signals；不引入 RigidBody2D、全局 Event Bus 或替代碰撞系统。
-- Physics 与 Vitality 通过显式事件和响应交互；SurfaceResponseModel 使用碰撞前 Velocity/Vitality 计算普通响应，BallController 按 Velocity → Vitality delta → State 应用。Paddle 低能支撑与异常恢复为保留的明确物理入口。
-- Activity 转换只更新状态并通知，不直接修改 Velocity、Position 或 Physics 状态。Ground/Paddle 物理停稳先应用运动与支撑结果，再提交 RESTING；Wake 可显式同时恢复活力与按需启动。
-- configure() 只配置依赖，start_active() 显式开局；不得恢复隐式开局。Paddle 是 Surface + Interaction Medium，不是 Ball Controller。
-- BallVitalityModel 只维护 Vitality 边界和状态，不持有 Surface 或速度公式。
-- Vitality 保持在 [0, max]；正常玩法由碰撞改变，初始化及显式强 Wake 恢复为已确认的独立入口。
-- 保留 ACTIVE / DECAYING / RESTING。Support独立于Activity；当前连续弱几何响应、离散Strong Wake与支撑契约见docs/v0.1.5-paddle-interaction.md，替代V0.1.3的速度映射。
-- Paddle 固定高度、直接位置驱动；轻量 sweep 仅登记，未纳入本轮。
-- safe bounds 仅用于异常恢复，不能代替正常 Surface Response；settle 不额外施加 Vitality 损耗或生成反弹。
-- 不保留 Combo UI、计数、清零、成绩或对应规则测试。Timer 仅在默认隐藏的 F1 开发面板累计过程时间，不绑定 Activity/Vitality/Interaction，不因 RESTING 暂停或 Wake 归零；不持久化参数或观察时间。
-- ball_radius 为物理圆与未形变 Core 的共享半径，paddle_size 为物理矩形与外观共享尺寸；场景形状与 tuning 必须一致，几何回归锁定此约束。
+- 机制数量和工程成本不先限制整体构想；选择能共同形成可玩瞬间的事件、行为与环境，而非堆积功能数量。
+- 音效、视觉、动画、光效、配色、参数、对象及恢复方式可自主选择、修改和组合，不沿用旧候选数量或资产形式限制。
+- 不为 wake／rebounce 的语义差异预先固定状态结构。可使用临时实现，也可为当前实际需要建立结构；不以工程形式是否优雅衡量原型价值。
+- 以完整体验片段检验组合效果，不要求所有组成机制先分别获用户验收。产品设置、全量 UI、发布包装不是本轮重点。
+- 保留简单对照和可返回版本，以便之后移除、替换和反向分析。
 
-## main 冻结视觉与范围（V0.1.6）
+## 主代理与低推理子代理
 
-- Ball Core / Glow 表达 Vitality，保留 RESTING 固定底光与状态色的已验收特例；Trail 只表达 Velocity；Paddle Feedback 只来自真实碰撞。禁止合并为统一 activity 值。
-- 荧光青 Ball、连续径向 Glow、离散时间采样 Trail、Paddle 瞬时反馈、Dark token 校准属于 V0.1.3 已授权范围。
-- Ball 不使用独立事件亮暗脉冲；可保留瞬时几何 squash/stretch。
-- Paddle 不使用常驻 Glow、edge line 或装饰层；约 140 ms 回到接近基础色，有限尾段完全清零。曲线口径见当前 spec。
-- 视觉仍为运行时程序生成 GradientTexture2D，不生产正式位图或字体。V0.1.4使用少量Kenney CC0音效及已授权最小裁片，不建立正式素材生产流程。
-- 不实现 Game Over、Classic、Recover、主题切换、Light 对象重设计、Paddle 分区、障碍物、排行榜、最高分、Vitality 数值条、复杂 Shader 或粒子。
-- V0.1.4仅Paddle/Ground/Wake最小音频反馈，Wall低优先级。每事件最多2–3候选，保留原始来源与许可；不代替用户作听感决定。V0.1.5已授权上述交互修正；V0.2音频流程、正式混音、风格体系、动态音高、随机变体、材质音色和配乐不在当前范围。
+- 主任务按高推理配置执行，负责体验目标、任务定义、必要接口约定、实际效果检验、最终复核和重派修改。AGENTS 本身不改变模型配置。
+- 运行时代码、场景、视听实现、测试代码、重构和修复由明确使用 `reasoning_effort=low` 的子代理完成；默认继承同一模型，不把 low 自动解释为更小模型。
+- 主代理可读取代码、运行检验、检查图像与日志、维护设计／治理文档和执行 Git；不直接编写或修复运行时及测试代码。发现问题应给出复现、预期和文件范围，重新分派。
+- 每项任务明确文件负责人。独立文件可并行，共享控制器与主场景接线由单一负责人负责，避免交叉覆盖。
+- 子代理返回真实变更、运行命令、结果及已知问题，不能只汇报“完成”。主代理独立检查，不能用子代理结论替代检验。
+- 子代理失败时先重划任务或重派，不悄悄让主代理接管实现。此次子代理授权不自动包含 worktree、远端写入或合入 main。
 
-## 文件、Git 与技能安全
+## 工作区、素材与 Git
 
-- 不覆盖或撤销用户修改，不擅自删除、移动或重命名文件。本轮已明确授权 Combo 代码移除及文档归档；保留历史审计与探索素材。
-- docs/design 为正式设计基线；docs/reviews 为项目审计资产；Claude outputs 为 AI 过程档案，保留视觉探索和生成记录。归档复制校验字节与 SHA-256，不重写历史报告。
-- 保留 Reviewer、AI 来源及 Co-authored-by；不将临时会话 URL 写入新增文件或提交。已有 commit 的 Session 信息需单独授权历史处理，不以工作区清理冒充移除历史。
-- 原始概念图仅可按授权复制；不覆盖、转码或移动；归档复制核对字节数与 SHA-256。
-- 本地 Git 已批准；用户已授权首次推送到 https://github.com/Kandecho/Bounce-Lite.git。后续远端写操作仍以具体任务授权为准，不推送本地工具快照 refs。未经用户明确请求，不创建子 Agent、并行 Agent 或 worktree。
-- 不为方便安装依赖或改变系统配置。
-- 技能仅作为方法，不扩大授权；不默认启动完整 Superpowers 工作流。
-- 文档与素材任务按需使用对应技能；代码实现不因技能存在而生成新视觉方向。
-- 状态用“已确认、待确认、阻塞”等明确表述；区分已实现、机器已验证和人工待验收。
-- 历史记录保留并加替代说明，不把旧方案改写成当时已执行的新决定。
+- 开始先核对明确仓库路径、Git 状态和待改文件；编辑前读取当前内容。保护用户已有修改，不覆盖或撤销他人工作。
+- 原型工作在实验分支，保留 main 和 E01 可返回基准。本地提交可用于保存实验；远端推送、合入 main 和历史重写须有对应用户授权，不推本地工具快照 refs。
+- 不擅自删除、移动或重命名用户文件；历史原稿、审计与 AI 过程资产保持来源。归档复制需核对字节和 SHA-256。
+- 保留 Reviewer、AI 来源、Co-authored-by 和素材许可。新增文件及提交不加入临时会话 URL。
+- 不为方便安装依赖或修改系统设置。现有 Windows / Godot / GDScript / Compatibility 环境可直接复用；环境维护与权限规则属于操作责任，不另造设计限制。
+- 技能提供方法，不自行扩大工作范围。结束前检查实际差异，区分已实现、机器已验证、人工已反馈和待体验。
 
-## 当前有效文档与验证入口
+## 验证与实际体验
 
-- docs/README.md：文档生命周期与归档导航。
-- docs/design/v0.2-exploration-principles.md：用户已确认的探索判断依据；规划已授权，实施未启动。
-- docs/exploration/v0.2-exploration-plan.md：首批体验假设、对照、观察、分支与筛选计划；不是已确认的功能清单。
-- docs/exploration/e01-contact-language.md：当前分支首个可玩实验、F7 对照方式及验证记录；待用户试玩。
-- docs/design/design-baseline-v0.1.6.md：main 实现契约；v0.1.x 原稿字节保留。
-- docs/reviews/v0.1.6-consolidation.md：本轮实施、验证及已知限制；历史审计不回写。
+- 对确定性行为先建立可复现检查，再实现或修复。运行 `tests/test_runner.gd`；几何、碰撞、Wake、场景接线改动另跑 `tests/test_physics_scenarios.gd` 和本原型场景测试；音频接线跑 `tests/test_audio_scenarios.gd`。
+- 有意改变的旧规则应记录对照差异，并在相应模式或测试中明确处理；不能为全绿批量放宽无关断言，也不能让旧行为断言否决已授权的新行为。
+- 视觉改动执行实际渲染捕获并检查截图，动态事件另以实际演化证据验证。阶段交付运行 headless import 和主场景 1200 帧，并检查完整片段的事件可达性和节奏。
+- Godot console 路径从 `GODOT_CONSOLE`、忽略的 `.local/godot.local.txt` 或 PATH 获取。自动化日志显式写入仓库 `.godot/`，不写用户全局设置；必要的临时配置仅影响检验进程。
+- 机器验证、主代理技术／视觉观察和用户体验结论分开记录。主代理不能用截图或测试宣布伙伴感成立，不能把历史测试冒充本轮执行。
+- 原型交付后由用户实际体验，再反向分析保留、变形或搁置哪些部分；不按完成度、代码量或投入成本决定进入 main。
 
-- README.md：GitHub项目介绍、简短状态及运行入口。
-- docs/v0.1.5-paddle-interaction.md：当前Paddle支撑、弱交互/Strong Wake契约、实施与验证。
-- docs/v0.1.4-basic-audio.md：当前音频范围、候选、触发、验证与试听门。
-- docs/project_overview.md：产品与已确认版本路线。
-- docs/superpowers/specs/2026-09-09-v0.1.3-bugfix-visual-design.md：当前契约、几何、反馈通道及实施解释。
-- docs/superpowers/plans/2026-09-09-v0.1.3-bugfix-visual-implementation.md：本阶段执行记录与验证命令。
-- docs/visual_spec.md：冻结视觉目标；docs/asset_registry.md：对应实现登记。
-- docs/development_notes.md：环境证据、变更与验证历史。
-- docs/reviews/：历史审查及冻结问题证据；顶部状态与处置记录优先于旧建议。
+## 文档入口
 
-改动确定性行为时先添加可复现回归，再实现修复；运行 tests/test_runner.gd。几何、Wake 或场景接线改动另跑 tests/test_physics_scenarios.gd；音频事件接线另跑 tests/test_audio_scenarios.gd。视觉改动执行 tests/capture_visual_baseline.gd 并检查截图。阶段结束运行 headless import 与主场景 1200 帧。纯文档修改检查差异、链接和状态一致性即可，不机械重跑全部测试。
-
-Godot console 路径由本机 GODOT_CONSOLE 或忽略的 .local/godot.local.txt 提供，启动器也支持 PATH。自动化验证显式将 --log-file 指向仓库 .godot 下。
-
-## 人工试听门
-
-V0.1.3及V0.1.4历史验收保留；main重力260保持。main沿用V0.1.5的Support NONE/GROUND/PADDLE，低速低活力顶面停稳、不承载横移、失去支撑恢复重力。输入为新目标位移，200 px范围/0.12 s休息/50 ms窗口，初始阈值12.5 px。弱交互连续几何响应、不改速度/活力、不发Wake声；Strong一次恢复0.15活力，必要时固定向上350，不继承水平速度。原0.18/0.70冲量映射已由用户新指令取代。Paddle碰撞始终有效。用户已验收总体体验；Paddle只在真实碰撞时闪动，弱交互/Strong Wake均不触发Paddle闪动。V0.1.5 Paddle interaction model已收口；V0.1.6改动的机器验证与人工待复核项见收口报告。V0.2探索原则与计划见上方导航，具体实施未启动。
+- [文档导航](docs/README.md)、[项目概览](docs/project_overview.md)
+- [当前完整原型口径](docs/design/v0.2-full-prototype.md)、[当前实施记录](docs/exploration/v0.2-shared-world.md)
+- [E01 与用户反馈](docs/exploration/e01-contact-language.md)
+- [main 设计基线](docs/design/design-baseline-v0.1.6.md)、[main 验证报告](docs/reviews/v0.1.6-consolidation.md)
+- 历史物理／交互、视觉和音频记录见文档导航，按其版本与顶部状态理解。

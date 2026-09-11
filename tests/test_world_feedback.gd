@@ -1,0 +1,62 @@
+extends RefCounted
+
+func run(suite: RefCounted) -> void:
+	var feedback = load("res://scripts/world/world_feedback.gd").new()
+	feedback.initialize()
+	for kind in feedback.streams:
+		var stream: AudioStreamWAV = feedback.streams[kind]
+		suite.expect_true(stream.data.size() > 8000 and stream.data.size() < 23000, "world cue short PCM length")
+		var peak := 0
+		for i in range(0, stream.data.size(), 2):
+			peak = maxi(peak, absi(stream.data.decode_s16(i)))
+		suite.expect_true(peak > 1000 and peak < 22000, "world synthesis audible with clipping headroom")
+		suite.expect_equal(stream.data.decode_s16(0), 0, "wave starts at zero")
+	feedback.on_world_event("invalid", Vector2.ZERO, 1.0)
+	feedback.on_world_event("rotor", Vector2.INF, 1.0)
+	feedback.on_world_event("rotor", Vector2.ZERO, NAN)
+	feedback.on_world_event("rotor", Vector2.ZERO, -1.0)
+	suite.expect_equal(feedback.transients.size(), 0, "invalid events ignored")
+	feedback.on_world_event("rotor", Vector2.ZERO, 7.0)
+	suite.expect_float(feedback.transients[0].intensity, 1.0, 0.001, "intensity capped")
+	feedback.on_world_event("rotor", Vector2.ZERO, 1.0)
+	suite.expect_equal(feedback.play_count, 1, "duplicate event cooled down")
+	feedback.on_world_event("charge", Vector2.ZERO, 1.0)
+	feedback.on_world_event("resume", Vector2.ZERO, 1.0)
+	feedback.advance_time(0.17)
+	feedback.on_world_event("rotor", Vector2.ZERO, 1.0)
+	suite.expect_equal(feedback.play_count, 3, "three voice concurrency ceiling")
+	feedback.set_muted(true)
+	for player in feedback.players:
+		suite.expect_true(player.stream == null, "mute releases player stream reference")
+	feedback.advance_time(1.0)
+	feedback.on_world_event("charge", Vector2.ZERO, 1.0)
+	suite.expect_equal(feedback.play_count, 3, "muted event has no audio")
+	suite.expect_equal(feedback.transients.size(), 1, "muting preserves event visual")
+	feedback.advance_time(1.0)
+	suite.expect_equal(feedback.transients.size(), 0, "transients expire")
+	feedback.set_enabled(false)
+	feedback.on_world_event("rotor", Vector2.ZERO, 1.0)
+	suite.expect_equal(feedback.transients.size(), 0, "disabled event ignored")
+	feedback.set_enabled(true)
+	feedback.set_muted(false)
+	feedback.on_world_event("resume", Vector2.ZERO, 1.0)
+	suite.expect_equal(feedback.play_count, 4, "reenabling accepts future events")
+	feedback.set_enabled(false)
+	suite.expect_equal(feedback.transients.size(), 0, "disable clears active visuals immediately")
+	for remaining in feedback.voice_remaining:
+		suite.expect_float(remaining, 0.0, 0.001, "disable clears active voice lifetimes")
+	feedback.set_enabled(true)
+	feedback.on_world_event("breeze", Vector2.ZERO, 1.0)
+	suite.expect_equal(feedback.play_count, 4, "breeze intentionally silent")
+	suite.expect_equal(feedback.transients.size(), 1, "breeze still has visual trace")
+	feedback._exit_tree()
+	suite.expect_equal(feedback.streams.size(), 0, "exit releases cached synthesis streams")
+	for player in feedback.players:
+		suite.expect_true(player.stream == null, "exit releases player stream reference")
+	suite.expect_equal(feedback.transients.size(), 0, "exit clears transients")
+	for remaining in feedback.voice_remaining:
+		suite.expect_float(remaining, 0.0, 0.001, "exit clears voice lifetimes")
+	feedback.initialize()
+	suite.expect_equal(feedback.players.size(), 3, "reinitialize does not duplicate players")
+	suite.expect_equal(feedback.streams.size(), 3, "reinitialize restores streams after exit")
+	feedback.free()

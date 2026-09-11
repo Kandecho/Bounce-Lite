@@ -7,12 +7,15 @@
 - [项目概览](project_overview.md)、[Paddle 交互](v0.1.5-paddle-interaction.md)、[基础音频](v0.1.4-basic-audio.md)：顶部当前说明优先，历史段落保留。
 - [视觉规格](visual_spec.md)、[素材登记](asset_registry.md)：冻结视觉与来源；历史 HUD 概念不代表当前实现授权。
 
-## V0.2 体验空间搜索
+## V0.2 完整可玩片段原型
 
-- [探索设计原则](design/v0.2-exploration-principles.md)：用户已确认的核心关系、目标与奖励边界、事件优先、模糊性及实验自由度，是后续探索判断依据。
-- [第一阶段探索计划](exploration/v0.2-exploration-plan.md)：四个用于区分不同方向的体验假设、对照与观察方法，以及后续候选池和分支流程。
+- [当前设计与实施口径](design/v0.2-full-prototype.md)：充分展开原型的授权、两项设计硬边界，以及高推理主代理检验／低推理子代理实现的协作方式。
+- [共享小世界实施记录](exploration/v0.2-shared-world.md)：当前分支的接触、转子余波、补能、停顿与继续，以及验证和试玩入口。
+- [原创世界反馈](exploration/world-feedback-notes.md)：合成声音与视觉反馈的实现、来源和检验。
+- [E01 接触语言](exploration/e01-contact-language.md)：有限影响经用户实测可以保留，作为本原型起点。
+- [早期探索原则](design/v0.2-exploration-principles.md)与[逐项实验计划](exploration/v0.2-exploration-plan.md)：保留早期判断和候选，不再要求本轮逐项实施或逐项验收。
 
-用户已要求开始探索；当前分支实现[E01 接触语言](exploration/e01-contact-language.md)，待用户试玩。`docs/exploration/` 保存探索计划及后续经整理的发现；事件候选不等于正式功能承诺，未试玩不标为已验收。main 仍为 V0.1.6 可玩基线，历史文档中的“V0.2 未授权”按记录时点理解；当前授权范围以探索原则和计划顶部说明为准。
+当前分支为 `codex/exp-v02-shared-world`。用户已授权自主修改机制和视听，优先完整可玩片段，不追求设置和全量 UI。整体体验尚待用户试玩；main 仍为 V0.1.6 可玩基线。历史文档中的未授权、冻结和独立实验要求按当时时点理解，以当前设计口径为准。
 
 ## 项目审计资产
 

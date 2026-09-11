@@ -1,5 +1,9 @@
 # Bounce Lite Asset Registry
 
+## V0.2 原型补充（2026-09-11）
+
+当前实验分支新增转子叶片与余转风迹、琥珀补能对象及耗尽／恢复外观、事件扩散环，均在 `scripts/world/` 运行时绘制；未生产或改写参考位图。世界声音为初始化时生成的原创 PCM，来源与检查见[反馈说明](exploration/world-feedback-notes.md)。均属于已实现、待整体体验的原型素材，不是正式美术风格验收。当前创作授权见[完整原型口径](design/v0.2-full-prototype.md)；下文冻结规格保留历史版本。
+
 ## V0.1.6 生命周期说明（2026-09-10）
 
 当前默认画面无 Combo 或时间 HUD；旧 Combo／HUD Timer／结果 UI 的规格和素材登记仅保留历史参考，不再作为当前生产要求。时间累计只在默认隐藏的 F1 开发面板显示 `DEV ELAPSED`，没有 Wake reset 或 RESTING pause。Ball / Glow / Trail / Paddle 的已验收外观不改。当前语义见 [V0.1.6 基线](design/design-baseline-v0.1.6.md)，变更见 [收口报告](reviews/v0.1.6-consolidation.md)。

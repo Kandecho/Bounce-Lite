@@ -9,6 +9,7 @@ enum SurfaceKind {
 	TOP,
 	GROUND,
 	PADDLE,
+	ROTOR,
 }
 
 var tuning: Resource
@@ -53,6 +54,8 @@ func resolve(
 	)
 	if result.valid_paddle_hit:
 		result.velocity_after += result.normal * tuning.paddle_impulse
+	if result.effective_surface_kind == SurfaceKind.ROTOR:
+		result.velocity_after += result.normal * 45.0
 	result.velocity_after = result.velocity_after.limit_length(tuning.max_speed)
 	# E01: a bounded bias of the ordinary outgoing motion, never a target angle.
 	# Only real, descending, near-flat top contacts participate.
@@ -81,6 +84,8 @@ func resolve(
 
 
 func _effective_kind(surface_kind: int, valid_paddle_hit: bool) -> int:
+	if surface_kind == SurfaceKind.ROTOR:
+		return SurfaceKind.ROTOR
 	if surface_kind == SurfaceKind.PADDLE and valid_paddle_hit:
 		return SurfaceKind.PADDLE
 	if surface_kind == SurfaceKind.TOP:
@@ -92,6 +97,8 @@ func _effective_kind(surface_kind: int, valid_paddle_hit: bool) -> int:
 
 func _restitution_for(kind: int, vitality_ratio: float) -> float:
 	match kind:
+		SurfaceKind.ROTOR:
+			return 0.94
 		SurfaceKind.TOP:
 			return lerpf(tuning.top_restitution_min, tuning.top_restitution_max, vitality_ratio)
 		SurfaceKind.GROUND:
@@ -115,6 +122,8 @@ func _tangent_retention_for(kind: int) -> float:
 
 
 func _vitality_delta_for(kind: int, vitality_before: float, max_vitality: float) -> float:
+	if kind == SurfaceKind.ROTOR:
+		return maxf(max_vitality - vitality_before, 0.0) * 0.12
 	if kind == SurfaceKind.PADDLE:
 		var missing_vitality := maxf(maxf(max_vitality, 0.001) - vitality_before, 0.0)
 		return missing_vitality * clampf(tuning.paddle_vitality_restore, 0.0, 1.0)

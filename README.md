@@ -18,9 +18,9 @@ Bounce Lite 希望让屏幕中的互动拥有真实玩具的触感：操作简�
 
 ## 当前状态
 
-当前为 **V0.1.6 可玩原型**，已收口 Activity / Physics 边界并移除成绩型显示，保留核心交互、冻结视觉和基础音效。当前提供 Godot 工程源码，主要面向 Windows 试玩。
+当前分支为 **V0.2「共享小世界」可玩原型**。玩家通过挡板接触球，球可以拨动转子、改变局部气流、触碰补能对象；最近有互动时，短暂停顿后还可能继续一段。优先探索一个愿意停留几分钟的片段，没有加入设置界面或全量 UI。
 
-**当前分支是 E01 接触语言实验**：基于 V0.1.6，真实顶面接触位置会有限影响反弹倾向。运行方式同下；**F7 切换实验／原版接触规则**，标题栏显示当前版本。见[E01 试玩与验证记录](docs/exploration/e01-contact-language.md)。实验待用户体验判断，main 游戏基线未改变。
+分支 `codex/exp-v02-shared-world` 从已获用户实测认可的 E01 有限接触影响展开；main 仍为 V0.1.6。完整组合尚待用户体验，不自动合入 main。运行和检验细节见[原型记录](docs/exploration/v0.2-shared-world.md)。
 
 F1 打开开发调参与 `DEV ELAPSED` 观察计数器；计数器持续累计，不因休息暂停或 Wake 归零，默认不显示在游戏画面。
 
@@ -34,7 +34,7 @@ F1 打开开发调参与 `DEV ELAPSED` 观察计数器；计数器持续累计�
 2. 下载或克隆本仓库，在 Godot 中导入根目录的 `project.godot`。
 3. 打开工程，按 **F5** 启动游戏。
 
-游戏中左右移动鼠标控制挡板；球停下后，在附近拨动挡板尝试唤醒它。游戏内 **F5** 可切换静音，比较有声与无声的体验。
+游戏中左右移动鼠标控制挡板；球停下后，在附近拨动挡板尝试唤醒它。游戏内 **F5** 切换全部音效静音，**F7** 切换有限接触影响；F7 只改变之后的接触，不重置世界。
 
 ### 使用 Windows 启动器
 
@@ -48,12 +48,12 @@ F1 打开开发调参与 `DEV ELAPSED` 观察计数器；计数器持续累计�
 
 ## 技术栈
 
-使用 **Godot 4.7 / GDScript / Compatibility 渲染器**。画面以 960×720、4:3 为设计基准，窗口缩放时保持比例。球体、光晕与残影由程序绘制，基础音效使用 Kenney 素材。
+使用 **Godot 4.7 / GDScript / Compatibility 渲染器**。画面以 960×720、4:3 为设计基准，窗口缩放时保持比例。画面由程序绘制；基础音效使用 Kenney 素材，世界事件使用原创合成音。
 
 ## 文档
 
 - [main 设计基线](docs/design/design-baseline-v0.1.6.md)：V0.1.6 当前实现职责与边界。
-- [V0.2 探索原则](docs/design/v0.2-exploration-principles.md)与[探索计划](docs/exploration/v0.2-exploration-plan.md)：已确认的判断基础与待试玩假设；当前开始 E01。
+- [V0.2 当前设计](docs/design/v0.2-full-prototype.md)与[原型记录](docs/exploration/v0.2-shared-world.md)：实施口径、实际机制、验证和待体验项。
 - [V0.1.6 收口报告](docs/reviews/v0.1.6-consolidation.md)：改动、验证与保留限制。
 - [文档导航](docs/README.md)：正式文档、审计与历史过程档案。
 - [项目概览](docs/project_overview.md)：产品方向、版本路线与当前状态。
