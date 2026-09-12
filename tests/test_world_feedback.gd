@@ -1,6 +1,7 @@
 extends RefCounted
 
 func run(suite: RefCounted) -> void:
+	_test_launch_identity(suite)
 	var feedback = load("res://scripts/world/world_feedback.gd").new()
 	feedback.initialize()
 	for kind in feedback.streams:
@@ -58,5 +59,29 @@ func run(suite: RefCounted) -> void:
 		suite.expect_float(remaining, 0.0, 0.001, "exit clears voice lifetimes")
 	feedback.initialize()
 	suite.expect_equal(feedback.players.size(), 3, "reinitialize does not duplicate players")
-	suite.expect_equal(feedback.streams.size(), 3, "reinitialize restores streams after exit")
+	suite.expect_equal(feedback.streams.size(), 4, "reinitialize restores streams after exit")
+	feedback.free()
+
+func _test_launch_identity(suite: RefCounted) -> void:
+	var feedback = load("res://scripts/world/world_feedback.gd").new()
+	feedback.initialize()
+	feedback.on_world_event("wake", Vector2(40, 80), 1.0)
+	feedback.on_world_event("resume", Vector2(80, 80), 1.0)
+	suite.expect_equal(feedback.transients.size(), 2, "both committed launch types have feedback")
+	if feedback.transients.size() == 2:
+		suite.expect_true(feedback.transients[0].life > feedback.transients[1].life * 2.0, "Wake leaves a trace after Continue's local cue ends")
+		suite.expect_true(feedback.players[0].volume_db > feedback.players[1].volume_db, "Wake sound is stronger than Continue")
+		feedback.advance_time(0.3)
+		suite.expect_equal(feedback.transients.size(), 1, "Continue does not leave a large lingering ring")
+		suite.expect_equal(feedback.transients[0].kind, "wake", "remaining launch trace belongs to Wake")
+	suite.expect_true(feedback.streams.has("wake"), "Wake has its own sound")
+	if feedback.streams.has("wake"):
+		suite.expect_true(feedback.streams.wake.data != feedback.streams.resume.data, "launch types have distinct synthesized sounds")
+	feedback.set_muted(true)
+	for index in range(50):
+		feedback.cooldown_remaining.clear()
+		feedback.on_world_event("wake", Vector2(index, 80), 1.0)
+	suite.expect_true(feedback.transients.size() <= feedback.MAX_TRANSIENTS, "repeated launches cannot grow visual resources without bound")
+	feedback.advance_time(1.0)
+	suite.expect_equal(feedback.transients.size(), 0, "all launch traces expire")
 	feedback.free()

@@ -1,5 +1,5 @@
 ; Engine configuration file.
-; Keep project initialization settings minimal until gameplay work is authorized.
+; Physical toy baseline: full client-area shared world prototype.
 
 config_version=5
 
@@ -12,7 +12,7 @@ run/main_scene="res://scenes/main.tscn"
 [bounce_lite]
 
 ui_title="Bouncing Ball"
-phase="v0.1.6-design-boundary-consolidation"
+phase="v0.2.0-physical-toy-baseline"
 target_platform="Windows"
 
 [display]

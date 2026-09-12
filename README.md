@@ -18,11 +18,11 @@ Bounce Lite 希望让屏幕中的互动拥有真实玩具的触感：操作简�
 
 ## 当前状态
 
-当前分支为 **V0.2「共享小世界」可玩原型**。玩家通过挡板接触球，球可以拨动转子、改变局部气流、触碰补能对象；最近有互动时，短暂停顿后还可能继续一段。优先探索一个愿意停留几分钟的片段，没有加入设置界面或全量 UI。
+当前已完成 **V0.2.0 物理玩具底座**。玩家通过挡板接触球，球可以拨动随机出现的转子、改变局部气流、触碰补能对象；有效挡板介入后，短暂停顿还可能继续一段。
 
-分支 `codex/exp-v02-shared-world` 从已获用户实测认可的 E01 有限接触影响展开；main 仍为 V0.1.6。最新已实现中心色 UI 与全客户区场地，默认窗口 640×480；对象仍固定摆放。完整组合待实机体验，不自动合入 main。当前依据见[V0.2.0 设计笔记](docs/design/v0.2.0-design-note.md)，实际证据见[原型记录](docs/exploration/v0.2-shared-world.md)。
+从已获用户实测认可的 E01 展开，中心色 UI、全客户区场地、随机对象、真实动作资格及 Wake／Continue 强弱与表现均已实现。默认窗口640×480。当前行为见[V0.2.0 基线](docs/design/design-baseline-v0.2.0.md)，本轮验证见[收口记录](docs/reviews/v0.2.0-consolidation.md)。新组合尚无用户试玩结论。
 
-[后续计划](docs/exploration/v0.2.0-follow-up-plan.md)已落盘：先随机出现，再调整 Continue 资格与 Wake／Continue 表现，最后完整试玩。这些后续变更尚未实施；计划中的临时数值和候选判定不视为已确认规格。
+用户已授权将收尾合入 main，再广泛探索“球和挡板还可以怎么玩”：主动借鉴弹球和物理游戏机制，直接做成可玩的东西，设计理念在试玩后筛选与改造时重新介入。方向与后续交付见[物理玩具探索](docs/exploration/physical-toy-exploration.md)。
 
 F1 打开开发调参与 `DEV ELAPSED` 观察计数器；计数器持续累计，不因休息暂停或 Wake 归零，默认不显示在游戏画面。
 
@@ -54,7 +54,7 @@ F1 打开开发调参与 `DEV ELAPSED` 观察计数器；计数器持续累计�
 
 ## 文档
 
-- [main 设计基线](docs/design/design-baseline-v0.1.6.md)：V0.1.6 当前实现职责与边界。
+- [V0.2.0 实现基线](docs/design/design-baseline-v0.2.0.md)：当前底座；[V0.1.6 基线](docs/design/design-baseline-v0.1.6.md)保留为历史对照。
 - [V0.2.0 当前设计](docs/design/v0.2.0-design-note.md)、[后续计划](docs/exploration/v0.2.0-follow-up-plan.md)与[原型记录](docs/exploration/v0.2-shared-world.md)：分别说明判断依据、待实施任务和实际验证。
 - [V0.1.6 收口报告](docs/reviews/v0.1.6-consolidation.md)：改动、验证与保留限制。
 - [文档导航](docs/README.md)：正式文档、审计与历史过程档案。

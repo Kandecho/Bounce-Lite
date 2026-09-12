@@ -48,7 +48,7 @@ func run(suite: RefCounted) -> void:
 		suite.expect_false(ball.apply_resting_interaction(distance, Vector2(681, 537)), "range rejects input")
 		suite.expect_true(ball.apply_resting_interaction(distance, Vector2(480, 537)), "threshold and overshoot activate")
 		suite.expect_equal(ball.velocity, Vector2(0, -350), "launch is independent of input magnitude")
-		suite.expect_float(ball.vitality_model.current_vitality, 0.19, 0.0001, "one fixed vitality recovery")
+		suite.expect_float(ball.vitality_model.current_vitality, 0.34, 0.0001, "one fixed vitality recovery")
 		ball.free()
 	ball = load("res://scripts/ball/ball_controller.gd").new()
 	ball.configure(load("res://scripts/config/prototype_tuning.gd").new())

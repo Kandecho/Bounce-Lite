@@ -11,6 +11,7 @@ func _init() -> void:
 func _run() -> void:
 	var suite = Support.new()
 	var world = World.new()
+	world.set_random_spawns_enabled(false)
 	root.add_child(world)
 	world.configure(null, Rect2(173, 133, 615, 448))
 	world.set_physics_process(false)

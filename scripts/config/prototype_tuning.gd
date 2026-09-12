@@ -5,6 +5,10 @@ extends Resource
 var e01_contact_enabled: bool = false
 var e01_contact_angle_degrees: float = 18.0
 var shared_world_enabled: bool = false
+var legacy_rhythm_enabled: bool = false
+var continue_vitality_restore_ratio := 0.18
+var continue_action_distance := 4.0
+var continue_near_distance := 260.0
 
 @export_group("Vitality")
 @export_range(0.001, 100.0, 0.001) var max_vitality: float = 1.0
@@ -21,7 +25,7 @@ var shared_world_enabled: bool = false
 @export_range(0.0, 1.0, 0.01) var wake_rest_delay_seconds: float = 0.12
 @export_range(1.0, 100.0, 0.5) var wake_interaction_distance: float = 12.5
 @export_range(1.0, 1000.0, 1.0) var wake_launch_speed: float = 350.0
-@export_range(0.0, 1.0, 0.01) var wake_vitality_restore_ratio: float = 0.15
+@export_range(0.0, 1.0, 0.01) var wake_vitality_restore_ratio: float = 0.30
 @export_range(0.0, 500.0, 1.0) var wake_horizontal_range: float = 200.0
 @export_range(0.0, 0.1, 0.001) var wake_sample_seconds: float = 0.05
 

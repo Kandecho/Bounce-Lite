@@ -99,7 +99,7 @@ func advance_motion(delta: float) -> void:
 	position.x = clampf(position.x, _minimum_center_x(), _maximum_center_x())
 	position.y = fixed_y
 	velocity = Vector2((position.x - previous_x) / delta, 0.0)
-	interaction_sampled.emit(_pending_input_distance, global_position)
+	interaction_sampled.emit(_pending_input_distance if tuning.legacy_rhythm_enabled else absf(position.x - previous_x), global_position)
 	_pending_input_distance = 0.0
 
 

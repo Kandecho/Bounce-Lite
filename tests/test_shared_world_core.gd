@@ -37,7 +37,7 @@ func run(suite: RefCounted) -> void:
 	suite.expect_true(ball.velocity == before, "Activity notification cannot change physics")
 	ball.velocity = Vector2.ZERO
 	ball.support_kind = Ball.SupportKind.GROUND
-	ball.note_player_input(20.0)
+	ball.play_rhythm.note_input(20.0) # Explicit qualified-interaction fixture.
 	ball.advance_play_rhythm(0.5)
 	suite.expect_true(ball.velocity.is_zero_approx(), "physical rest retains pause")
 	ball.advance_play_rhythm(0.5)

@@ -88,7 +88,12 @@ func _run() -> void:
 			suite.expect_false(ball.wake_consumed, "small swipe onset remains available")
 			ball._physics_process(1.0 / hz)
 			paddle.set_target_x(paddle.position.x + direction * 50)
-			paddle.advance_motion(1.0 / hz)
+			# Physical travel, rather than the target jump, crosses the Wake threshold.
+			for sample in range(3):
+				paddle.advance_motion(1.0 / hz)
+				if not ball.is_resting():
+					break
+				ball.advance_resting_time(1.0 / hz)
 			suite.expect_false(ball.is_resting(), "actual left/right swipe activates Wake")
 			suite.expect_true(ball.velocity.y < -300, "swipe produces clear upward movement")
 			contacts.clear()
@@ -192,8 +197,8 @@ func _run() -> void:
 		await physics_frame
 		ball._physics_process(1.0 / 60.0)
 	suite.expect_true(contacts.has(true), "real top collision emits valid Paddle feedback")
-	suite.expect_float(ball.vitality_model.current_vitality, 1.0, 0.001,
-		"normal top collision still restores max Vitality")
+	suite.expect_float(ball.vitality_model.current_vitality, 0.20 + 0.80 * main.tuning.paddle_vitality_restore, 0.001,
+		"normal top collision restores the configured share of missing Vitality")
 	contacts.clear()
 	# The Ball's own region below the Paddle: rising into the underside from just below it.
 	ball.position = Vector2(480, underside_y + 20.0)

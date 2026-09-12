@@ -22,7 +22,7 @@ func run(suite: RefCounted) -> void:
 	var motion_samples: Array = []
 	var has_motion_signal := paddle.has_signal("interaction_sampled")
 	suite.expect_true(has_motion_signal,
-		"Paddle exposes fresh scalar target input separately from physical velocity")
+		"Paddle exposes scalar actual movement alongside physical velocity")
 	if has_motion_signal:
 		paddle.connect("interaction_sampled", func(sample_distance: float, sample_position: Vector2) -> void:
 			if sample_distance > 0.0:
@@ -40,24 +40,24 @@ func run(suite: RefCounted) -> void:
 		"Paddle velocity reflects actual horizontal movement")
 	if has_motion_signal:
 		suite.expect_equal(motion_samples.size(), 1,
-			"one new target publishes one non-zero interaction sample")
+			"one motion step publishes one non-zero interaction sample")
 		if motion_samples.size() == 1:
 			suite.expect_float(motion_samples[0][0], 235.0, 0.001,
-				"motion sample carries fresh clamped target distance")
+				"motion sample carries actual clamped movement")
 
 		paddle.advance_motion(0.1)
 		suite.expect_equal(motion_samples.size(), 1,
-			"unchanged target does not publish fresh interaction")
+			"settled paddle does not publish movement")
 	paddle.set_target_x(500.0)
 	paddle.advance_motion(1.0 / 60.0)
 	var sample_count := motion_samples.size()
 	paddle.advance_motion(1.0 / 60.0)
 	suite.expect_true(absf(paddle.velocity.x) > 0.0, "Paddle smoothing is still physically moving")
-	suite.expect_equal(motion_samples.size(), sample_count, "smoothing tail is not fresh interaction")
+	suite.expect_equal(motion_samples.size(), sample_count + 1, "smoothing tail reports real motion")
 	paddle.set_target_x(2000.0)
 	paddle.advance_motion(1.0 / 60.0)
 	sample_count = motion_samples.size()
 	paddle.set_target_x(3000.0)
 	paddle.advance_motion(1.0 / 60.0)
-	suite.expect_equal(motion_samples.size(), sample_count, "movement beyond clamped target cannot farm interaction")
+	suite.expect_equal(motion_samples.size(), sample_count + 1, "clamped target still reports actual smoothing motion")
 	paddle.free()

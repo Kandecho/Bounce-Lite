@@ -15,6 +15,7 @@ signal paddle_energy_transferred(amount: float)
 
 var play_rhythm: RefCounted = PlayRhythm.new()
 var play_world: Object
+var _related_motion_distance := 0.0
 
 enum SupportKind { NONE, GROUND, PADDLE }
 var support_kind: SupportKind = SupportKind.NONE
@@ -211,6 +212,8 @@ func start_active(initial_direction: Vector2) -> void:
 		configure(tuning)
 	vitality_model.reset_active()
 	play_rhythm = PlayRhythm.new()
+	play_rhythm.qualification_seconds = 15.0 if tuning.legacy_rhythm_enabled else 12.0
+	_related_motion_distance = 0.0
 	rest_elapsed_time = 0.0
 	wake_consumed = false
 	support_kind = SupportKind.NONE
@@ -237,8 +240,27 @@ func configure_world(world: Object) -> void:
 
 
 func note_player_input(distance: float) -> void:
-	if tuning.shared_world_enabled:
+	if tuning.shared_world_enabled and tuning.legacy_rhythm_enabled:
 		play_rhythm.note_input(distance)
+
+
+func note_paddle_action(distance: float, paddle_position: Vector2, paddle_velocity: Vector2) -> void:
+	if tuning.legacy_rhythm_enabled:
+		note_player_input(distance)
+		return
+	if not tuning.shared_world_enabled:
+		return
+	var offset := global_position - paddle_position
+	var related: bool = not is_resting() and support_kind == SupportKind.NONE \
+		and offset.length() <= tuning.continue_near_distance \
+		and offset.x * paddle_velocity.x > 0.0 and distance > 0.0
+	if not related:
+		_related_motion_distance = 0.0
+		return
+	_related_motion_distance += distance
+	if _related_motion_distance >= tuning.continue_action_distance:
+		play_rhythm.note_input(_related_motion_distance)
+		_related_motion_distance = 0.0
 
 
 func receive_world_vitality(amount: float) -> void:
@@ -260,8 +282,8 @@ func advance_play_rhythm(delta: float) -> void:
 	# Physics explicitly accepts the request, commits motion, then publishes Activity.
 	velocity = Vector2(0.0, -290.0).limit_length(tuning.max_speed)
 	support_kind = SupportKind.NONE
-	vitality_model.wake(vitality_model.current_vitality + vitality_model.max_vitality * 0.22)
 	wake_consumed = true
+	vitality_model.wake(vitality_model.current_vitality + vitality_model.max_vitality * tuning.continue_vitality_restore_ratio)
 	_update_visuals()
 	resume_committed.emit(global_position)
 
@@ -299,6 +321,8 @@ func resolve_surface_collision(kind: int, normal: Vector2, valid_paddle_hit: boo
 	elif not was_resting:
 		vitality_model.resolve_activity(false)
 	_update_visuals()
+	if result.valid_paddle_hit and tuning.shared_world_enabled and not tuning.legacy_rhythm_enabled:
+		play_rhythm.note_input(tuning.continue_action_distance)
 	surface_resolved.emit(result)
 	if result.valid_paddle_hit and transferred > 0.0:
 		paddle_energy_transferred.emit(transferred)
@@ -334,16 +358,15 @@ func apply_resting_interaction(input_distance: float, paddle_position: Vector2) 
 	var needs_start: bool = support_kind != SupportKind.NONE and velocity.length() <= tuning.rest_settle_speed
 	_clear_wake_sample()
 	var vitality_before_wake: float = vitality_model.current_vitality
-	var activated: bool = vitality_model.wake(vitality_model.current_vitality + vitality_model.max_vitality * tuning.wake_vitality_restore_ratio)
-	if not activated:
-		return false
-	var wake_transferred: float = vitality_model.current_vitality - vitality_before_wake
-	wake_consumed = true
 	if needs_start:
 		# A discrete self-start, never proportional to input and never horizontal.
 		velocity.y = -tuning.wake_launch_speed
 		velocity = velocity.limit_length(tuning.max_speed)
 	support_kind = SupportKind.NONE
+	wake_consumed = true
+	play_rhythm.consume()
+	vitality_model.wake(vitality_model.current_vitality + vitality_model.max_vitality * tuning.wake_vitality_restore_ratio)
+	var wake_transferred: float = vitality_model.current_vitality - vitality_before_wake
 	_update_visuals()
 	var visuals := get_node_or_null("Visuals")
 	if visuals != null and visuals.has_method("play_wake_feedback"):

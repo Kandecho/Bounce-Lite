@@ -51,7 +51,7 @@ func wake(target_vitality: float) -> bool:
 	if state != ActivityState.RESTING:
 		return false
 	_set_vitality(target_vitality)
-	resolve_activity(false)
+	_set_state(ActivityState.ACTIVE)
 	return state != ActivityState.RESTING
 
 

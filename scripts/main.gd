@@ -20,6 +20,7 @@ var world_feedback: Node2D
 func _ready() -> void:
 	DisplayServer.window_set_title("Bouncing Ball")
 	_set_e01_enabled(not OS.get_cmdline_user_args().has("--e01-baseline"))
+	tuning.legacy_rhythm_enabled = OS.get_cmdline_user_args().has("--v02-legacy-rhythm")
 	tuning.shared_world_enabled = not OS.get_cmdline_user_args().has("--v02-baseline")
 	if tuning.shared_world_enabled:
 		tuning.paddle_vitality_restore = 0.30
@@ -41,6 +42,11 @@ func _ready() -> void:
 		play_world = load("res://scripts/world/play_world.gd").new()
 		play_world.name = "PlayWorld"
 		$GameArea.add_child(play_world)
+		play_world.set_ball_context(ball.global_position, tuning.ball_radius)
+		play_world.set_random_spawns_enabled(not OS.get_cmdline_user_args().has("--v02-fixed-world"))
+		for argument in OS.get_cmdline_user_args():
+			if argument.begins_with("--world-seed="):
+				play_world.set_seed(int(argument.trim_prefix("--world-seed=")))
 		play_world.configure(tuning, ball.arena_bounds, spawn_region())
 		ball.configure_world(play_world)
 		world_feedback = load("res://scripts/world/world_feedback.gd").new()
@@ -50,6 +56,7 @@ func _ready() -> void:
 		play_world.event_emitted.connect(world_feedback.on_world_event)
 		ball.surface_resolved.connect(_on_world_surface_resolved)
 		ball.resume_committed.connect(_on_resume_committed)
+		ball.wake_committed.connect(_on_wake_committed)
 
 	paddle.interaction_sampled.connect(_on_paddle_interaction_sampled)
 	ball.paddle_energy_transferred.connect(paddle.play_energy_transfer)
@@ -70,11 +77,13 @@ func spawn_region() -> Rect2:
 
 
 func _on_paddle_interaction_sampled(input_distance: float, paddle_position: Vector2) -> void:
-	ball.note_player_input(input_distance)
+	ball.note_paddle_action(input_distance, paddle_position, paddle.velocity)
 	ball.apply_resting_interaction(input_distance, paddle_position)
 
 
 func _physics_process(_delta: float) -> void:
+	if is_instance_valid(play_world):
+		play_world.set_ball_context(ball.global_position, tuning.ball_radius)
 	if is_instance_valid(world_feedback):
 		world_feedback.set_muted($BasicAudio.muted)
 
@@ -91,6 +100,11 @@ func _on_resume_committed(ball_position: Vector2) -> void:
 	world_feedback.on_world_event("resume", ball_position, 0.65)
 
 
+func _on_wake_committed(_strength: float, activated: bool, ball_position: Vector2) -> void:
+	if activated:
+		world_feedback.on_world_event("wake", ball_position, 1.0)
+
+
 func _set_e01_enabled(enabled: bool) -> void:
 	tuning.e01_contact_enabled = enabled
 	_update_title()
@@ -98,7 +112,7 @@ func _set_e01_enabled(enabled: bool) -> void:
 
 
 func _update_title() -> void:
-	DisplayServer.window_set_title("Bouncing Ball | 0.2 " + ("shared world" if tuning.shared_world_enabled else "baseline") + " | E01 " + ("contact" if tuning.e01_contact_enabled else "off"))
+	DisplayServer.window_set_title("Bouncing Ball | v0.2.0 " + ("shared world" if tuning.shared_world_enabled else "baseline") + " | E01 " + ("contact" if tuning.e01_contact_enabled else "off"))
 
 
 func _unhandled_key_input(event: InputEvent) -> void:

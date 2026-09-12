@@ -4,8 +4,8 @@ extends Node2D
 const SAMPLE_RATE := 22050
 const MAX_VOICES := 3
 const MAX_TRANSIENTS := 18
-const COOLDOWNS := {"rotor": 0.16, "charge": 0.45, "breeze": 1.2, "resume": 0.5}
-const COLORS := {"rotor": Color(0.37, 0.84, 0.76), "charge": Color(1.0, 0.72, 0.39), "breeze": Color("83aeb9"), "resume": Color("9bdde4")}
+const COOLDOWNS := {"rotor": 0.16, "charge": 0.45, "breeze": 1.2, "resume": 0.5, "wake": 0.5}
+const COLORS := {"rotor": Color(0.37, 0.84, 0.76), "charge": Color(1.0, 0.72, 0.39), "breeze": Color("83aeb9"), "resume": Color("9bdde4"), "wake": Color("9bdde4")}
 var enabled := true
 var muted := false
 var transients: Array[Dictionary] = []
@@ -23,7 +23,8 @@ func initialize() -> void:
 		return
 	streams["rotor"] = synthesize(310.0, 0.27, 0.0)
 	streams["charge"] = synthesize(420.0, 0.48, 150.0)
-	streams["resume"] = synthesize(350.0, 0.42, -35.0)
+	streams["wake"] = synthesize(350.0, 0.42, 90.0)
+	streams["resume"] = synthesize(290.0, 0.20, -35.0)
 	if not players.is_empty():
 		return
 	for i in range(MAX_VOICES):
@@ -43,7 +44,8 @@ func on_world_event(kind: String, world_position: Vector2, intensity: float) -> 
 	cooldown_remaining[kind] = COOLDOWNS[kind]
 	if transients.size() >= MAX_TRANSIENTS:
 		transients.pop_front()
-	transients.append({"kind": kind, "position": to_local(world_position) if is_inside_tree() else world_position, "intensity": clampf(intensity, 0.0, 1.0), "age": 0.0, "life": 0.65 if kind != "breeze" else 0.9})
+	var life := 0.9 if kind == "breeze" else (0.24 if kind == "resume" else 0.65)
+	transients.append({"kind": kind, "position": to_local(world_position) if is_inside_tree() else world_position, "intensity": clampf(intensity, 0.0, 1.0), "age": 0.0, "life": life})
 	queue_redraw()
 	if muted or kind == "breeze":
 		return
@@ -51,6 +53,8 @@ func on_world_event(kind: String, world_position: Vector2, intensity: float) -> 
 		if voice_remaining[i] <= 0.0 and not players[i].playing:
 			players[i].stream = streams[kind]
 			players[i].volume_db = -19.0 + 5.0 * clampf(intensity, 0.0, 1.0)
+			if kind == "resume":
+				players[i].volume_db -= 7.0
 			voice_remaining[i] = streams[kind].get_length()
 			play_count += 1
 			if is_inside_tree():
@@ -105,7 +109,14 @@ func _draw() -> void:
 		var tint: Color = COLORS[item.kind]
 		tint.a = (1.0 - progress) * (1.0 - progress) * 0.48 * strength
 		var radius := 9.0 + progress * (22.0 + 18.0 * strength)
-		if item.kind == "breeze":
+		if item.kind == "resume":
+			# Brief upward wisps close to the launch point, not a residual ring.
+			tint.a *= 0.55
+			var lift := Vector2.UP * progress * 13.0
+			for side in [-1.0, 1.0]:
+				var start: Vector2 = item.position + Vector2(side * 8.0, 3.0) + lift
+				draw_line(start, start + Vector2(side * -2.0, -5.0), tint, 1.0, true)
+		elif item.kind == "breeze":
 			draw_arc(item.position, radius, -0.55, 0.55, 16, tint, 1.0, true)
 		else:
 			draw_arc(item.position, radius, 0.0, TAU, 40, tint, 1.2, true)

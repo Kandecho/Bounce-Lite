@@ -1,5 +1,13 @@
 # 文档导航与生命周期
 
+## 当前入口（2026-09-13）
+
+- [物理电子玩具探索](exploration/physical-toy-exploration.md)：最新用户方向，基线合入后广泛制作可玩机制，试玩后筛选改造。
+- [V0.2.0 实现基线](design/design-baseline-v0.2.0.md)：随机对象、真实动作资格、Wake/Continue 与现有底座。
+- [V0.2.0 收口记录](reviews/v0.2.0-consolidation.md)：本轮验证、Git 状态和体验边界。
+
+下方保留上一轮文档导航的历史状态描述；其中“只落盘计划”“未实现”“不自动合入”已由本轮实施与用户连续执行授权替代。
+
 ## 正式项目文档
 
 - [main 实现基线 V0.1.6](design/design-baseline-v0.1.6.md)：当前可玩实现的设计职责；原文保留，不作为 V0.2 探索机制的冻结清单。
@@ -7,7 +15,7 @@
 - [项目概览](project_overview.md)、[Paddle 交互](v0.1.5-paddle-interaction.md)、[基础音频](v0.1.4-basic-audio.md)：顶部当前说明优先，历史段落保留。
 - [视觉规格](visual_spec.md)、[素材登记](asset_registry.md)：历史视觉基线与来源，顶部说明指向最新 UI 记录；历史 HUD 概念不代表当前实现授权。
 
-## V0.2.0 当前设计、计划与现场
+## V0.2.0 原型阶段的设计、计划与现场（历史导航）
 
 - [V0.2.0 Design Note](design/v0.2.0-design-note.md)：当前设计依据，包含不检测观看、固定 lifecycle、有效挡板动作、世界对象规则及后续顺序；其中建议和待探索项保留其状态。
 - [后续实施计划](exploration/v0.2.0-follow-up-plan.md)：从 `793c361` 现场继续的任务、分工、参数决策方法与验证；本轮只落盘计划，不启动代码。

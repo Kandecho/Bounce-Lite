@@ -31,7 +31,7 @@ func _run() -> void:
 	ball.vitality_model.set_vitality(0.04)
 	ball.vitality_model.resolve_activity(true)
 	ball.support_kind = ball.SupportKind.GROUND
-	ball.note_player_input(20.0)
+	ball.play_rhythm.note_input(20.0) # Explicit qualified-interaction fixture.
 	for frame in range(65):
 		ball._physics_process(1.0 / 60.0)
 		await physics_frame
@@ -57,7 +57,11 @@ func _run() -> void:
 	suite.expect_equal(ball.bounds_recovery_count, 0, "moving paddle corner cannot eject ball through right wall")
 	main.queue_free()
 	await process_frame
-	await create_timer(0.15).timeout
+	# AudioServer releases stopped playback on its real-time mixing thread.
+	# Fixed-fps simulation timers can expire before even one audio buffer runs.
+	var audio_drain_deadline := Time.get_ticks_msec() + 250
+	while Time.get_ticks_msec() < audio_drain_deadline:
+		await process_frame
 	suite.print_summary()
 	quit(0 if suite.failures == 0 else 1)
 

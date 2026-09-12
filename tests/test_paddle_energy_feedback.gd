@@ -37,12 +37,12 @@ func run(suite: RefCounted) -> void:
 	suite.expect_true(ball.apply_resting_interaction(25.0, ball.global_position), "Wake activates")
 	suite.expect_equal(transfers.size(), 2, "Wake through the Paddle reports its transfer")
 	if transfers.size() == 2:
-		suite.expect_float(transfers[1], 0.15, 0.0001, "Wake transfer equals its Vitality restore")
+		suite.expect_float(transfers[1], 0.30, 0.0001, "Wake transfer equals its Vitality restore")
 
 	ball.vitality_model.set_vitality(0.04)
 	TestSupport.prepare_resting(ball)
 	ball.support_kind = ball.SupportKind.GROUND
-	ball.note_player_input(20.0)
+	ball.play_rhythm.note_input(20.0) # Explicit qualified-interaction fixture.
 	var resumed := false
 	for frame in range(70):
 		ball.advance_play_rhythm(1.0 / 60.0)
