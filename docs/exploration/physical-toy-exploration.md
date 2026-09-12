@@ -18,7 +18,7 @@
 
 ## 基线收尾现场
 
-起点 `b924cf0`，分支 `codex/exp-v02-shared-world`。本轮起点 main 为 `46fea98`，可玩代码仍是 V0.1.6。中心色 UI 与全客户区几何已经存在；随机出现、Continue 动作资格与反馈交换正在实施。
+起点 `b924cf0`，分支 `codex/exp-v02-shared-world`。2026-09-13完成收尾并保存 `e905580`，main 已从 `46fea98` 快进合入此V0.2.0代码基线。随机出现、Continue 动作资格与反馈交换均已实现，检验及体验边界见[收口记录](../reviews/v0.2.0-consolidation.md)。
 
 分工：low 世界代理独占 PlayWorld 与世界测试；low 核心代理独占 Main、Ball、Paddle、Vitality、PlayRhythm、tuning 与核心接线测试；low 反馈代理独占 BallVisuals、WorldFeedback 与对应测试。主代理维护文档和 Git，独立运行验证并检查渲染。
 
