@@ -1,0 +1,2122 @@
+{
+	"contact_journal": [
+		{
+			"id": 0,
+			"kind": "brick",
+			"lifetime": 16.8710403442383,
+			"phase": "appearing",
+			"position": [
+				661.807189941406,
+				214.221878051758
+			],
+			"time": 0.116666666666667
+		},
+		{
+			"id": 1,
+			"kind": "brick",
+			"lifetime": 22.8241310119629,
+			"phase": "appearing",
+			"position": [
+				770.034545898438,
+				316.845153808594
+			],
+			"time": 0.583333333333333
+		},
+		{
+			"id": 0,
+			"kind": "brick",
+			"lifetime": 16.8710403442383,
+			"phase": "active",
+			"position": [
+				661.807189941406,
+				214.221878051758
+			],
+			"time": 0.750000000000001
+		},
+		{
+			"id": 2,
+			"kind": "spring",
+			"lifetime": 18.6340179443359,
+			"phase": "appearing",
+			"position": [
+				385.799530029297,
+				694.775512695313
+			],
+			"time": 1.05
+		},
+		{
+			"id": 1,
+			"kind": "brick",
+			"lifetime": 22.8241310119629,
+			"phase": "active",
+			"position": [
+				770.034545898438,
+				316.845153808594
+			],
+			"time": 1.21666666666667
+		},
+		{
+			"id": 2,
+			"kind": "spring",
+			"lifetime": 18.6340179443359,
+			"phase": "active",
+			"position": [
+				385.799530029297,
+				694.775512695313
+			],
+			"time": 1.68333333333333
+		},
+		{
+			"id": 3,
+			"kind": "seesaw",
+			"lifetime": 12.1768999099731,
+			"phase": "appearing",
+			"position": [
+				392.064575195313,
+				115.478034973145
+			],
+			"time": 2.75
+		},
+		{
+			"id": 3,
+			"kind": "seesaw",
+			"lifetime": 12.1768999099731,
+			"phase": "active",
+			"position": [
+				392.064575195313,
+				115.478034973145
+			],
+			"time": 3.38333333333333
+		},
+		{
+			"id": 4,
+			"kind": "brick",
+			"lifetime": 20.4018020629883,
+			"phase": "appearing",
+			"position": [
+				456.736114501953,
+				389.753051757813
+			],
+			"time": 6.11666666666665
+		},
+		{
+			"id": 4,
+			"kind": "brick",
+			"lifetime": 20.4018020629883,
+			"phase": "active",
+			"position": [
+				456.736114501953,
+				389.753051757813
+			],
+			"time": 6.86666666666665
+		},
+		{
+			"id": 5,
+			"kind": "seesaw",
+			"lifetime": 22.6804161071777,
+			"phase": "appearing",
+			"position": [
+				280.726013183594,
+				302.020935058594
+			],
+			"time": 9.43333333333338
+		},
+		{
+			"id": 5,
+			"kind": "seesaw",
+			"lifetime": 22.6804161071777,
+			"phase": "active",
+			"position": [
+				280.726013183594,
+				302.020935058594
+			],
+			"time": 10.0666666666667
+		},
+		{
+			"id": 3,
+			"kind": "seesaw",
+			"lifetime": 12.1768999099731,
+			"phase": "fading",
+			"position": [
+				392.064575195313,
+				115.478034973145
+			],
+			"time": 14.916666666667
+		},
+		{
+			"id": 3,
+			"kind": "seesaw",
+			"lifetime": 12.1768999099731,
+			"phase": "removed",
+			"position": [
+				392.064575195313,
+				115.478034973145
+			],
+			"time": 15.566666666667
+		},
+		{
+			"id": 6,
+			"kind": "sling",
+			"lifetime": 15.6799602508545,
+			"phase": "appearing",
+			"position": [
+				66.1603927612305,
+				426.094696044922
+			],
+			"time": 15.9000000000004
+		},
+		{
+			"id": 6,
+			"kind": "sling",
+			"lifetime": 15.6799602508545,
+			"phase": "active",
+			"position": [
+				66.1603927612305,
+				426.094696044922
+			],
+			"time": 16.5333333333337
+		},
+		{
+			"id": 0,
+			"kind": "brick",
+			"lifetime": 16.8710403442383,
+			"phase": "fading",
+			"position": [
+				661.807189941406,
+				214.221878051758
+			],
+			"time": 16.9833333333337
+		},
+		{
+			"id": 0,
+			"kind": "brick",
+			"lifetime": 16.8710403442383,
+			"phase": "removed",
+			"position": [
+				661.807189941406,
+				214.221878051758
+			],
+			"time": 17.6333333333336
+		},
+		{
+			"id": 7,
+			"kind": "brick",
+			"lifetime": 12.8148078918457,
+			"phase": "appearing",
+			"position": [
+				386.116973876953,
+				435.454956054688
+			],
+			"time": 18.8000000000002
+		},
+		{
+			"id": 7,
+			"kind": "brick",
+			"lifetime": 12.8148078918457,
+			"phase": "active",
+			"position": [
+				386.116973876953,
+				435.454956054688
+			],
+			"time": 19.4333333333335
+		},
+		{
+			"id": 2,
+			"kind": "spring",
+			"lifetime": 18.6340179443359,
+			"phase": "fading",
+			"position": [
+				385.799530029297,
+				694.775512695313
+			],
+			"time": 19.6833333333335
+		},
+		{
+			"id": 2,
+			"kind": "spring",
+			"lifetime": 18.6340179443359,
+			"phase": "removed",
+			"position": [
+				385.799530029297,
+				694.775512695313
+			],
+			"time": 20.3333333333335
+		},
+		{
+			"id": 8,
+			"kind": "spring",
+			"lifetime": 17.4218673706055,
+			"phase": "appearing",
+			"position": [
+				435.507659912109,
+				264.657470703125
+			],
+			"time": 20.9333333333334
+		},
+		{
+			"id": 8,
+			"kind": "spring",
+			"lifetime": 17.4218673706055,
+			"phase": "active",
+			"position": [
+				435.507659912109,
+				264.657470703125
+			],
+			"time": 21.5666666666667
+		},
+		{
+			"id": 1,
+			"kind": "brick",
+			"lifetime": 22.8241310119629,
+			"phase": "fading",
+			"position": [
+				770.034545898438,
+				316.845153808594
+			],
+			"time": 23.4
+		},
+		{
+			"id": 1,
+			"kind": "brick",
+			"lifetime": 22.8241310119629,
+			"phase": "removed",
+			"position": [
+				770.034545898438,
+				316.845153808594
+			],
+			"time": 24.0499999999999
+		},
+		{
+			"id": 9,
+			"kind": "sling",
+			"lifetime": 18.7435874938965,
+			"phase": "appearing",
+			"position": [
+				654.895690917969,
+				146.004806518555
+			],
+			"time": 24.0999999999999
+		},
+		{
+			"id": 9,
+			"kind": "sling",
+			"lifetime": 18.7435874938965,
+			"phase": "active",
+			"position": [
+				654.895690917969,
+				146.004806518555
+			],
+			"time": 24.7333333333332
+		},
+		{
+			"id": 4,
+			"kind": "brick",
+			"lifetime": 20.4018020629883,
+			"phase": "fading",
+			"position": [
+				456.736114501953,
+				389.753051757813
+			],
+			"time": 26.5166666666664
+		},
+		{
+			"id": 4,
+			"kind": "brick",
+			"lifetime": 20.4018020629883,
+			"phase": "removed",
+			"position": [
+				456.736114501953,
+				389.753051757813
+			],
+			"time": 27.1666666666664
+		},
+		{
+			"id": 10,
+			"kind": "sling",
+			"lifetime": 21.9630126953125,
+			"phase": "appearing",
+			"position": [
+				660.415161132813,
+				449.207733154297
+			],
+			"time": 27.4833333333331
+		},
+		{
+			"id": 10,
+			"kind": "sling",
+			"lifetime": 21.9630126953125,
+			"phase": "active",
+			"position": [
+				660.415161132813,
+				449.207733154297
+			],
+			"time": 28.1166666666664
+		},
+		{
+			"id": 6,
+			"kind": "sling",
+			"lifetime": 15.6799602508545,
+			"phase": "fading",
+			"position": [
+				66.1603927612305,
+				426.094696044922
+			],
+			"time": 31.5666666666662
+		},
+		{
+			"id": 7,
+			"kind": "brick",
+			"lifetime": 12.8148078918457,
+			"phase": "fading",
+			"position": [
+				386.116973876953,
+				435.454956054688
+			],
+			"time": 31.5999999999995
+		},
+		{
+			"id": 5,
+			"kind": "seesaw",
+			"lifetime": 22.6804161071777,
+			"phase": "fading",
+			"position": [
+				280.726013183594,
+				302.020935058594
+			],
+			"time": 32.0999999999995
+		},
+		{
+			"id": 6,
+			"kind": "sling",
+			"lifetime": 15.6799602508545,
+			"phase": "removed",
+			"position": [
+				66.1603927612305,
+				426.094696044922
+			],
+			"time": 32.2166666666661
+		},
+		{
+			"id": 7,
+			"kind": "brick",
+			"lifetime": 12.8148078918457,
+			"phase": "removed",
+			"position": [
+				386.116973876953,
+				435.454956054688
+			],
+			"time": 32.2499999999995
+		},
+		{
+			"id": 11,
+			"kind": "spring",
+			"lifetime": 23.949743270874,
+			"phase": "appearing",
+			"position": [
+				436.073089599609,
+				101.692489624023
+			],
+			"time": 32.3666666666661
+		},
+		{
+			"id": 5,
+			"kind": "seesaw",
+			"lifetime": 22.6804161071777,
+			"phase": "removed",
+			"position": [
+				280.726013183594,
+				302.020935058594
+			],
+			"time": 32.7499999999994
+		},
+		{
+			"id": 11,
+			"kind": "spring",
+			"lifetime": 23.949743270874,
+			"phase": "active",
+			"position": [
+				436.073089599609,
+				101.692489624023
+			],
+			"time": 32.9999999999994
+		},
+		{
+			"id": 12,
+			"kind": "sling",
+			"lifetime": 19.5188674926758,
+			"phase": "appearing",
+			"position": [
+				527.708740234375,
+				113.077758789063
+			],
+			"time": 34.816666666666
+		},
+		{
+			"id": 12,
+			"kind": "sling",
+			"lifetime": 19.5188674926758,
+			"phase": "active",
+			"position": [
+				527.708740234375,
+				113.077758789063
+			],
+			"time": 35.4499999999993
+		},
+		{
+			"id": 13,
+			"kind": "bumper",
+			"lifetime": 12.5521926879883,
+			"phase": "appearing",
+			"position": [
+				416.254333496094,
+				419.445739746094
+			],
+			"time": 37.3499999999992
+		},
+		{
+			"id": 13,
+			"kind": "bumper",
+			"lifetime": 12.5521926879883,
+			"phase": "active",
+			"position": [
+				416.254333496094,
+				419.445739746094
+			],
+			"time": 37.9833333333325
+		},
+		{
+			"id": 8,
+			"kind": "spring",
+			"lifetime": 17.4218673706055,
+			"phase": "fading",
+			"position": [
+				435.507659912109,
+				264.657470703125
+			],
+			"time": 38.3499999999991
+		},
+		{
+			"id": 8,
+			"kind": "spring",
+			"lifetime": 17.4218673706055,
+			"phase": "removed",
+			"position": [
+				435.507659912109,
+				264.657470703125
+			],
+			"time": 38.9999999999991
+		},
+		{
+			"id": 14,
+			"kind": "peg",
+			"lifetime": 18.399242401123,
+			"phase": "appearing",
+			"position": [
+				451.776977539063,
+				636.561950683594
+			],
+			"time": 39.5833333333324
+		},
+		{
+			"id": 14,
+			"kind": "peg",
+			"lifetime": 18.399242401123,
+			"phase": "active",
+			"position": [
+				451.776977539063,
+				636.561950683594
+			],
+			"time": 40.2166666666657
+		},
+		{
+			"id": 9,
+			"kind": "sling",
+			"lifetime": 18.7435874938965,
+			"phase": "fading",
+			"position": [
+				654.895690917969,
+				146.004806518555
+			],
+			"time": 42.8333333333322
+		},
+		{
+			"id": 9,
+			"kind": "sling",
+			"lifetime": 18.7435874938965,
+			"phase": "removed",
+			"position": [
+				654.895690917969,
+				146.004806518555
+			],
+			"time": 43.4833333333321
+		},
+		{
+			"id": 15,
+			"kind": "brick",
+			"lifetime": 15.4795026779175,
+			"phase": "appearing",
+			"position": [
+				387.621734619141,
+				163.505020141602
+			],
+			"time": 43.4999999999988
+		},
+		{
+			"id": 15,
+			"kind": "brick",
+			"lifetime": 15.4795026779175,
+			"phase": "active",
+			"position": [
+				387.621734619141,
+				163.505020141602
+			],
+			"time": 44.1333333333321
+		},
+		{
+			"id": 10,
+			"kind": "sling",
+			"lifetime": 21.9630126953125,
+			"phase": "fading",
+			"position": [
+				660.415161132813,
+				449.207733154297
+			],
+			"time": 49.4333333333318
+		},
+		{
+			"id": 13,
+			"kind": "bumper",
+			"lifetime": 12.5521926879883,
+			"phase": "fading",
+			"position": [
+				416.254333496094,
+				419.445739746094
+			],
+			"time": 49.8999999999985
+		},
+		{
+			"id": 10,
+			"kind": "sling",
+			"lifetime": 21.9630126953125,
+			"phase": "removed",
+			"position": [
+				660.415161132813,
+				449.207733154297
+			],
+			"time": 50.0833333333318
+		},
+		{
+			"id": 16,
+			"kind": "seesaw",
+			"lifetime": 15.1656198501587,
+			"phase": "appearing",
+			"position": [
+				391.372161865234,
+				536.981567382813
+			],
+			"time": 50.4333333333318
+		},
+		{
+			"id": 13,
+			"kind": "bumper",
+			"lifetime": 12.5521926879883,
+			"phase": "removed",
+			"position": [
+				416.254333496094,
+				419.445739746094
+			],
+			"time": 50.5499999999984
+		},
+		{
+			"id": 16,
+			"kind": "seesaw",
+			"lifetime": 15.1656198501587,
+			"phase": "active",
+			"position": [
+				391.372161865234,
+				536.981567382813
+			],
+			"time": 51.0666666666651
+		},
+		{
+			"id": 17,
+			"kind": "bumper",
+			"lifetime": 12.0300979614258,
+			"phase": "appearing",
+			"position": [
+				894.473754882813,
+				98.7968292236328
+			],
+			"time": 53.5166666666649
+		},
+		{
+			"id": 17,
+			"kind": "bumper",
+			"lifetime": 12.0300979614258,
+			"phase": "active",
+			"position": [
+				894.473754882813,
+				98.7968292236328
+			],
+			"time": 54.1499999999982
+		},
+		{
+			"id": 12,
+			"kind": "sling",
+			"lifetime": 19.5188674926758,
+			"phase": "fading",
+			"position": [
+				527.708740234375,
+				113.077758789063
+			],
+			"time": 54.3333333333315
+		},
+		{
+			"id": 12,
+			"kind": "sling",
+			"lifetime": 19.5188674926758,
+			"phase": "removed",
+			"position": [
+				527.708740234375,
+				113.077758789063
+			],
+			"time": 54.9833333333315
+		},
+		{
+			"id": 11,
+			"kind": "spring",
+			"lifetime": 23.949743270874,
+			"phase": "fading",
+			"position": [
+				436.073089599609,
+				101.692489624023
+			],
+			"time": 56.2999999999981
+		},
+		{
+			"id": 18,
+			"kind": "bumper",
+			"lifetime": 21.8943347930908,
+			"phase": "appearing",
+			"position": [
+				573.990356445313,
+				412.549377441406
+			],
+			"time": 56.8999999999981
+		},
+		{
+			"id": 11,
+			"kind": "spring",
+			"lifetime": 23.949743270874,
+			"phase": "removed",
+			"position": [
+				436.073089599609,
+				101.692489624023
+			],
+			"time": 56.949999999998
+		},
+		{
+			"id": 18,
+			"kind": "bumper",
+			"lifetime": 21.8943347930908,
+			"phase": "active",
+			"position": [
+				573.990356445313,
+				412.549377441406
+			],
+			"time": 57.5333333333313
+		},
+		{
+			"id": 14,
+			"kind": "peg",
+			"lifetime": 18.399242401123,
+			"phase": "fading",
+			"position": [
+				451.776977539063,
+				636.561950683594
+			],
+			"time": 57.9666666666647
+		},
+		{
+			"id": 14,
+			"kind": "peg",
+			"lifetime": 18.399242401123,
+			"phase": "removed",
+			"position": [
+				451.776977539063,
+				636.561950683594
+			],
+			"time": 58.6166666666646
+		},
+		{
+			"id": 15,
+			"kind": "brick",
+			"lifetime": 15.4795026779175,
+			"phase": "fading",
+			"position": [
+				387.621734619141,
+				163.505020141602
+			],
+			"time": 58.9666666666646
+		},
+		{
+			"id": 15,
+			"kind": "brick",
+			"lifetime": 15.4795026779175,
+			"phase": "removed",
+			"position": [
+				387.621734619141,
+				163.505020141602
+			],
+			"time": 59.6166666666646
+		},
+		{
+			"id": 19,
+			"kind": "bumper",
+			"lifetime": 17.745174407959,
+			"phase": "appearing",
+			"position": [
+				230.375045776367,
+				270.106170654297
+			],
+			"time": 60.0499999999979
+		},
+		{
+			"id": 19,
+			"kind": "bumper",
+			"lifetime": 17.745174407959,
+			"phase": "active",
+			"position": [
+				230.375045776367,
+				270.106170654297
+			],
+			"time": 60.6833333333312
+		},
+		{
+			"id": 20,
+			"kind": "bumper",
+			"lifetime": 15.3577575683594,
+			"phase": "appearing",
+			"position": [
+				264.78564453125,
+				203.282028198242
+			],
+			"time": 61.9333333333311
+		},
+		{
+			"id": 20,
+			"kind": "bumper",
+			"lifetime": 15.3577575683594,
+			"phase": "active",
+			"position": [
+				264.78564453125,
+				203.282028198242
+			],
+			"time": 62.5666666666644
+		},
+		{
+			"id": 21,
+			"kind": "bumper",
+			"lifetime": 13.9713897705078,
+			"phase": "appearing",
+			"position": [
+				927.048522949219,
+				355.775756835938
+			],
+			"time": 64.9499999999976
+		},
+		{
+			"id": 17,
+			"kind": "bumper",
+			"lifetime": 12.0300979614258,
+			"phase": "fading",
+			"position": [
+				894.473754882813,
+				98.7968292236328
+			],
+			"time": 65.5333333333309
+		},
+		{
+			"id": 16,
+			"kind": "seesaw",
+			"lifetime": 15.1656198501587,
+			"phase": "fading",
+			"position": [
+				391.372161865234,
+				536.981567382813
+			],
+			"time": 65.5833333333309
+		},
+		{
+			"id": 21,
+			"kind": "bumper",
+			"lifetime": 13.9713897705078,
+			"phase": "active",
+			"position": [
+				927.048522949219,
+				355.775756835938
+			],
+			"time": 65.5833333333309
+		},
+		{
+			"id": 17,
+			"kind": "bumper",
+			"lifetime": 12.0300979614258,
+			"phase": "removed",
+			"position": [
+				894.473754882813,
+				98.7968292236328
+			],
+			"time": 66.1833333333309
+		},
+		{
+			"id": 16,
+			"kind": "seesaw",
+			"lifetime": 15.1656198501587,
+			"phase": "removed",
+			"position": [
+				391.372161865234,
+				536.981567382813
+			],
+			"time": 66.2333333333309
+		},
+		{
+			"id": 22,
+			"kind": "spring",
+			"lifetime": 12.6555910110474,
+			"phase": "appearing",
+			"position": [
+				622.022338867188,
+				494.957885742188
+			],
+			"time": 68.1166666666641
+		},
+		{
+			"id": 22,
+			"kind": "spring",
+			"lifetime": 12.6555910110474,
+			"phase": "active",
+			"position": [
+				622.022338867188,
+				494.957885742188
+			],
+			"time": 68.7499999999974
+		}
+	],
+	"events": [
+		{
+			"intensity": 0.7,
+			"kind": "catch",
+			"position": "(807.1991, 544.668)",
+			"time": 2.79999999999999
+		},
+		{
+			"intensity": 1.0,
+			"kind": "throw",
+			"position": "(659.6995, 544.72)",
+			"time": 3.56666666666666
+		},
+		{
+			"intensity": 0.85,
+			"kind": "toy_brick",
+			"position": "(661.8072, 214.2219)",
+			"time": 4.56666666666666
+		},
+		{
+			"intensity": 0.7,
+			"kind": "catch",
+			"position": "(636.0267, 544.6717)",
+			"time": 5.58333333333332
+		},
+		{
+			"intensity": 1.0,
+			"kind": "throw",
+			"position": "(430.8662, 544.72)",
+			"time": 6.34999999999998
+		},
+		{
+			"intensity": 0.7,
+			"kind": "catch",
+			"position": "(365.8184, 544.654)",
+			"time": 9.40000000000005
+		},
+		{
+			"intensity": 1.0,
+			"kind": "throw",
+			"position": "(341.2869, 544.72)",
+			"time": 10.1666666666668
+		},
+		{
+			"intensity": 0.85,
+			"kind": "toy_seesaw",
+			"position": "(280.726, 302.0209)",
+			"time": 10.7166666666668
+		},
+		{
+			"intensity": 0.7,
+			"kind": "catch",
+			"position": "(444.8209, 544.6814)",
+			"time": 11.2666666666668
+		},
+		{
+			"intensity": 1.0,
+			"kind": "throw",
+			"position": "(515.6991, 544.72)",
+			"time": 12.0333333333335
+		},
+		{
+			"intensity": 0.7,
+			"kind": "catch",
+			"position": "(581.4332, 544.6594)",
+			"time": 15.3000000000003
+		},
+		{
+			"intensity": 1.0,
+			"kind": "throw",
+			"position": "(612.8179, 544.72)",
+			"time": 16.066666666667
+		},
+		{
+			"intensity": 0.7,
+			"kind": "catch",
+			"position": "(527.7239, 544.6681)",
+			"time": 19.3666666666668
+		},
+		{
+			"intensity": 1.0,
+			"kind": "throw",
+			"position": "(292.1975, 544.72)",
+			"time": 20.1333333333335
+		},
+		{
+			"intensity": 0.85,
+			"kind": "toy_seesaw",
+			"position": "(280.726, 302.0209)",
+			"time": 20.7666666666668
+		},
+		{
+			"intensity": 0.85,
+			"kind": "toy_brick",
+			"position": "(386.117, 435.455)",
+			"time": 21.0833333333334
+		},
+		{
+			"intensity": 0.7,
+			"kind": "catch",
+			"position": "(297.2962, 544.686)",
+			"time": 21.3666666666667
+		},
+		{
+			"intensity": 1.0,
+			"kind": "throw",
+			"position": "(366.5703, 544.72)",
+			"time": 22.1333333333334
+		},
+		{
+			"intensity": 0.85,
+			"kind": "toy_brick",
+			"position": "(386.117, 435.455)",
+			"time": 22.3166666666667
+		},
+		{
+			"intensity": 0.7,
+			"kind": "catch",
+			"position": "(378.0269, 544.6885)",
+			"time": 22.5166666666667
+		},
+		{
+			"intensity": 1.0,
+			"kind": "throw",
+			"position": "(476.3754, 544.72)",
+			"time": 23.2833333333333
+		},
+		{
+			"intensity": 0.85,
+			"kind": "toy_brick",
+			"position": "(456.7361, 389.7531)",
+			"time": 23.5999999999999
+		},
+		{
+			"intensity": 0.7,
+			"kind": "catch",
+			"position": "(499.7445, 544.6561)",
+			"time": 23.9333333333333
+		},
+		{
+			"intensity": 1.0,
+			"kind": "throw",
+			"position": "(608.8846, 544.72)",
+			"time": 24.6999999999999
+		},
+		{
+			"intensity": 0.85,
+			"kind": "toy_sling",
+			"position": "(654.8957, 146.0048)",
+			"time": 26.0999999999998
+		},
+		{
+			"intensity": 0.7,
+			"kind": "catch",
+			"position": "(884.941, 544.72)",
+			"time": 26.9333333333331
+		},
+		{
+			"intensity": 1.0,
+			"kind": "throw",
+			"position": "(612.9791, 544.72)",
+			"time": 27.6999999999997
+		},
+		{
+			"intensity": 0.7,
+			"kind": "catch",
+			"position": "(527.9699, 544.6681)",
+			"time": 30.9999999999995
+		},
+		{
+			"intensity": 1.0,
+			"kind": "throw",
+			"position": "(292.2311, 544.72)",
+			"time": 31.7666666666661
+		},
+		{
+			"intensity": 0.7,
+			"kind": "catch",
+			"position": "(161.2606, 544.6567)",
+			"time": 33.1666666666661
+		},
+		{
+			"intensity": 1.0,
+			"kind": "throw",
+			"position": "(380.5277, 544.72)",
+			"time": 33.9333333333327
+		},
+		{
+			"intensity": 0.85,
+			"kind": "toy_spring",
+			"position": "(435.5077, 264.6575)",
+			"time": 34.6999999999993
+		},
+		{
+			"intensity": 0.7,
+			"kind": "catch",
+			"position": "(352.2241, 544.6568)",
+			"time": 34.7499999999993
+		},
+		{
+			"intensity": 1.0,
+			"kind": "throw",
+			"position": "(536.7997, 544.72)",
+			"time": 35.5166666666659
+		},
+		{
+			"intensity": 0.7,
+			"kind": "portal",
+			"position": "(736.0257, 166.8248)",
+			"time": 36.9166666666659
+		},
+		{
+			"intensity": 0.85,
+			"kind": "toy_sling",
+			"position": "(660.4152, 449.2077)",
+			"time": 38.5666666666658
+		},
+		{
+			"intensity": 0.7,
+			"kind": "catch",
+			"position": "(783.6552, 544.7043)",
+			"time": 38.8833333333324
+		},
+		{
+			"intensity": 0.7,
+			"kind": "boost",
+			"position": "(325.9756, 223.7365)",
+			"time": 39.4333333333324
+		},
+		{
+			"intensity": 1.0,
+			"kind": "throw",
+			"position": "(588.1517, 544.72)",
+			"time": 39.649999999999
+		},
+		{
+			"intensity": 0.7,
+			"kind": "boost",
+			"position": "(334.2383, 183.814)",
+			"time": 40.249999999999
+		},
+		{
+			"intensity": 0.7,
+			"kind": "boost",
+			"position": "(341.5798, 188.1608)",
+			"time": 40.9666666666656
+		},
+		{
+			"intensity": 0.7,
+			"kind": "catch",
+			"position": "(354.3172, 544.6657)",
+			"time": 42.3666666666655
+		},
+		{
+			"intensity": 1.0,
+			"kind": "throw",
+			"position": "(298.3253, 544.72)",
+			"time": 43.1333333333322
+		},
+		{
+			"intensity": 0.85,
+			"kind": "toy_peg",
+			"position": "(451.777, 636.562)",
+			"time": 43.4166666666655
+		},
+		{
+			"intensity": 0.7,
+			"kind": "catch",
+			"position": "(263.0518, 544.6721)",
+			"time": 46.433333333332
+		},
+		{
+			"intensity": 1.0,
+			"kind": "throw",
+			"position": "(541.4583, 544.72)",
+			"time": 47.1999999999986
+		},
+		{
+			"intensity": 0.7,
+			"kind": "catch",
+			"position": "(653.4494, 544.6681)",
+			"time": 50.4999999999984
+		},
+		{
+			"intensity": 1.0,
+			"kind": "throw",
+			"position": "(589.736, 544.72)",
+			"time": 51.266666666665
+		},
+		{
+			"intensity": 0.7,
+			"kind": "catch",
+			"position": "(492.681, 544.6681)",
+			"time": 54.5666666666649
+		},
+		{
+			"intensity": 1.0,
+			"kind": "throw",
+			"position": "(482.1519, 544.6793)",
+			"time": 55.3333333333315
+		},
+		{
+			"intensity": 0.7,
+			"kind": "catch",
+			"position": "(484.825, 544.6541)",
+			"time": 60.8166666666645
+		},
+		{
+			"intensity": 1.0,
+			"kind": "throw",
+			"position": "(664.3553, 544.72)",
+			"time": 61.5833333333311
+		},
+		{
+			"intensity": 0.7,
+			"kind": "catch",
+			"position": "(635.3778, 544.6682)",
+			"time": 64.8833333333309
+		},
+		{
+			"intensity": 1.0,
+			"kind": "throw",
+			"position": "(335.1167, 544.72)",
+			"time": 65.6499999999976
+		},
+		{
+			"intensity": 0.7,
+			"kind": "boost",
+			"position": "(324.3441, 372.7274)",
+			"time": 66.1166666666642
+		},
+		{
+			"intensity": 0.7,
+			"kind": "catch",
+			"position": "(360.5442, 544.6569)",
+			"time": 66.4499999999975
+		},
+		{
+			"intensity": 1.0,
+			"kind": "throw",
+			"position": "(292.0226, 544.72)",
+			"time": 67.2166666666641
+		},
+		{
+			"intensity": 0.7,
+			"kind": "boost",
+			"position": "(294.1319, 393.8311)",
+			"time": 67.6166666666641
+		},
+		{
+			"intensity": 0.7,
+			"kind": "catch",
+			"position": "(326.1653, 544.6683)",
+			"time": 67.8999999999974
+		},
+		{
+			"intensity": 1.0,
+			"kind": "throw",
+			"position": "(365.8495, 544.72)",
+			"time": 68.6666666666641
+		}
+	],
+	"field_journal": [
+		{
+			"id": "random_1",
+			"kind": "slow",
+			"lifetime": 17.8797416687012,
+			"phase": "entering",
+			"positions": [
+				[
+					417.008880615234,
+					241.58642578125
+				]
+			],
+			"time": 1.16666666666667
+		},
+		{
+			"id": "random_1",
+			"kind": "slow",
+			"lifetime": 17.8797416687012,
+			"phase": "active",
+			"positions": [
+				[
+					417.008880615234,
+					241.58642578125
+				]
+			],
+			"time": 1.81666666666667
+		},
+		{
+			"id": "random_2",
+			"kind": "slow",
+			"lifetime": 10.5697107315063,
+			"phase": "entering",
+			"positions": [
+				[
+					588.335327148438,
+					171.295562744141
+				]
+			],
+			"time": 4.41666666666666
+		},
+		{
+			"id": "random_2",
+			"kind": "slow",
+			"lifetime": 10.5697107315063,
+			"phase": "active",
+			"positions": [
+				[
+					588.335327148438,
+					171.295562744141
+				]
+			],
+			"time": 5.06666666666665
+		},
+		{
+			"id": "random_3",
+			"kind": "lift",
+			"lifetime": 12.6871967315674,
+			"phase": "entering",
+			"positions": [
+				[
+					722.275024414063,
+					382.989227294922
+				]
+			],
+			"time": 6.88333333333331
+		},
+		{
+			"id": "random_3",
+			"kind": "lift",
+			"lifetime": 12.6871967315674,
+			"phase": "active",
+			"positions": [
+				[
+					722.275024414063,
+					382.989227294922
+				]
+			],
+			"time": 7.53333333333331
+		},
+		{
+			"id": "random_4",
+			"kind": "slow",
+			"lifetime": 11.8681507110596,
+			"phase": "entering",
+			"positions": [
+				[
+					180.32421875,
+					341.370971679688
+				]
+			],
+			"time": 9.93333333333341
+		},
+		{
+			"id": "random_4",
+			"kind": "slow",
+			"lifetime": 11.8681507110596,
+			"phase": "active",
+			"positions": [
+				[
+					180.32421875,
+					341.370971679688
+				]
+			],
+			"time": 10.5833333333334
+		},
+		{
+			"id": "random_2",
+			"kind": "slow",
+			"lifetime": 10.5697107315063,
+			"phase": "leaving",
+			"positions": [
+				[
+					588.335327148438,
+					171.295562744141
+				]
+			],
+			"time": 14.3500000000003
+		},
+		{
+			"id": "random_2",
+			"kind": "slow",
+			"lifetime": 10.5697107315063,
+			"phase": "removed",
+			"positions": [
+				[
+					588.335327148438,
+					171.295562744141
+				]
+			],
+			"time": 15.0000000000003
+		},
+		{
+			"id": "random_5",
+			"kind": "magnet",
+			"lifetime": 12.6413106918335,
+			"phase": "entering",
+			"positions": [
+				[
+					150.36344909668,
+					598.639831542969
+				]
+			],
+			"time": 17.4500000000003
+		},
+		{
+			"id": "random_5",
+			"kind": "magnet",
+			"lifetime": 12.6413106918335,
+			"phase": "active",
+			"positions": [
+				[
+					150.36344909668,
+					598.639831542969
+				]
+			],
+			"time": 18.1000000000003
+		},
+		{
+			"id": "random_1",
+			"kind": "slow",
+			"lifetime": 17.8797416687012,
+			"phase": "leaving",
+			"positions": [
+				[
+					417.008880615234,
+					241.58642578125
+				]
+			],
+			"time": 18.4000000000002
+		},
+		{
+			"id": "random_3",
+			"kind": "lift",
+			"lifetime": 12.6871967315674,
+			"phase": "leaving",
+			"positions": [
+				[
+					722.275024414063,
+					382.989227294922
+				]
+			],
+			"time": 18.9333333333335
+		},
+		{
+			"id": "random_1",
+			"kind": "slow",
+			"lifetime": 17.8797416687012,
+			"phase": "removed",
+			"positions": [
+				[
+					417.008880615234,
+					241.58642578125
+				]
+			],
+			"time": 19.0500000000002
+		},
+		{
+			"id": "random_3",
+			"kind": "lift",
+			"lifetime": 12.6871967315674,
+			"phase": "removed",
+			"positions": [
+				[
+					722.275024414063,
+					382.989227294922
+				]
+			],
+			"time": 19.5833333333335
+		},
+		{
+			"id": "random_6",
+			"kind": "slow",
+			"lifetime": 20.7127475738525,
+			"phase": "entering",
+			"positions": [
+				[
+					834.1025390625,
+					610.790832519531
+				]
+			],
+			"time": 21.1166666666667
+		},
+		{
+			"id": "random_4",
+			"kind": "slow",
+			"lifetime": 11.8681507110596,
+			"phase": "leaving",
+			"positions": [
+				[
+					180.32421875,
+					341.370971679688
+				]
+			],
+			"time": 21.1666666666667
+		},
+		{
+			"id": "random_6",
+			"kind": "slow",
+			"lifetime": 20.7127475738525,
+			"phase": "active",
+			"positions": [
+				[
+					834.1025390625,
+					610.790832519531
+				]
+			],
+			"time": 21.7666666666667
+		},
+		{
+			"id": "random_4",
+			"kind": "slow",
+			"lifetime": 11.8681507110596,
+			"phase": "removed",
+			"positions": [
+				[
+					180.32421875,
+					341.370971679688
+				]
+			],
+			"time": 21.8166666666667
+		},
+		{
+			"id": "random_7",
+			"kind": "magnet",
+			"lifetime": 10.8770208358765,
+			"phase": "entering",
+			"positions": [
+				[
+					248.265228271484,
+					570.250183105469
+				]
+			],
+			"time": 23.6833333333333
+		},
+		{
+			"id": "random_7",
+			"kind": "magnet",
+			"lifetime": 10.8770208358765,
+			"phase": "active",
+			"positions": [
+				[
+					248.265228271484,
+					570.250183105469
+				]
+			],
+			"time": 24.3333333333332
+		},
+		{
+			"id": "random_8",
+			"kind": "magnet",
+			"lifetime": 12.8128795623779,
+			"phase": "entering",
+			"positions": [
+				[
+					271.292053222656,
+					232.988952636719
+				]
+			],
+			"time": 26.5833333333331
+		},
+		{
+			"id": "random_8",
+			"kind": "magnet",
+			"lifetime": 12.8128795623779,
+			"phase": "active",
+			"positions": [
+				[
+					271.292053222656,
+					232.988952636719
+				]
+			],
+			"time": 27.2333333333331
+		},
+		{
+			"id": "random_5",
+			"kind": "magnet",
+			"lifetime": 12.6413106918335,
+			"phase": "leaving",
+			"positions": [
+				[
+					150.36344909668,
+					598.639831542969
+				]
+			],
+			"time": 29.4499999999996
+		},
+		{
+			"id": "random_5",
+			"kind": "magnet",
+			"lifetime": 12.6413106918335,
+			"phase": "removed",
+			"positions": [
+				[
+					150.36344909668,
+					598.639831542969
+				]
+			],
+			"time": 30.0999999999996
+		},
+		{
+			"id": "random_9",
+			"kind": "portal",
+			"lifetime": 17.623908996582,
+			"phase": "entering",
+			"positions": [
+				[
+					777.535583496094,
+					135.505035400391
+				],
+				[
+					463.033447265625,
+					447.826507568359
+				]
+			],
+			"time": 32.3833333333328
+		},
+		{
+			"id": "random_9",
+			"kind": "portal",
+			"lifetime": 17.623908996582,
+			"phase": "active",
+			"positions": [
+				[
+					777.535583496094,
+					135.505035400391
+				],
+				[
+					463.033447265625,
+					447.826507568359
+				]
+			],
+			"time": 33.0333333333327
+		},
+		{
+			"id": "random_7",
+			"kind": "magnet",
+			"lifetime": 10.8770208358765,
+			"phase": "leaving",
+			"positions": [
+				[
+					248.265228271484,
+					570.250183105469
+				]
+			],
+			"time": 33.916666666666
+		},
+		{
+			"id": "random_7",
+			"kind": "magnet",
+			"lifetime": 10.8770208358765,
+			"phase": "removed",
+			"positions": [
+				[
+					248.265228271484,
+					570.250183105469
+				]
+			],
+			"time": 34.566666666666
+		},
+		{
+			"id": "random_10",
+			"kind": "boost",
+			"lifetime": 10.4852848052979,
+			"phase": "entering",
+			"positions": [
+				[
+					316.615264892578,
+					201.461883544922
+				]
+			],
+			"time": 34.6833333333326
+		},
+		{
+			"id": "random_10",
+			"kind": "boost",
+			"lifetime": 10.4852848052979,
+			"phase": "active",
+			"positions": [
+				[
+					316.615264892578,
+					201.461883544922
+				]
+			],
+			"time": 35.3333333333326
+		},
+		{
+			"id": "random_8",
+			"kind": "magnet",
+			"lifetime": 12.8128795623779,
+			"phase": "leaving",
+			"positions": [
+				[
+					271.292053222656,
+					232.988952636719
+				]
+			],
+			"time": 38.7499999999991
+		},
+		{
+			"id": "random_8",
+			"kind": "magnet",
+			"lifetime": 12.8128795623779,
+			"phase": "removed",
+			"positions": [
+				[
+					271.292053222656,
+					232.988952636719
+				]
+			],
+			"time": 39.399999999999
+		},
+		{
+			"id": "random_6",
+			"kind": "slow",
+			"lifetime": 20.7127475738525,
+			"phase": "leaving",
+			"positions": [
+				[
+					834.1025390625,
+					610.790832519531
+				]
+			],
+			"time": 41.1833333333323
+		},
+		{
+			"id": "random_6",
+			"kind": "slow",
+			"lifetime": 20.7127475738525,
+			"phase": "removed",
+			"positions": [
+				[
+					834.1025390625,
+					610.790832519531
+				]
+			],
+			"time": 41.8333333333322
+		},
+		{
+			"id": "random_11",
+			"kind": "magnet",
+			"lifetime": 20.3626251220703,
+			"phase": "entering",
+			"positions": [
+				[
+					189.422882080078,
+					298.712341308594
+				]
+			],
+			"time": 42.0833333333322
+		},
+		{
+			"id": "random_11",
+			"kind": "magnet",
+			"lifetime": 20.3626251220703,
+			"phase": "active",
+			"positions": [
+				[
+					189.422882080078,
+					298.712341308594
+				]
+			],
+			"time": 42.7333333333322
+		},
+		{
+			"id": "random_10",
+			"kind": "boost",
+			"lifetime": 10.4852848052979,
+			"phase": "leaving",
+			"positions": [
+				[
+					316.615264892578,
+					201.461883544922
+				]
+			],
+			"time": 44.5333333333321
+		},
+		{
+			"id": "random_10",
+			"kind": "boost",
+			"lifetime": 10.4852848052979,
+			"phase": "removed",
+			"positions": [
+				[
+					316.615264892578,
+					201.461883544922
+				]
+			],
+			"time": 45.1833333333321
+		},
+		{
+			"id": "random_12",
+			"kind": "portal",
+			"lifetime": 13.6834993362427,
+			"phase": "entering",
+			"positions": [
+				[
+					128.287994384766,
+					514.969665527344
+				],
+				[
+					253.454010009766,
+					317.038208007813
+				]
+			],
+			"time": 45.883333333332
+		},
+		{
+			"id": "random_12",
+			"kind": "portal",
+			"lifetime": 13.6834993362427,
+			"phase": "active",
+			"positions": [
+				[
+					128.287994384766,
+					514.969665527344
+				],
+				[
+					253.454010009766,
+					317.038208007813
+				]
+			],
+			"time": 46.533333333332
+		},
+		{
+			"id": "random_13",
+			"kind": "magnet",
+			"lifetime": 21.7462940216064,
+			"phase": "entering",
+			"positions": [
+				[
+					415.237243652344,
+					440.266387939453
+				]
+			],
+			"time": 49.1666666666652
+		},
+		{
+			"id": "random_9",
+			"kind": "portal",
+			"lifetime": 17.623908996582,
+			"phase": "leaving",
+			"positions": [
+				[
+					777.535583496094,
+					135.505035400391
+				],
+				[
+					463.033447265625,
+					447.826507568359
+				]
+			],
+			"time": 49.3666666666651
+		},
+		{
+			"id": "random_13",
+			"kind": "magnet",
+			"lifetime": 21.7462940216064,
+			"phase": "active",
+			"positions": [
+				[
+					415.237243652344,
+					440.266387939453
+				]
+			],
+			"time": 49.8166666666651
+		},
+		{
+			"id": "random_9",
+			"kind": "portal",
+			"lifetime": 17.623908996582,
+			"phase": "removed",
+			"positions": [
+				[
+					777.535583496094,
+					135.505035400391
+				],
+				[
+					463.033447265625,
+					447.826507568359
+				]
+			],
+			"time": 50.0166666666651
+		},
+		{
+			"id": "random_14",
+			"kind": "lift",
+			"lifetime": 17.2148838043213,
+			"phase": "entering",
+			"positions": [
+				[
+					440.176391601563,
+					122.638206481934
+				]
+			],
+			"time": 52.6999999999983
+		},
+		{
+			"id": "random_14",
+			"kind": "lift",
+			"lifetime": 17.2148838043213,
+			"phase": "active",
+			"positions": [
+				[
+					440.176391601563,
+					122.638206481934
+				]
+			],
+			"time": 53.3499999999983
+		},
+		{
+			"id": "random_12",
+			"kind": "portal",
+			"lifetime": 13.6834993362427,
+			"phase": "leaving",
+			"positions": [
+				[
+					128.287994384766,
+					514.969665527344
+				],
+				[
+					253.454010009766,
+					317.038208007813
+				]
+			],
+			"time": 58.9333333333313
+		},
+		{
+			"id": "random_12",
+			"kind": "portal",
+			"lifetime": 13.6834993362427,
+			"phase": "removed",
+			"positions": [
+				[
+					128.287994384766,
+					514.969665527344
+				],
+				[
+					253.454010009766,
+					317.038208007813
+				]
+			],
+			"time": 59.5833333333312
+		},
+		{
+			"id": "random_15",
+			"kind": "boost",
+			"lifetime": 17.450590133667,
+			"phase": "entering",
+			"positions": [
+				[
+					295.63720703125,
+					369.336944580078
+				]
+			],
+			"time": 60.3499999999979
+		},
+		{
+			"id": "random_15",
+			"kind": "boost",
+			"lifetime": 17.450590133667,
+			"phase": "active",
+			"positions": [
+				[
+					295.63720703125,
+					369.336944580078
+				]
+			],
+			"time": 60.9999999999978
+		},
+		{
+			"id": "random_11",
+			"kind": "magnet",
+			"lifetime": 20.3626251220703,
+			"phase": "leaving",
+			"positions": [
+				[
+					189.422882080078,
+					298.712341308594
+				]
+			],
+			"time": 61.7999999999978
+		},
+		{
+			"id": "random_11",
+			"kind": "magnet",
+			"lifetime": 20.3626251220703,
+			"phase": "removed",
+			"positions": [
+				[
+					189.422882080078,
+					298.712341308594
+				]
+			],
+			"time": 62.4499999999977
+		},
+		{
+			"id": "random_16",
+			"kind": "boost",
+			"lifetime": 11.9540643692017,
+			"phase": "entering",
+			"positions": [
+				[
+					735.135070800781,
+					498.842590332031
+				]
+			],
+			"time": 63.2499999999977
+		},
+		{
+			"id": "random_16",
+			"kind": "boost",
+			"lifetime": 11.9540643692017,
+			"phase": "active",
+			"positions": [
+				[
+					735.135070800781,
+					498.842590332031
+				]
+			],
+			"time": 63.8999999999977
+		},
+		{
+			"id": "random_14",
+			"kind": "lift",
+			"lifetime": 17.2148838043213,
+			"phase": "leaving",
+			"positions": [
+				[
+					440.176391601563,
+					122.638206481934
+				]
+			],
+			"time": 69.266666666664
+		},
+		{
+			"id": "random_14",
+			"kind": "lift",
+			"lifetime": 17.2148838043213,
+			"phase": "removed",
+			"positions": [
+				[
+					440.176391601563,
+					122.638206481934
+				]
+			],
+			"time": 69.916666666664
+		}
+	],
+	"input_only": true,
+	"observations": [
+		{
+			"contact_count": 6,
+			"events": {
+				"catch": 3,
+				"throw": 2,
+				"toy_brick": 1
+			},
+			"field_group_count": 4,
+			"seed": 184,
+			"snapshot_saved": false,
+			"time": 10.0000000000001
+		},
+		{
+			"contact_count": 6,
+			"events": {
+				"catch": 10,
+				"throw": 10,
+				"toy_brick": 4,
+				"toy_seesaw": 2,
+				"toy_sling": 1
+			},
+			"field_group_count": 4,
+			"seed": 184,
+			"snapshot_saved": true,
+			"time": 29.9999999999996
+		},
+		{
+			"contact_count": 6,
+			"events": {
+				"boost": 3,
+				"catch": 16,
+				"portal": 1,
+				"throw": 16,
+				"toy_brick": 4,
+				"toy_peg": 1,
+				"toy_seesaw": 2,
+				"toy_sling": 2,
+				"toy_spring": 1
+			},
+			"field_group_count": 3,
+			"seed": 184,
+			"snapshot_saved": false,
+			"time": 49.9999999999984
+		},
+		{
+			"contact_count": 5,
+			"events": {
+				"boost": 5,
+				"catch": 22,
+				"portal": 1,
+				"throw": 22,
+				"toy_brick": 4,
+				"toy_peg": 1,
+				"toy_seesaw": 2,
+				"toy_sling": 2,
+				"toy_spring": 1
+			},
+			"field_group_count": 3,
+			"seed": 184,
+			"snapshot_saved": false,
+			"time": 69.9999999999973
+		}
+	],
+	"seed": 184
+}

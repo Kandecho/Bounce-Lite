@@ -2,15 +2,17 @@
 
 > A video game with the tactile feel of a real toy.
 
-Bounce Lite 是一个轻量的桌面数字玩具。移动鼠标控制挡板，接触一颗不断弹跳的球，观察它的运动、衰减与回应。
+Bounce Lite 是一个物理电子玩具。移动鼠标控制挡板，让球与机关碰撞、停下、再次活动。一个玩的动作，不需要积分、奖励、任务或长期收益来证明它值得发生。
 
-这里没有 Game Over，也没有必须坚持多久的压力。你可以连续接球，也可以看着它慢慢停下来，再拨弄一下，让它重新动起来。
+当前候选分支 `codex/harvest-geometry` 集成第一批几何／机械机关：单球、圆形弹跳器、三角侧踢、斜面、平台、弹簧、摆板。机关随机出现、停留和离场，允许同类并存，由实际物理产生组合。
+
+**当前按 [harvest + refinement](docs/exploration/harvest-refinement-plan.md) 逐批集成**：每批完成后更新文档、停止并等待人工检查。第一批记录见[几何／机械集成](docs/exploration/geometry-harvest-batch1.md)。第二批传送门、第三批普通砖／反向砖尚未启动；结构由长期试玩后决定，场力、多球与抓球保留原实验成果。
 
 ## 核心体验
 
 Bounce Lite 希望让屏幕中的互动拥有真实玩具的触感：操作简单，反馈清楚；玩家决定何时介入，球的后续运动由物理世界决定。
 
-- **接住与弹起**：用挡板与球互动，观察真实接触后的反弹。挡板移动方向不直接传给球。
+- **接球与改变球路**：鼠标移动挡板，真实接触保留E01的有限影响；静态表面自然反射，主动机关与机械运动提供不同的碰撞回应。
 - **停下与唤醒**：球会逐渐失去活力、进入休息；在附近移动挡板，可以让它重新活动。
 - **看见与听见反馈**：明亮球核心、青色光晕与残影呈现活力和运动；挡板在实际传递活力后变暗，简短音效回应碰撞与世界事件。
 
@@ -18,17 +20,36 @@ Bounce Lite 希望让屏幕中的互动拥有真实玩具的触感：操作简�
 
 ## 当前状态
 
-当前已完成 **V0.2.0 物理玩具底座**。玩家通过挡板接触球，球可以拨动随机出现的转子、改变局部气流、触碰补能对象；有效挡板介入后，短暂停顿还可能继续一段。
+**main 已建立 V0.2.0 基线**：代码提交 `e905580`，合入记录 `f792d3b`。球、挡板、Vitality、随机转子和能量块、Wake/Continue 已完成收尾。
+
+**第一批候选 `codex/harvest-geometry`** 从main选择性迁入几何／机械、随机生命周期、专用碰撞声音及种子／快照入口。原游乐场留在 `codex/exp-physical-toybox`：固定代码 `6f31ea7`、随机代码 `4947b67`。它仍可用于多球、抓球和场力实验，操作与旧验证见[游乐场试玩记录](docs/exploration/toybox-playtest.md)。
 
 从已获用户实测认可的 E01 展开，中心色 UI、全客户区场地、随机对象、真实动作资格及 Wake／Continue 强弱与表现均已实现。默认窗口640×480。当前行为见[V0.2.0 基线](docs/design/design-baseline-v0.2.0.md)，本轮验证见[收口记录](docs/reviews/v0.2.0-consolidation.md)。新组合尚无用户试玩结论。
 
-用户已授权将收尾合入 main，再广泛探索“球和挡板还可以怎么玩”：主动借鉴弹球和物理游戏机制，直接做成可玩的东西，设计理念在试玩后筛选与改造时重新介入。方向与后续交付见[物理玩具探索](docs/exploration/physical-toy-exploration.md)。
+上一轮已主动借鉴弹球和物理游戏机制，制作可玩组合；来源与交付见[物理玩具探索](docs/exploration/physical-toy-exploration.md)。接下来按[分批集成与打磨方案](docs/exploration/harvest-refinement-plan.md)收获这些成果，玩法本身无需依赖积分、奖励、任务或长期收益。
 
 F1 打开开发调参与 `DEV ELAPSED` 观察计数器；计数器持续累计，不因休息暂停或 Wake 归零，默认不显示在游戏画面。
 
 详细进度与版本路线见[项目概览](docs/project_overview.md)。
 
-## 运行试玩
+## 运行第一批试玩
+
+配置下述 Godot 路径后，双击 [run-geometry.bat](run-geometry.bat) 进入单球随机几何场景；编辑器F5和原 [run-playtest.bat](run-playtest.bat) 也启动当前默认场景。
+
+- 鼠标移动挡板，接球或在休息球附近拨动挡板。
+- R按当前种子重开场景，N换种子。
+- F8保存机关组合，F9恢复组合后安全重新发单球。
+- H显示开发快捷键；F1调参、F5静音、F7切换E01沿用。
+
+启动参数 `--geometry-baseline` 返回V0.2.0底座，`--geometry-fixed` 使用六类机关的固定开发对照，`--geometry-seed=184` 使用指定种子。直接调用 Godot 时，把这些参数放在 `--` 之后。同种子仍受输入与合法生成重试影响，快照更适合保存已经出现的组合；新的几何快照与旧游乐场快照区分类型。
+
+指定几何种子开始试玩：
+
+```powershell
+.\run-geometry.bat --geometry-seed=184
+```
+
+仓库附带[一次自然演化30秒的几何快照](docs/exploration/snapshots/geometry-batch1-184-30s.json)，可通过 `--geometry-snapshot=res://docs/exploration/snapshots/geometry-batch1-184-30s.json` 重访。当前第一批已完成，等待人工检查；main尚未更新。
 
 ### 使用 Godot 编辑器
 

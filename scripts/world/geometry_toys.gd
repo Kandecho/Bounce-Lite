@@ -1,0 +1,350 @@
+extends Node2D
+
+signal event_emitted(kind: String, position: Vector2, intensity: float)
+
+# Lifecycle and JSON reproducibility adapted from the random playground 4947b67.
+# This module contains only the first harvest geometry/mechanical family.
+const MAX_SPEED := 520.0
+const FADE_TIME := 0.65
+const KINDS := ["bumper", "sling", "ramp", "platform", "spring", "seesaw"]
+const PALETTE := {"bumper": Color("efba69"), "sling": Color("e68a83"), "ramp": Color("85bcb2"), "platform": Color("9cbbcc"), "spring": Color("72c9e8"), "seesaw": Color("d6b284")}
+var _arena := Rect2(0, 0, 960, 720)
+var _toys: Array[StaticBody2D] = []
+var _balls: Array[Dictionary] = []
+var _clock := 0.0
+var _next_id := 0
+var layout := 0
+var random_mode := false
+var lifecycle_events: Array[Dictionary] = []
+var _rng := RandomNumberGenerator.new()
+var _spawn_timer := 0.1
+var _paddle_position := Vector2.INF
+var _paddle_size := Vector2.ZERO
+func set_paddle_context(position: Vector2, size: Vector2) -> void:
+	_paddle_position = position
+	_paddle_size = size
+
+func set_random_mode(value: bool, seed_value: int) -> void:
+	set_layout(0)
+	random_mode = value
+	_rng.seed = seed_value
+	_spawn_timer = 0.1
+	_clock = 0.0
+	_next_id = 0
+	lifecycle_events.clear()
+
+func _log_phase(body: StaticBody2D, phase: String) -> void:
+	lifecycle_events.append({"time": _clock, "id": body.get_meta("toy_id"), "kind": body.get_meta("toy_kind"), "phase": phase, "position": [body.global_position.x, body.global_position.y], "lifetime": body.get_meta("lifetime", 0.0)})
+	if lifecycle_events.size() > 512:
+		lifecycle_events.pop_front()
+
+func _spawn_shape(kind: String, kick: Vector2) -> Shape2D:
+	if kind in ["bumper"]:
+		var circle := CircleShape2D.new()
+		circle.radius = 27.0
+		return circle
+	if kind in ["sling", "ramp"]:
+		var triangle := ConvexPolygonShape2D.new()
+		triangle.points = _polygon(kind, kick)
+		return triangle
+	var box := RectangleShape2D.new()
+	box.size = Vector2(152, 54) if kind == "seesaw" else _box_size(kind)
+	return box
+
+func _legal_point(kind: String, point: Vector2, kick: Vector2, ignore: StaticBody2D = null) -> bool:
+	var shape := _spawn_shape(kind, kick)
+	var envelope := shape.get_rect()
+	var allowed := _arena.grow(-3.0)
+	allowed.position.y += 34.0
+	allowed.size.y -= 34.0
+	if not allowed.encloses(Rect2(point + envelope.position, envelope.size)):
+		return false
+	var transform := Transform2D(0.0, point)
+	for ball in _balls:
+		var circle := CircleShape2D.new()
+		circle.radius = float(ball.get("radius", 16.0)) + 2.0
+		if shape.collide(transform, circle, Transform2D(0.0, ball.get("position", Vector2.ZERO))):
+			return false
+	if _paddle_size.x > 0.0:
+		var paddle := RectangleShape2D.new()
+		paddle.size = _paddle_size + Vector2(4, 4)
+		if shape.collide(transform, paddle, Transform2D(0.0, _paddle_position)):
+			return false
+	for other in _toys:
+		if other == ignore or other.get_meta("phase", "active") == "fading":
+			continue
+		var other_shape := _spawn_shape(other.get_meta("toy_kind"), other.get_meta("kick"))
+		if shape.collide(transform, other_shape, Transform2D(0.0, other.global_position)):
+			return false
+	return true
+
+func configure(arena: Rect2) -> void:
+	_arena = arena
+
+func set_ball_context(position: Vector2, radius: float) -> void:
+	_balls = [{"position": position, "radius": radius}]
+
+func set_balls_context(balls: Array[Dictionary]) -> void:
+	_balls = balls.duplicate()
+
+func set_layout(preset: int) -> void:
+	random_mode = false
+	for body in _toys:
+		body.collision_layer = 0
+		body.set_meta("active", false)
+		remove_child(body)
+		body.queue_free()
+	_toys.clear()
+	layout = preset
+	if preset != 0:
+		_add("bumper", Vector2(250, 300))
+		_add("sling", Vector2(730, 410), Vector2(-1, -1))
+		_add("ramp", Vector2(460, 290), Vector2(1, -1))
+		_add("platform", Vector2(700, 230))
+		_add("spring", Vector2(250, 460))
+		_add("seesaw", Vector2(500, 420))
+	queue_redraw()
+
+func _polygon(kind: String, kick: Vector2) -> PackedVector2Array:
+	var side := 1.0 if kick.x > 0.0 else -1.0
+	if kind == "ramp":
+		return PackedVector2Array([Vector2(-58 * side, -24), Vector2(58 * side, 24), Vector2(-58 * side, 24)])
+	return PackedVector2Array([Vector2(-32 * side, -36), Vector2(32 * side, 36), Vector2(-32 * side, 36)])
+
+func _box_size(kind: String) -> Vector2:
+	match kind:
+		"spring": return Vector2(78, 24)
+		"seesaw": return Vector2(150, 14)
+	return Vector2(116, 16)
+
+func _add(kind: String, point: Vector2, kick := Vector2.UP) -> void:
+	var body := StaticBody2D.new()
+	body.name = "Geometry_%s_%d" % [kind, _next_id]
+	body.position = to_local(_arena.position + point * _arena.size / Vector2(960, 720))
+	body.collision_layer = 1
+	body.collision_mask = 2
+	body.set_meta("toy_kind", kind)
+	body.set_meta("toy_id", _next_id)
+	body.set_meta("surface_kind", 0)
+	body.set_meta("kick", kick.normalized())
+	body.set_meta("active", true)
+	body.set_meta("phase", "active")
+	for key in ["compression", "flash", "cooldown", "phase_time", "lifetime", "remaining", "swing_phase"]:
+		body.set_meta(key, 0.0)
+	_next_id += 1
+	var collider := CollisionShape2D.new()
+	if kind == "seesaw":
+		var box := RectangleShape2D.new()
+		box.size = _box_size(kind)
+		collider.shape = box
+	else:
+		collider.shape = _spawn_shape(kind, kick)
+	body.add_child(collider)
+	add_child(body)
+	_toys.append(body)
+
+func _owned(body: Object) -> bool:
+	return is_instance_valid(body) and body is StaticBody2D and body in _toys and body.get_meta("active", false)
+
+func contact_request(result: RefCounted, collider: Object, ball_position: Vector2) -> Dictionary:
+	if not _owned(collider):
+		return {}
+	var incoming: Vector2 = result.velocity_before
+	var normal: Vector2 = result.normal.normalized()
+	if normal.length_squared() < 0.1:
+		normal = (ball_position - collider.global_position).normalized()
+	if normal.length_squared() < 0.1:
+		normal = Vector2.UP
+	var output := incoming.bounce(normal)
+	var kind: String = collider.get_meta("toy_kind")
+	var ready: bool = collider.get_meta("cooldown") <= 0.0
+	var powered := false
+	if ready and kind == "bumper":
+		# Preserve the tangent; the circular contact normal explains the extra rebound.
+		output += normal * maxf(0.0, 380.0 - output.dot(normal))
+		powered = true
+	elif ready and kind == "sling" and normal.y < -0.3 and absf(normal.x) > 0.3:
+		output += normal * maxf(0.0, 440.0 - output.dot(normal))
+		powered = true
+	elif ready and kind == "spring" and normal.y < -0.8:
+		output = Vector2(incoming.x * 0.9, -500.0)
+		powered = true
+	elif kind == "seesaw":
+		# Moving surface response comes from the same angular motion drawn on screen.
+		var omega := cos(_clock * 0.9 + float(collider.get_meta("swing_phase"))) * 0.26 * 0.9
+		var offset: Vector2 = ball_position - collider.global_position
+		var surface_velocity := Vector2(-offset.y, offset.x) * omega
+		output = (incoming - surface_velocity).bounce(normal) + surface_velocity
+	return {"velocity": output.limit_length(MAX_SPEED), "vitality_delta": 0.02 if powered else 0.0}
+
+func on_contact_committed(collider: Object, result: RefCounted, _ball_position: Vector2) -> void:
+	if not _owned(collider) or collider.get_meta("cooldown") > 0.0:
+		return
+	collider.set_meta("cooldown", 0.12)
+	if collider.get_meta("toy_kind") == "spring" and result.normal.y < -0.8:
+		collider.set_meta("compression", 1.0)
+	collider.set_meta("flash", clampf(result.velocity_before.length() / 450.0, 0.2, 1.0))
+	event_emitted.emit("toy_" + str(collider.get_meta("toy_kind")), collider.global_position, collider.get_meta("flash"))
+	queue_redraw()
+
+func _physics_process(delta: float) -> void:
+	_clock += delta
+	if random_mode:
+		_random_tick(delta)
+	for body in _toys:
+		body.set_meta("compression", maxf(0.0, float(body.get_meta("compression")) - delta * 4.0))
+		body.set_meta("flash", maxf(0.0, float(body.get_meta("flash")) - delta * 3.6))
+		body.set_meta("cooldown", maxf(0.0, float(body.get_meta("cooldown")) - delta))
+		if body.get_meta("toy_kind") == "seesaw":
+			body.rotation = sin(_clock * 0.9 + float(body.get_meta("swing_phase"))) * 0.26
+	queue_redraw()
+
+func _shade(color: Color, opacity: float) -> Color:
+	return Color(color, color.a * opacity)
+
+func _draw() -> void:
+	for body in _toys:
+		var kind: String = body.get_meta("toy_kind")
+		var color: Color = PALETTE[kind]
+		var phase: String = body.get_meta("phase")
+		if phase == "appearing":
+			color.a *= minf(0.5, float(body.get_meta("phase_time")) / FADE_TIME)
+		elif phase == "fading":
+			color.a *= maxf(0.0, 1.0 - float(body.get_meta("phase_time")) / FADE_TIME)
+		var flash: float = body.get_meta("flash")
+		var line := color.lerp(Color.WHITE, flash * 0.6)
+		line.a = color.a
+		if kind == "seesaw":
+			draw_set_transform(body.position)
+			draw_colored_polygon(PackedVector2Array([Vector2(0, 5), Vector2(-12, 29), Vector2(12, 29)]), _shade(color, 0.4))
+		draw_set_transform(body.position, body.rotation)
+		if kind == "bumper":
+			draw_circle(Vector2.ZERO, 27, _shade(color, 0.16))
+			draw_arc(Vector2.ZERO, 27, 0, TAU, 56, line, 2.6, true)
+			draw_circle(Vector2.ZERO, 14 + flash * 5, _shade(line, 0.85))
+			if flash > 0.0:
+				draw_arc(Vector2.ZERO, 29 + (1 - flash) * 15, 0, TAU, 56, _shade(color, flash * 0.4), 2.0, true)
+		elif kind in ["ramp", "sling"]:
+			var points := _polygon(kind, body.get_meta("kick"))
+			draw_colored_polygon(points, _shade(color, 0.13 + flash * 0.12))
+			var outline := points.duplicate()
+			outline.append(points[0])
+			draw_polyline(outline, _shade(line, 0.6), 1.7, true)
+			draw_line(points[0], points[1], line, 3.3 if kind == "sling" else 2.3, true)
+			if kind == "sling":
+				var midpoint := (points[0] + points[1]) * 0.5
+				var outward := Vector2(points[1].y - points[0].y, points[0].x - points[1].x).normalized()
+				if outward.y > 0: outward = -outward
+				draw_line(midpoint - outward * 7, midpoint - outward * 15, line, 2.0, true)
+		else:
+			var size := _box_size(kind)
+			var rect := Rect2(-size / 2, size)
+			draw_rect(rect, _shade(color, 0.12))
+			draw_rect(rect, _shade(line, 0.65), false, 1.5)
+			draw_line(Vector2(-size.x / 2, -size.y / 2), Vector2(size.x / 2, -size.y / 2), line, 2.7, true)
+			if kind == "spring":
+				var coil := PackedVector2Array()
+				for index in range(9):
+					coil.append(Vector2(-28 + index * 7, -1 + (1 if index % 2 == 0 else -1) * (6 - float(body.get_meta("compression")) * 4)))
+				draw_polyline(coil, line, 1.8, true)
+				draw_line(Vector2(-31, 9), Vector2(31, 9), _shade(line, 0.5), 1.5, true)
+			elif kind == "seesaw":
+				draw_circle(Vector2.ZERO, 4.0, line)
+		draw_set_transform(Vector2.ZERO)
+
+func _try_spawn() -> bool:
+	if _balls.is_empty() or _toys.size() >= 6:
+		return false
+	var kind: String = KINDS[_rng.randi_range(0, KINDS.size() - 1)]
+	var kick := Vector2(-1 if _rng.randf() < 0.5 else 1, -1).normalized()
+	for attempt in range(24):
+		var point := _arena.position + Vector2(_rng.randf(), _rng.randf()) * _arena.size
+		if not _legal_point(kind, point, kick):
+			continue
+		_add(kind, (point - _arena.position) / _arena.size * Vector2(960, 720), kick)
+		var body: StaticBody2D = _toys.back()
+		body.set_meta("phase", "appearing")
+		body.set_meta("phase_time", 0.0)
+		body.set_meta("lifetime", _rng.randf_range(10.0, 24.0))
+		body.set_meta("remaining", body.get_meta("lifetime"))
+		body.set_meta("swing_phase", _rng.randf_range(0.0, TAU))
+		body.set_meta("active", false)
+		body.collision_layer = 0
+		_log_phase(body, "appearing")
+		return true
+	return false
+
+func _random_tick(delta: float) -> void:
+	_spawn_timer -= delta
+	if _spawn_timer <= 0.0:
+		var spawned := _try_spawn()
+		_spawn_timer = (0.45 if _next_id < 3 else _rng.randf_range(1.5, 3.5)) if spawned else 0.5
+	for body in _toys.duplicate():
+		body.set_meta("remaining", body.get_meta("remaining") - delta)
+		body.set_meta("phase_time", body.get_meta("phase_time") + delta)
+		var phase: String = body.get_meta("phase")
+		if phase == "appearing" and body.get_meta("phase_time") >= FADE_TIME:
+			if _legal_point(body.get_meta("toy_kind"), body.global_position, body.get_meta("kick"), body):
+				body.set_meta("phase", "active")
+				body.set_meta("active", true)
+				body.collision_layer = 1
+				_log_phase(body, "active")
+		if phase != "fading" and body.get_meta("remaining") <= 0.0:
+			body.set_meta("phase", "fading")
+			body.set_meta("phase_time", 0.0)
+			body.set_meta("active", false)
+			body.collision_layer = 0
+			_log_phase(body, "fading")
+		elif phase == "fading" and body.get_meta("phase_time") >= FADE_TIME:
+			_log_phase(body, "removed")
+			_toys.erase(body)
+			remove_child(body)
+			body.queue_free()
+
+func export_snapshot() -> Dictionary:
+	var entries: Array[Dictionary] = []
+	for body in _toys:
+		var point := body.global_position
+		var kick: Vector2 = body.get_meta("kick")
+		var entry := {"kind": body.get_meta("toy_kind"), "id": body.get_meta("toy_id"), "position": [point.x, point.y], "kick": [kick.x, kick.y], "rotation": body.rotation}
+		for key in ["compression", "flash", "cooldown", "active", "phase", "phase_time", "lifetime", "remaining", "swing_phase"]:
+			entry[key] = body.get_meta(key)
+		entries.append(entry)
+	return {"version": 1, "random_mode": random_mode, "layout": layout, "clock": _clock, "spawn_timer": _spawn_timer, "next_id": _next_id, "rng_seed": str(_rng.seed), "rng_state": str(_rng.state), "toys": entries}
+
+func restore_snapshot(data: Dictionary) -> bool:
+	if data.get("version") != 1 or not data.get("toys") is Array or data.toys.size() > 24:
+		return false
+	for entry in data.toys:
+		if not entry is Dictionary or not entry.get("kind") in KINDS or not entry.get("position") is Array or entry.position.size() != 2 or not entry.get("kick") is Array or entry.kick.size() != 2:
+			return false
+		if not entry.has("id") or not entry.get("phase", "active") in ["appearing", "active", "fading"]:
+			return false
+		for value in entry.position + entry.kick:
+			if not (value is int or value is float) or not is_finite(float(value)):
+				return false
+		for key in ["id", "compression", "flash", "cooldown", "phase_time", "lifetime", "remaining", "swing_phase", "rotation"]:
+			var value: Variant = entry.get(key, 0.0)
+			if not (value is int or value is float) or not is_finite(float(value)):
+				return false
+	if bool(data.get("random_mode", false)) and data.toys.size() > 6:
+		return false
+	set_layout(0)
+	random_mode = bool(data.get("random_mode", false))
+	layout = int(data.get("layout", 0))
+	_clock = float(data.get("clock", 0.0))
+	_spawn_timer = float(data.get("spawn_timer", 0.5))
+	for entry in data.toys:
+		var point := Vector2(float(entry.position[0]), float(entry.position[1]))
+		_add(entry.kind, (point - _arena.position) / _arena.size * Vector2(960, 720), Vector2(float(entry.kick[0]), float(entry.kick[1])))
+		var body: StaticBody2D = _toys.back()
+		body.set_meta("toy_id", int(entry.id))
+		for key in ["compression", "flash", "cooldown", "active", "phase", "phase_time", "lifetime", "remaining", "swing_phase"]:
+			body.set_meta(key, entry.get(key, body.get_meta(key)))
+		body.rotation = float(entry.get("rotation", 0.0))
+		body.collision_layer = 1 if body.get_meta("active") and body.get_meta("phase") == "active" else 0
+	_next_id = int(data.get("next_id", _next_id))
+	_rng.seed = int(str(data.get("rng_seed", "0")))
+	_rng.state = int(str(data.get("rng_state", "0")))
+	queue_redraw()
+	return true

@@ -1,5 +1,7 @@
 # Bounce Lite Project Overview
 
+> 2026-09-14 当前状态：按[分批方案](exploration/harvest-refinement-plan.md)完成[第一批几何／机械候选](exploration/geometry-harvest-batch1.md)，默认单球、六类随机机关，停在人工检查点。分支为 `codex/harvest-geometry`，main仍为 `f792d3b`。第二批门户、第三批普通砖／反向砖尚未启动；结构簇等待长期试玩，场力、多球、抓球保留实验成果。下方广度探索及更早状态保留为历史。
+
 > 2026-09-13 当前状态：V0.2.0 随机对象、有效挡板动作资格、Wake/Continue 收尾已实现并完成本轮机器与渲染检查，按用户授权合入 main 后连续进入广泛物理玩具探索。当前入口为[新方向](exploration/physical-toy-exploration.md)、[实现基线](design/design-baseline-v0.2.0.md)、[收口记录](reviews/v0.2.0-consolidation.md)。以下2026-09-11及更早状态为历史，不能覆盖本轮授权或作为新玩法的提前筛选门槛。
 
 > 2026-09-11 当前状态：`codex/exp-v02-shared-world` 已在完整原型上实现中心色 UI 与全客户区场地，文档同步起点为 `793c361`。当前依据为 [V0.2.0 Design Note](design/v0.2.0-design-note.md)，后续顺序和验证见[实施计划](exploration/v0.2.0-follow-up-plan.md)，实际改动和证据见[共享小世界记录](exploration/v0.2-shared-world.md)。随机出现、Continue 资格及 Wake／Continue 表现调整尚未实施；最新组合待实机体验。main 游戏代码仍为 V0.1.6。下文保留历史时点，不覆盖当前设计。

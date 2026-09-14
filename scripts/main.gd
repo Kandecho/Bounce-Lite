@@ -11,6 +11,8 @@ const SPAWN_PADDLE_CLEARANCE := 96.0
 var tuning: Resource = PrototypeTuningScript.new()
 var play_world: Node2D
 var world_feedback: Node2D
+var geometry_playground: Node2D
+var geometry_enabled := true
 
 @onready var ball: CharacterBody2D = $GameArea/Ball
 @onready var paddle: CharacterBody2D = $GameArea/Paddle
@@ -19,6 +21,7 @@ var world_feedback: Node2D
 
 func _ready() -> void:
 	DisplayServer.window_set_title("Bouncing Ball")
+	geometry_enabled = not (OS.get_cmdline_user_args().has("--geometry-baseline") or OS.get_cmdline_user_args().has("--v02-baseline"))
 	_set_e01_enabled(not OS.get_cmdline_user_args().has("--e01-baseline"))
 	tuning.legacy_rhythm_enabled = OS.get_cmdline_user_args().has("--v02-legacy-rhythm")
 	tuning.shared_world_enabled = not OS.get_cmdline_user_args().has("--v02-baseline")
@@ -38,7 +41,7 @@ func _ready() -> void:
 	ball.configure(tuning)
 	ball.configure_support(paddle)
 	ball.configure_arena(Rect2(Vector2(left, top), Vector2(right - left, bottom - top)))
-	if tuning.shared_world_enabled:
+	if tuning.shared_world_enabled and not geometry_enabled:
 		play_world = load("res://scripts/world/play_world.gd").new()
 		play_world.name = "PlayWorld"
 		$GameArea.add_child(play_world)
@@ -60,10 +63,20 @@ func _ready() -> void:
 
 	paddle.interaction_sampled.connect(_on_paddle_interaction_sampled)
 	ball.paddle_energy_transferred.connect(paddle.play_energy_transfer)
-	ball.surface_resolved.connect($BasicAudio.on_surface_resolved)
+	ball.surface_resolved.connect(_on_surface_audio)
 	ball.wake_committed.connect($BasicAudio.on_wake_committed)
 
 	ball.start_active(Vector2(0.62, 1.0))
+	if geometry_enabled:
+		# Keep the baseline's committed launch feedback, without its world objects.
+		world_feedback = load("res://scripts/world/world_feedback.gd").new()
+		$GameArea.add_child(world_feedback)
+		ball.resume_committed.connect(_on_resume_committed)
+		ball.wake_committed.connect(_on_wake_committed)
+		geometry_playground = load("res://scripts/world/geometry_playground.gd").new()
+		geometry_playground.name = "GeometryPlayground"
+		$GameArea.add_child(geometry_playground)
+		geometry_playground.configure(self)
 
 
 func spawn_region() -> Rect2:
@@ -112,10 +125,15 @@ func _set_e01_enabled(enabled: bool) -> void:
 
 
 func _update_title() -> void:
-	DisplayServer.window_set_title("Bouncing Ball | v0.2.0 " + ("shared world" if tuning.shared_world_enabled else "baseline") + " | E01 " + ("contact" if tuning.e01_contact_enabled else "off"))
+	DisplayServer.window_set_title("Bouncing Ball | v0.2.0 " + ("geometry harvest" if geometry_enabled else ("shared world" if tuning.shared_world_enabled else "baseline")) + " | E01 " + ("contact" if tuning.e01_contact_enabled else "off"))
 
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_F7:
 		_set_e01_enabled(not tuning.e01_contact_enabled)
 		get_viewport().set_input_as_handled()
+
+
+func _on_surface_audio(result: RefCounted) -> void:
+	if not bool(result.get_meta("geometry_contact", false)):
+		$BasicAudio.on_surface_resolved(result)

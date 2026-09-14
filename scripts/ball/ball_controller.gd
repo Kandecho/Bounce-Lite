@@ -14,10 +14,12 @@ signal resume_committed(ball_position: Vector2)
 signal paddle_energy_transferred(amount: float)
 
 var play_rhythm: RefCounted = PlayRhythm.new()
+var geometry_contacts: Node
+var support_geometry: CollisionObject2D
 var play_world: Object
 var _related_motion_distance := 0.0
 
-enum SupportKind { NONE, GROUND, PADDLE }
+enum SupportKind { NONE, GROUND, PADDLE, GEOMETRY }
 var support_kind: SupportKind = SupportKind.NONE
 var support_paddle: Node2D
 
@@ -87,7 +89,7 @@ func _physics_process(delta: float) -> void:
 		var contact_offset := 0.0
 		if valid_paddle_hit and collider is Node2D:
 			contact_offset = (collision.get_position().x - collider.global_position.x) / maxf(tuning.paddle_size.x * 0.5, 1.0)
-		resolve_surface_collision(kind, normal, valid_paddle_hit, contact_offset)
+		resolve_surface_collision(kind, normal, valid_paddle_hit, contact_offset, collider)
 		if kind == SurfaceResponseModelScript.SurfaceKind.PADDLE and support_kind != SupportKind.PADDLE:
 			paddle_contact.emit(valid_paddle_hit, collision.get_position())
 		if velocity.length_squared() <= MOTION_EPSILON * MOTION_EPSILON:
@@ -288,7 +290,7 @@ func advance_play_rhythm(delta: float) -> void:
 	resume_committed.emit(global_position)
 
 
-func resolve_surface_collision(kind: int, normal: Vector2, valid_paddle_hit: bool, contact_offset: float = 0.0) -> void:
+func resolve_surface_collision(kind: int, normal: Vector2, valid_paddle_hit: bool, contact_offset: float = 0.0, collider: Object = null) -> void:
 	if vitality_model == null or surface_response_model == null:
 		return
 	# Low-energy top contact is support, not a repeatedly rewarded hit.
@@ -312,11 +314,33 @@ func resolve_surface_collision(kind: int, normal: Vector2, valid_paddle_hit: boo
 		effective_paddle_hit,
 		contact_offset
 	)
+	var geometry_contact := is_instance_valid(geometry_contacts) and is_instance_valid(collider) and collider.has_meta("toy_kind")
+	if geometry_contact:
+		var request: Dictionary = geometry_contacts.contact_request(result, collider, global_position)
+		if request.has("velocity") and request.velocity is Vector2 and request.velocity.is_finite():
+			result.velocity_after = request.velocity.limit_length(tuning.max_speed)
+		if request.has("vitality_delta") and is_finite(float(request.vitality_delta)):
+			result.vitality_delta += clampf(float(request.vitality_delta), -0.5, 0.5)
 	velocity = result.velocity_after.limit_length(tuning.max_speed)
+	result.velocity_after = velocity
 	vitality_model.apply_delta(result.vitality_delta)
+	result.vitality_after = vitality_model.current_vitality
+	result.vitality_delta = result.vitality_after - result.vitality_before
+	result.set_meta("geometry_contact", geometry_contact)
 	var transferred: float = vitality_model.current_vitality - vitality_before
 	# Surface response grants physical settle permission; Activity is committed last.
-	if result.settle_allowed and (was_resting or vitality_model.vitality_ratio() <= tuning.rest_vitality_ratio):
+	if geometry_contact and collider.get_meta("toy_kind") == "platform" and normal.y < -0.98 \
+		and result.velocity_before.length() <= tuning.rest_settle_speed \
+		and vitality_model.vitality_ratio() <= tuning.rest_vitality_ratio:
+		velocity = Vector2.ZERO
+		result.velocity_after = velocity
+		support_kind = SupportKind.GEOMETRY
+		support_geometry = collider
+		_clear_wake_sample()
+		rest_elapsed_time = 0.0
+		wake_consumed = false
+		vitality_model.resolve_activity(true)
+	elif result.settle_allowed and (was_resting or vitality_model.vitality_ratio() <= tuning.rest_vitality_ratio):
 		_commit_resting_settle(SupportKind.GROUND)
 	elif not was_resting:
 		vitality_model.resolve_activity(false)
@@ -324,6 +348,8 @@ func resolve_surface_collision(kind: int, normal: Vector2, valid_paddle_hit: boo
 	if result.valid_paddle_hit and tuning.shared_world_enabled and not tuning.legacy_rhythm_enabled:
 		play_rhythm.note_input(tuning.continue_action_distance)
 	surface_resolved.emit(result)
+	if geometry_contact:
+		geometry_contacts.on_contact_committed(collider, result, global_position)
 	if result.valid_paddle_hit and transferred > 0.0:
 		paddle_energy_transferred.emit(transferred)
 	_play_collision_feedback(result.effective_surface_kind, normal)
@@ -463,5 +489,13 @@ func _refresh_support() -> void:
 		and absf(global_position.x - support_paddle.global_position.x) <= tuning.paddle_size.x * 0.5 - 1.0 \
 		and absf(global_position.y - _paddle_support_y()) <= 0.5:
 		support_kind = SupportKind.PADDLE
+	if support_kind == SupportKind.NONE and is_instance_valid(support_geometry) and support_geometry.collision_layer != 0:
+		var support_probe := KinematicCollision2D.new()
+		if test_move(global_transform, Vector2.DOWN * 0.8, support_probe) and support_probe.get_collider() == support_geometry:
+			support_kind = SupportKind.GEOMETRY
 	if previous != SupportKind.NONE and support_kind == SupportKind.NONE:
 		_clear_wake_sample()
+
+
+func configure_geometry(source: Node) -> void:
+	geometry_contacts = source
