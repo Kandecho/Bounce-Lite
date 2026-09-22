@@ -13,7 +13,15 @@ func _init() -> void:
 		for i in range(stream.data.size() / 2): peak = maxf(peak, absf(float(stream.data.decode_s16(i * 2)) / 32767.0))
 		suite.expect_true(peak > 0.05 and peak <= 0.5, "audible bounded waveform " + kind)
 		hashes[hash(stream.data)] = true
-	suite.expect_true(hashes.size() == 6, "six distinct waveforms")
+	suite.expect_true(hashes.size() == 8, "five ordinary and three spring phase waveforms")
+	suite.expect_true(sound.streams.toy_spring.data == sound.streams.toy_spring_seat.data, "generic spring contact is seating, never release")
+	for phase in ["seat", "compress", "release"]:
+		sound.on_geometry_event("toy_spring_" + phase, Vector2.ZERO, 1.0)
+	suite.expect_true(sound.play_count == 3, "different spring phases do not suppress each other")
+	sound.set_muted(true)
+	sound.set_muted(false)
+	sound.advance_time(1.0)
+	sound.play_count = 0
 	sound.on_geometry_event("toy_bumper", Vector2.ZERO, 1.0)
 	sound.on_geometry_event("toy_bumper", Vector2.ZERO, 1.0)
 	suite.expect_true(sound.play_count == 1, "repeated contact throttled")

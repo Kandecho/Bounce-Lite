@@ -8,6 +8,19 @@ const MAX_SPEED := 520.0
 const FADE_TIME := 0.65
 const KINDS := ["bumper", "sling", "ramp", "platform", "spring", "seesaw"]
 const PALETTE := {"bumper": Color("efba69"), "sling": Color("e68a83"), "ramp": Color("85bcb2"), "platform": Color("9cbbcc"), "spring": Color("72c9e8"), "seesaw": Color("d6b284")}
+const SNAPSHOT_PROFILE := "geometry-refinement-v2"
+@export var spring_hold_seconds := 0.32
+@export var spring_release_speed := 500.0
+@export var spring_recapture_delay := 1.0
+@export var spring_compression_travel := 14.0
+@export var seesaw_max_angle := 0.34
+@export var seesaw_max_angular_velocity := 1.8
+@export var seesaw_impulse_inertia := 24000.0
+@export var seesaw_damping := 3.5
+@export var seesaw_return_strength := 1.8
+@export var seesaw_pivot_variation := 18.0
+@export var bottom_geometry_clearance := 150.0
+@export var paddle_path_clearance := 18.0
 var _arena := Rect2(0, 0, 960, 720)
 var _toys: Array[StaticBody2D] = []
 var _balls: Array[Dictionary] = []
@@ -20,6 +33,53 @@ var _rng := RandomNumberGenerator.new()
 var _spawn_timer := 0.1
 var _paddle_position := Vector2.INF
 var _paddle_size := Vector2.ZERO
+var _supported_colliders: Array = []
+
+func set_supported_colliders(colliders: Array) -> void:
+	_supported_colliders = colliders.duplicate()
+
+func begin_spring_hold(collider: Object) -> bool:
+	if not _owned(collider) or collider.get_meta("toy_kind") != "spring" or collider.get_meta("cooldown") > 0.0 or collider.get_meta("holding"):
+		return false
+	collider.set_meta("holding", true)
+	collider.set_meta("hold_elapsed", 0.0)
+	event_emitted.emit("toy_spring_seat", collider.global_position, 0.6)
+	return true
+
+func spring_hold_request(collider: Object, ball_radius: float) -> Dictionary:
+	if not _owned(collider) or not collider.get_meta("holding", false):
+		return {"release": true, "velocity": Vector2(0, -spring_release_speed)}
+	var top := -12.0 + float(collider.get_meta("compression")) * spring_compression_travel
+	return {"position": collider.global_position + Vector2(0, top - ball_radius - 0.6), "release": float(collider.get_meta("hold_elapsed")) >= spring_hold_seconds, "velocity": Vector2(0, -spring_release_speed)}
+
+func end_spring_hold(collider: Object) -> void:
+	if not is_instance_valid(collider) or collider not in _toys:
+		return
+	collider.set_meta("holding", false)
+	collider.set_meta("cooldown", spring_recapture_delay)
+	collider.set_meta("flash", 1.0)
+	event_emitted.emit("toy_spring_release", collider.global_position, 1.0)
+
+func cancel_spring_hold(collider: Object) -> void:
+	if not is_instance_valid(collider) or collider not in _toys:
+		return
+	collider.set_meta("holding", false)
+	collider.set_meta("hold_elapsed", 0.0)
+	collider.set_meta("cooldown", spring_recapture_delay)
+
+func clear_spring_holds() -> void:
+	for body in _toys:
+		if body.get_meta("holding"):
+			cancel_spring_hold(body)
+
+func _engaged(body: StaticBody2D) -> bool:
+	return bool(body.get_meta("holding")) or (body.get_meta("toy_kind") == "platform" and body in _supported_colliders)
+
+func _bottom_limit() -> float:
+	var limit := _arena.end.y - bottom_geometry_clearance
+	if _paddle_size.y > 0.0:
+		limit = minf(limit, _paddle_position.y - _paddle_size.y * 0.5 - paddle_path_clearance)
+	return limit
 func set_paddle_context(position: Vector2, size: Vector2) -> void:
 	_paddle_position = position
 	_paddle_size = size
@@ -48,7 +108,7 @@ func _spawn_shape(kind: String, kick: Vector2) -> Shape2D:
 		triangle.points = _polygon(kind, kick)
 		return triangle
 	var box := RectangleShape2D.new()
-	box.size = Vector2(152, 54) if kind == "seesaw" else _box_size(kind)
+	box.size = Vector2(2.0 * (75.0 + seesaw_pivot_variation + 1.0), 2.0 * ((75.0 + seesaw_pivot_variation) * sin(seesaw_max_angle) + 8.0)) if kind == "seesaw" else _box_size(kind)
 	return box
 
 func _legal_point(kind: String, point: Vector2, kick: Vector2, ignore: StaticBody2D = null) -> bool:
@@ -57,6 +117,7 @@ func _legal_point(kind: String, point: Vector2, kick: Vector2, ignore: StaticBod
 	var allowed := _arena.grow(-3.0)
 	allowed.position.y += 34.0
 	allowed.size.y -= 34.0
+	allowed.size.y = maxf(0.0, _bottom_limit() - allowed.position.y)
 	if not allowed.encloses(Rect2(point + envelope.position, envelope.size)):
 		return false
 	var transform := Transform2D(0.0, point)
@@ -129,7 +190,9 @@ func _add(kind: String, point: Vector2, kick := Vector2.UP) -> void:
 	body.set_meta("kick", kick.normalized())
 	body.set_meta("active", true)
 	body.set_meta("phase", "active")
-	for key in ["compression", "flash", "cooldown", "phase_time", "lifetime", "remaining", "swing_phase"]:
+	body.set_meta("holding", false)
+	body.set_meta("expired_pending", false)
+	for key in ["compression", "flash", "cooldown", "phase_time", "lifetime", "remaining", "hold_elapsed", "angular_velocity", "pivot_offset"]:
 		body.set_meta(key, 0.0)
 	_next_id += 1
 	var collider := CollisionShape2D.new()
@@ -158,33 +221,32 @@ func contact_request(result: RefCounted, collider: Object, ball_position: Vector
 	var output := incoming.bounce(normal)
 	var kind: String = collider.get_meta("toy_kind")
 	var ready: bool = collider.get_meta("cooldown") <= 0.0
-	var powered := false
 	if ready and kind == "bumper":
 		# Preserve the tangent; the circular contact normal explains the extra rebound.
 		output += normal * maxf(0.0, 380.0 - output.dot(normal))
-		powered = true
 	elif ready and kind == "sling" and normal.y < -0.3 and absf(normal.x) > 0.3:
 		output += normal * maxf(0.0, 440.0 - output.dot(normal))
-		powered = true
-	elif ready and kind == "spring" and normal.y < -0.8:
-		output = Vector2(incoming.x * 0.9, -500.0)
-		powered = true
+	elif ready and kind == "spring" and normal.y < -0.8 and incoming.dot(normal) < -35.0 and not collider.get_meta("holding"):
+		return {"velocity": Vector2.ZERO, "vitality_delta": 0.0, "spring_capture": collider}
 	elif kind == "seesaw":
 		# Moving surface response comes from the same angular motion drawn on screen.
-		var omega := cos(_clock * 0.9 + float(collider.get_meta("swing_phase"))) * 0.26 * 0.9
+		var omega: float = collider.get_meta("angular_velocity")
 		var offset: Vector2 = ball_position - collider.global_position
 		var surface_velocity := Vector2(-offset.y, offset.x) * omega
 		output = (incoming - surface_velocity).bounce(normal) + surface_velocity
-	return {"velocity": output.limit_length(MAX_SPEED), "vitality_delta": 0.02 if powered else 0.0}
+	return {"velocity": output.limit_length(MAX_SPEED), "vitality_delta": 0.0}
 
-func on_contact_committed(collider: Object, result: RefCounted, _ball_position: Vector2) -> void:
+func on_contact_committed(collider: Object, result: RefCounted, ball_position: Vector2) -> void:
 	if not _owned(collider) or collider.get_meta("cooldown") > 0.0:
 		return
 	collider.set_meta("cooldown", 0.12)
-	if collider.get_meta("toy_kind") == "spring" and result.normal.y < -0.8:
-		collider.set_meta("compression", 1.0)
+	if collider.get_meta("toy_kind") == "seesaw":
+		var lever: Vector2 = ball_position - collider.global_position
+		var impulse: Vector2 = result.velocity_before - result.velocity_after
+		collider.set_meta("angular_velocity", clampf(float(collider.get_meta("angular_velocity")) + lever.cross(impulse) / seesaw_impulse_inertia, -seesaw_max_angular_velocity, seesaw_max_angular_velocity))
 	collider.set_meta("flash", clampf(result.velocity_before.length() / 450.0, 0.2, 1.0))
-	event_emitted.emit("toy_" + str(collider.get_meta("toy_kind")), collider.global_position, collider.get_meta("flash"))
+	if not collider.get_meta("holding"):
+		event_emitted.emit("toy_" + str(collider.get_meta("toy_kind")), collider.global_position, collider.get_meta("flash"))
 	queue_redraw()
 
 func _physics_process(delta: float) -> void:
@@ -192,12 +254,36 @@ func _physics_process(delta: float) -> void:
 	if random_mode:
 		_random_tick(delta)
 	for body in _toys:
-		body.set_meta("compression", maxf(0.0, float(body.get_meta("compression")) - delta * 4.0))
+		if body.get_meta("holding"):
+			var before: float = body.get_meta("hold_elapsed")
+			body.set_meta("hold_elapsed", float(body.get_meta("hold_elapsed")) + delta)
+			if before < spring_hold_seconds * 0.2 and float(body.get_meta("hold_elapsed")) >= spring_hold_seconds * 0.2:
+				event_emitted.emit("toy_spring_compress", body.global_position, 0.7)
+			body.set_meta("compression", clampf(float(body.get_meta("hold_elapsed")) / spring_hold_seconds, 0.0, 1.0))
+		else:
+			body.set_meta("compression", maxf(0.0, float(body.get_meta("compression")) - delta * 8.0))
 		body.set_meta("flash", maxf(0.0, float(body.get_meta("flash")) - delta * 3.6))
 		body.set_meta("cooldown", maxf(0.0, float(body.get_meta("cooldown")) - delta))
 		if body.get_meta("toy_kind") == "seesaw":
-			body.rotation = sin(_clock * 0.9 + float(body.get_meta("swing_phase"))) * 0.26
+			var omega: float = body.get_meta("angular_velocity")
+			omega = (omega - body.rotation * seesaw_return_strength * delta) * exp(-seesaw_damping * delta)
+			body.rotation = clampf(body.rotation + omega * delta, -seesaw_max_angle, seesaw_max_angle)
+			if absf(body.rotation) >= seesaw_max_angle and signf(omega) == signf(body.rotation): omega = 0.0
+			if absf(body.rotation) < 0.0001 and absf(omega) < 0.0001:
+				body.rotation = 0.0
+				omega = 0.0
+			body.set_meta("angular_velocity", omega)
+		_sync_mechanical_shape(body)
 	queue_redraw()
+
+func _sync_mechanical_shape(body: StaticBody2D) -> void:
+	var collider: CollisionShape2D = body.get_child(0)
+	if body.get_meta("toy_kind") == "seesaw":
+		collider.position = Vector2(-float(body.get_meta("pivot_offset")), 0)
+	elif body.get_meta("toy_kind") == "spring":
+		var travel := float(body.get_meta("compression")) * spring_compression_travel
+		collider.position.y = travel * 0.5
+		collider.shape.size.y = 24.0 - travel
 
 func _shade(color: Color, opacity: float) -> Color:
 	return Color(color, color.a * opacity)
@@ -218,6 +304,8 @@ func _draw() -> void:
 			draw_set_transform(body.position)
 			draw_colored_polygon(PackedVector2Array([Vector2(0, 5), Vector2(-12, 29), Vector2(12, 29)]), _shade(color, 0.4))
 		draw_set_transform(body.position, body.rotation)
+		if kind == "seesaw":
+			draw_set_transform(body.position + Vector2(-float(body.get_meta("pivot_offset")), 0).rotated(body.rotation), body.rotation)
 		if kind == "bumper":
 			draw_circle(Vector2.ZERO, 27, _shade(color, 0.16))
 			draw_arc(Vector2.ZERO, 27, 0, TAU, 56, line, 2.6, true)
@@ -239,17 +327,20 @@ func _draw() -> void:
 		else:
 			var size := _box_size(kind)
 			var rect := Rect2(-size / 2, size)
+			if kind == "spring":
+				rect.position.y += float(body.get_meta("compression")) * spring_compression_travel
+				rect.size.y -= float(body.get_meta("compression")) * spring_compression_travel
 			draw_rect(rect, _shade(color, 0.12))
 			draw_rect(rect, _shade(line, 0.65), false, 1.5)
-			draw_line(Vector2(-size.x / 2, -size.y / 2), Vector2(size.x / 2, -size.y / 2), line, 2.7, true)
+			draw_line(rect.position, rect.position + Vector2(rect.size.x, 0), line, 2.7, true)
 			if kind == "spring":
 				var coil := PackedVector2Array()
 				for index in range(9):
-					coil.append(Vector2(-28 + index * 7, -1 + (1 if index % 2 == 0 else -1) * (6 - float(body.get_meta("compression")) * 4)))
+					coil.append(Vector2(-28 + index * 7, rect.get_center().y + (1 if index % 2 == 0 else -1) * (rect.size.y * 0.3)))
 				draw_polyline(coil, line, 1.8, true)
 				draw_line(Vector2(-31, 9), Vector2(31, 9), _shade(line, 0.5), 1.5, true)
 			elif kind == "seesaw":
-				draw_circle(Vector2.ZERO, 4.0, line)
+				draw_circle(Vector2(float(body.get_meta("pivot_offset")), 0), 4.0, line)
 		draw_set_transform(Vector2.ZERO)
 
 func _try_spawn() -> bool:
@@ -267,7 +358,9 @@ func _try_spawn() -> bool:
 		body.set_meta("phase_time", 0.0)
 		body.set_meta("lifetime", _rng.randf_range(10.0, 24.0))
 		body.set_meta("remaining", body.get_meta("lifetime"))
-		body.set_meta("swing_phase", _rng.randf_range(0.0, TAU))
+		if kind == "seesaw":
+			body.set_meta("pivot_offset", _rng.randi_range(-1, 1) * seesaw_pivot_variation)
+			_sync_mechanical_shape(body)
 		body.set_meta("active", false)
 		body.collision_layer = 0
 		_log_phase(body, "appearing")
@@ -290,6 +383,10 @@ func _random_tick(delta: float) -> void:
 				body.collision_layer = 1
 				_log_phase(body, "active")
 		if phase != "fading" and body.get_meta("remaining") <= 0.0:
+			if _engaged(body):
+				body.set_meta("expired_pending", true)
+				continue
+			body.set_meta("expired_pending", false)
 			body.set_meta("phase", "fading")
 			body.set_meta("phase_time", 0.0)
 			body.set_meta("active", false)
@@ -307,13 +404,13 @@ func export_snapshot() -> Dictionary:
 		var point := body.global_position
 		var kick: Vector2 = body.get_meta("kick")
 		var entry := {"kind": body.get_meta("toy_kind"), "id": body.get_meta("toy_id"), "position": [point.x, point.y], "kick": [kick.x, kick.y], "rotation": body.rotation}
-		for key in ["compression", "flash", "cooldown", "active", "phase", "phase_time", "lifetime", "remaining", "swing_phase"]:
+		for key in ["compression", "flash", "cooldown", "active", "phase", "phase_time", "lifetime", "remaining", "angular_velocity", "pivot_offset", "hold_elapsed", "holding", "expired_pending"]:
 			entry[key] = body.get_meta(key)
 		entries.append(entry)
-	return {"version": 1, "random_mode": random_mode, "layout": layout, "clock": _clock, "spawn_timer": _spawn_timer, "next_id": _next_id, "rng_seed": str(_rng.seed), "rng_state": str(_rng.state), "toys": entries}
+	return {"version": 2, "profile": SNAPSHOT_PROFILE, "random_mode": random_mode, "layout": layout, "clock": _clock, "spawn_timer": _spawn_timer, "next_id": _next_id, "rng_seed": str(_rng.seed), "rng_state": str(_rng.state), "toys": entries}
 
 func restore_snapshot(data: Dictionary) -> bool:
-	if data.get("version") != 1 or not data.get("toys") is Array or data.toys.size() > 24:
+	if data.get("version") != 2 or data.get("profile") != SNAPSHOT_PROFILE or not data.get("toys") is Array or data.toys.size() > 24:
 		return false
 	for entry in data.toys:
 		if not entry is Dictionary or not entry.get("kind") in KINDS or not entry.get("position") is Array or entry.position.size() != 2 or not entry.get("kick") is Array or entry.kick.size() != 2:
@@ -323,10 +420,14 @@ func restore_snapshot(data: Dictionary) -> bool:
 		for value in entry.position + entry.kick:
 			if not (value is int or value is float) or not is_finite(float(value)):
 				return false
-		for key in ["id", "compression", "flash", "cooldown", "phase_time", "lifetime", "remaining", "swing_phase", "rotation"]:
+		for key in ["id", "compression", "flash", "cooldown", "phase_time", "lifetime", "remaining", "angular_velocity", "pivot_offset", "hold_elapsed", "rotation"]:
 			var value: Variant = entry.get(key, 0.0)
 			if not (value is int or value is float) or not is_finite(float(value)):
 				return false
+		var point := Vector2(float(entry.position[0]), float(entry.position[1]))
+		var envelope := _spawn_shape(entry.kind, Vector2(float(entry.kick[0]), float(entry.kick[1]))).get_rect()
+		if point.y + envelope.end.y > _bottom_limit() or absf(float(entry.get("pivot_offset", 0))) > seesaw_pivot_variation or absf(float(entry.get("rotation", 0))) > seesaw_max_angle or absf(float(entry.get("angular_velocity", 0))) > seesaw_max_angular_velocity:
+			return false
 	if bool(data.get("random_mode", false)) and data.toys.size() > 6:
 		return false
 	set_layout(0)
@@ -339,9 +440,10 @@ func restore_snapshot(data: Dictionary) -> bool:
 		_add(entry.kind, (point - _arena.position) / _arena.size * Vector2(960, 720), Vector2(float(entry.kick[0]), float(entry.kick[1])))
 		var body: StaticBody2D = _toys.back()
 		body.set_meta("toy_id", int(entry.id))
-		for key in ["compression", "flash", "cooldown", "active", "phase", "phase_time", "lifetime", "remaining", "swing_phase"]:
+		for key in ["compression", "flash", "cooldown", "active", "phase", "phase_time", "lifetime", "remaining", "angular_velocity", "pivot_offset", "hold_elapsed", "holding", "expired_pending"]:
 			body.set_meta(key, entry.get(key, body.get_meta(key)))
 		body.rotation = float(entry.get("rotation", 0.0))
+		_sync_mechanical_shape(body)
 		body.collision_layer = 1 if body.get_meta("active") and body.get_meta("phase") == "active" else 0
 	_next_id = int(data.get("next_id", _next_id))
 	_rng.seed = int(str(data.get("rng_seed", "0")))

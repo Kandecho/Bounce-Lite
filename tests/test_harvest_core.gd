@@ -23,8 +23,11 @@ func run(suite: RefCounted) -> void:
 	ball.configure_geometry(geometry)
 	var collider := StaticBody2D.new()
 	collider.set_meta("toy_kind", "bumper")
+	ball.vitality_model.set_vitality(0.5)
+	var expected = ball.surface_response_model.resolve(Vector2(100, 200), Vector2.UP, 0, 0.5, 0.5, 1.0, false, 0.0)
 	ball.velocity = Vector2(100, 200)
 	ball.resolve_surface_collision(0, Vector2.UP, false, 0, collider)
+	suite.expect_float(ball.vitality_model.current_vitality, expected.vitality_after, 0.00001, "geometry cannot add its requested Vitality reward")
 	suite.expect_true(ball.velocity.length() <= 520.001, "geometry request is bounded by Physics")
 	suite.expect_equal(geometry.observed, ball.velocity, "geometry notification follows motion commit")
 	geometry.requested = Vector2.INF

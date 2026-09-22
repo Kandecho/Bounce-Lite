@@ -16,6 +16,9 @@ signal paddle_energy_transferred(amount: float)
 var play_rhythm: RefCounted = PlayRhythm.new()
 var geometry_contacts: Node
 var support_geometry: CollisionObject2D
+var spring_hold: CollisionObject2D
+var _spring_elapsed := 0.0
+var _spring_offset_x := 0.0
 var play_world: Object
 var _related_motion_distance := 0.0
 
@@ -55,6 +58,11 @@ func _physics_process(delta: float) -> void:
 		velocity = Vector2.ZERO
 		_update_visuals()
 		return
+	if spring_hold != null or _spring_elapsed > 0.0:
+		_advance_spring_hold(delta)
+		if _spring_elapsed > 0.0:
+			return
+		# Release already committed velocity; sweep away before the spring head rebounds.
 	recover_out_of_bounds()
 	_resolve_paddle_wall_pinch()
 	_refresh_support()
@@ -210,6 +218,7 @@ func configure(source_tuning: Resource) -> void:
 
 
 func start_active(initial_direction: Vector2) -> void:
+	clear_geometry_relationships()
 	if vitality_model == null or surface_response_model == null:
 		configure(tuning)
 	vitality_model.reset_active()
@@ -315,14 +324,26 @@ func resolve_surface_collision(kind: int, normal: Vector2, valid_paddle_hit: boo
 		contact_offset
 	)
 	var geometry_contact := is_instance_valid(geometry_contacts) and is_instance_valid(collider) and collider.has_meta("toy_kind")
+	var capture: CollisionObject2D
 	if geometry_contact:
 		var request: Dictionary = geometry_contacts.contact_request(result, collider, global_position)
 		if request.has("velocity") and request.velocity is Vector2 and request.velocity.is_finite():
 			result.velocity_after = request.velocity.limit_length(tuning.max_speed)
-		if request.has("vitality_delta") and is_finite(float(request.vitality_delta)):
-			result.vitality_delta += clampf(float(request.vitality_delta), -0.5, 0.5)
+		# Geometry changes motion only; the shared collision model owns Vitality.
+		if request.get("spring_capture") == collider:
+			capture = collider
 	velocity = result.velocity_after.limit_length(tuning.max_speed)
 	result.velocity_after = velocity
+	if is_instance_valid(capture):
+		spring_hold = capture
+		_spring_elapsed = 0.000001
+		_spring_offset_x = global_position.x - capture.global_position.x
+		support_kind = SupportKind.NONE
+		if not geometry_contacts.begin_spring_hold(capture):
+			spring_hold = null
+			_spring_elapsed = 0.0
+			velocity = Vector2(0, -500).limit_length(tuning.max_speed)
+			result.velocity_after = velocity
 	vitality_model.apply_delta(result.vitality_delta)
 	result.vitality_after = vitality_model.current_vitality
 	result.vitality_delta = result.vitality_after - result.vitality_before
@@ -499,3 +520,49 @@ func _refresh_support() -> void:
 
 func configure_geometry(source: Node) -> void:
 	geometry_contacts = source
+
+
+func clear_geometry_relationships() -> void:
+	if is_instance_valid(geometry_contacts) and is_instance_valid(spring_hold) and geometry_contacts.has_method("cancel_spring_hold"):
+		geometry_contacts.cancel_spring_hold(spring_hold)
+	spring_hold = null
+	_spring_elapsed = 0.0
+	support_geometry = null
+	support_kind = SupportKind.NONE
+
+
+func geometry_supported_colliders() -> Array:
+	var colliders: Array = []
+	if support_kind == SupportKind.GEOMETRY and is_instance_valid(support_geometry):
+		colliders.append(support_geometry)
+	if is_instance_valid(spring_hold):
+		colliders.append(spring_hold)
+	return colliders
+
+
+func _advance_spring_hold(delta: float) -> void:
+	_spring_elapsed += delta
+	var request: Dictionary = {}
+	if is_instance_valid(geometry_contacts) and is_instance_valid(spring_hold):
+		request = geometry_contacts.spring_hold_request(spring_hold, tuning.ball_radius)
+	var release := bool(request.get("release", true)) or _spring_elapsed >= 1.2
+	if request.get("position") is Vector2 and request.position.is_finite():
+		var target: Vector2 = request.position + Vector2(_spring_offset_x, 0)
+		if safe_center_bounds().has_point(target):
+			# Sweep against all physical objects. A compressed head is a real moving surface.
+			move_and_collide(target - global_position)
+	velocity = Vector2.ZERO
+	if release:
+		var launch: Vector2 = request.get("velocity", Vector2(0, -500))
+		if not launch.is_finite() or launch.y >= 0.0:
+			launch = Vector2(0, -500)
+		velocity = launch.limit_length(tuning.max_speed)
+		var released := spring_hold
+		spring_hold = null
+		_spring_elapsed = 0.0
+		support_kind = SupportKind.NONE
+		if is_instance_valid(geometry_contacts) and is_instance_valid(released):
+			geometry_contacts.end_spring_hold(released)
+	_update_visuals()
+	if not release:
+		_record_motion(delta)

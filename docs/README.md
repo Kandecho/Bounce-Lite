@@ -1,15 +1,15 @@
 # 文档导航与生命周期
 
-## 当前入口（2026-09-14）
+## 当前入口（2026-09-22）
 
-- [第一批几何／机械集成记录](exploration/geometry-harvest-batch1.md)：单球随机六类机关已完成，试玩入口、参数、验证与快照；当前等待人工检查。
+- [第一批几何／机械集成记录](exploration/geometry-harvest-batch1.md)：初版已试玩；refinement安全停点的实现、验证、已知基线问题与待体验项，按用户要求本地提交后停止。
 - [分批集成与打磨方案](exploration/harvest-refinement-plan.md)：最新方向；几何／机械、传送门、砖块逐批集成，每批完成后停止等待人工检查，长期试玩决定结构。
-- [物理电子玩具探索](exploration/physical-toy-exploration.md)：广度阶段方向、来源与已完成实现的历史记录。
-- [游乐场试玩记录](exploration/toybox-playtest.md)：默认随机玩具、组合快照、操作、固定对照和本轮验证。
+- [物理电子玩具探索](exploration/physical-toy-exploration.md)：广度探索收获、实际试玩后的筛选决定及历史来源。
+- [游乐场试玩记录](exploration/toybox-playtest.md)：用户试玩结论、当前设计决定、实现选择与历史机器证据，分开记录归属。
 - [V0.2.0 实现基线](design/design-baseline-v0.2.0.md)：随机对象、真实动作资格、Wake/Continue 与现有底座。
 - [V0.2.0 收口记录](reviews/v0.2.0-consolidation.md)：本轮验证、Git 状态和体验边界。
 
-下方保留旧版文档导航的历史状态描述；是否已实现以对应提交与实现记录为准，当前工作范围以最新方案和用户请求为准，不能将旧阶段的实施授权外推到本次文档任务。
+下方保留旧版文档导航的历史状态描述；是否已实现以对应提交与实现记录为准，当前工作范围以最新方案和用户请求为准，不能越过本次停止要求与后续人工检查点。
 
 ## 正式项目文档
 

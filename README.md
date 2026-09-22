@@ -8,6 +8,8 @@ Bounce Lite 是一个物理电子玩具。移动鼠标控制挡板，让球与�
 
 **当前按 [harvest + refinement](docs/exploration/harvest-refinement-plan.md) 逐批集成**：每批完成后更新文档、停止并等待人工检查。第一批记录见[几何／机械集成](docs/exploration/geometry-harvest-batch1.md)。第二批传送门、第三批普通砖／反向砖尚未启动；结构由长期试玩后决定，场力、多球与抓球保留原实验成果。
 
+**2026-09-22状态**：第一批refinement按用户要求收口到本地安全停点，包含弹簧自动持球／压缩／释放、撞击驱动跷跷板、底部生成包络、平台支撑期间延迟离场和移除机关补能。验证与已知问题见[收口记录](docs/exploration/geometry-harvest-batch1.md)。提交后停止，等待人工检查；手感与长期试玩仍待判断，main仍为 `f792d3b`，初版对照为 `ee6b25b`。
+
 ## 核心体验
 
 Bounce Lite 希望让屏幕中的互动拥有真实玩具的触感：操作简单，反馈清楚；玩家决定何时介入，球的后续运动由物理世界决定。
@@ -24,7 +26,7 @@ Bounce Lite 希望让屏幕中的互动拥有真实玩具的触感：操作简�
 
 **第一批候选 `codex/harvest-geometry`** 从main选择性迁入几何／机械、随机生命周期、专用碰撞声音及种子／快照入口。原游乐场留在 `codex/exp-physical-toybox`：固定代码 `6f31ea7`、随机代码 `4947b67`。它仍可用于多球、抓球和场力实验，操作与旧验证见[游乐场试玩记录](docs/exploration/toybox-playtest.md)。
 
-从已获用户实测认可的 E01 展开，中心色 UI、全客户区场地、随机对象、真实动作资格及 Wake／Continue 强弱与表现均已实现。默认窗口640×480。当前行为见[V0.2.0 基线](docs/design/design-baseline-v0.2.0.md)，本轮验证见[收口记录](docs/reviews/v0.2.0-consolidation.md)。新组合尚无用户试玩结论。
+从已获用户实测认可的 E01 展开，中心色 UI、全客户区场地、随机对象、真实动作资格及 Wake／Continue 强弱与表现均已实现。默认窗口640×480。底座行为见[V0.2.0 基线](docs/design/design-baseline-v0.2.0.md)，其验证见[收口记录](docs/reviews/v0.2.0-consolidation.md)。已发生的用户试玩结论见[试玩记录](docs/exploration/toybox-playtest.md)，当前refinement安全停点与待体验项见第一批记录。
 
 上一轮已主动借鉴弹球和物理游戏机制，制作可玩组合；来源与交付见[物理玩具探索](docs/exploration/physical-toy-exploration.md)。接下来按[分批集成与打磨方案](docs/exploration/harvest-refinement-plan.md)收获这些成果，玩法本身无需依赖积分、奖励、任务或长期收益。
 
@@ -49,7 +51,7 @@ F1 打开开发调参与 `DEV ELAPSED` 观察计数器；计数器持续累计�
 .\run-geometry.bat --geometry-seed=184
 ```
 
-仓库附带[一次自然演化30秒的几何快照](docs/exploration/snapshots/geometry-batch1-184-30s.json)，可通过 `--geometry-snapshot=res://docs/exploration/snapshots/geometry-batch1-184-30s.json` 重访。当前第一批已完成，等待人工检查；main尚未更新。
+仓库附带[初版自然演化30秒的几何快照](docs/exploration/snapshots/geometry-batch1-184-30s.json)，仅适用于 `ee6b25b` 的version1对照。refinement更改机械与生成规则，旧快照不能静默作为新版组合加载；当前尚未提供完成验证的新快照。main尚未更新。
 
 ### 使用 Godot 编辑器
 

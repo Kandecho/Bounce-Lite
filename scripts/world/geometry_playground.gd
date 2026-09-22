@@ -1,6 +1,6 @@
 extends Node2D
 ## First harvest batch: one Ball, six contact shapes, reproducible local combinations.
-const PROFILE := "bounce-lite-geometry-harvest-v1"
+const PROFILE := "geometry-refinement-v2"
 var main: Node2D
 var toys: Node2D
 var feedback: Node
@@ -46,6 +46,7 @@ func configure(host: Node2D) -> void:
 	print("GEOMETRY seed=", world_seed, " fixed=", fixed_layout)
 
 func restart_world(seed_value: int) -> void:
+	main.ball.clear_geometry_relationships()
 	world_seed = clampi(seed_value, 1, 0x7fffffff)
 	elapsed = 0.0
 	events.clear()
@@ -56,6 +57,7 @@ func restart_world(seed_value: int) -> void:
 	_queue_restart()
 
 func _queue_restart() -> void:
+	main.ball.clear_geometry_relationships()
 	_restart_pending = true
 	_restart_wait = 2
 	main.ball.visible = false
@@ -67,6 +69,7 @@ func _physics_process(delta: float) -> void:
 	feedback.set_muted(main.get_node("BasicAudio").muted)
 	toys.set_ball_context(main.ball.global_position, main.tuning.ball_radius)
 	toys.set_paddle_context(main.paddle.global_position, main.tuning.paddle_size)
+	toys.set_supported_colliders(main.ball.geometry_supported_colliders())
 	if not _restart_pending:
 		return
 	if _restart_wait > 0:
@@ -102,7 +105,7 @@ func save_combination() -> bool:
 	if DirAccess.make_dir_recursive_absolute(directory) != OK:
 		show_notice("记录失败：无法创建目录")
 		return false
-	var data := {"profile": PROFILE, "version": 1, "seed": world_seed, "time": elapsed,
+	var data := {"profile": PROFILE, "version": 2, "seed": world_seed, "time": elapsed,
 		"fixed": fixed_layout, "geometry": toys.export_snapshot(), "journal": toys.lifecycle_events,
 		"ball_observation": {"position": [main.ball.position.x, main.ball.position.y], "velocity": [main.ball.velocity.x, main.ball.velocity.y]}}
 	last_saved_path = directory + "/geometry-%d-%d.json" % [world_seed, Time.get_ticks_msec()]
@@ -122,12 +125,13 @@ func restore_combination(source_path: String = "") -> bool:
 		show_notice("先按 F8 记录本批组合")
 		return false
 	var data = JSON.parse_string(FileAccess.get_file_as_string(path))
-	if not data is Dictionary or data.get("profile") != PROFILE or data.get("version") != 1 or not data.get("geometry") is Dictionary:
+	if not data is Dictionary or data.get("profile") != PROFILE or data.get("version") != 2 or not data.get("geometry") is Dictionary:
 		show_notice("不是本批几何组合记录")
 		return false
 	if not toys.restore_snapshot(data.geometry):
 		show_notice("组合恢复失败")
 		return false
+	toys.clear_spring_holds()
 	world_seed = int(data.seed)
 	elapsed = float(data.time)
 	fixed_layout = bool(data.get("fixed", false))
