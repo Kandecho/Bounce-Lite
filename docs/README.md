@@ -2,6 +2,7 @@
 
 ## 当前入口（2026-09-23）
 
+- [代理模型与执行纪律](../AGENTS.md#agent-execution-policy)：唯一维护入口；Astra主代理（强度由用户控制）、Sol medium普通实现、Luna medium明确小活；定义审查触发条件、集成责任与可审计交付格式。历史low代理记录按当时事实保留。
 - [第一批几何／机械集成记录](exploration/geometry-harvest-batch1.md)：`d761c98`安全停点，以及两轮手感／速度控制调查的事实、探针方法、参数来源、耦合与证据限制。
 - [分批集成与打磨方案](exploration/harvest-refinement-plan.md)：最新方向；先处理已登记的基础手感问题，再依人工检查推进机制族，长期试玩决定结构。本次仅更新文档并提交。
 - [物理电子玩具探索](exploration/physical-toy-exploration.md)：广度探索收获、实际试玩后的筛选决定及历史来源。

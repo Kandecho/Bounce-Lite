@@ -22,6 +22,8 @@ Bounce Lite 希望让屏幕中的互动拥有真实玩具的触感：操作简�
 
 ## 当前状态
 
+协作规则见[代理模型与执行纪律](AGENTS.md#agent-execution-policy)：Astra主代理的思考强度由用户控制，Sol medium负责普通实现，Luna medium负责明确小活；子代理提交可审计证据，主代理按约束、风险与需求审查，默认不重复实现者的完整验证。
+
 **main 已建立 V0.2.0 基线**：代码提交 `e905580`，合入记录 `f792d3b`。球、挡板、Vitality、随机转子和能量块、Wake/Continue 已完成收尾。
 
 **第一批候选 `codex/harvest-geometry`** 从main选择性迁入几何／机械、随机生命周期、专用碰撞声音及种子／快照入口。原游乐场留在 `codex/exp-physical-toybox`：固定代码 `6f31ea7`、随机代码 `4947b67`。它仍可用于多球、抓球和场力实验，操作与旧验证见[游乐场试玩记录](docs/exploration/toybox-playtest.md)。
