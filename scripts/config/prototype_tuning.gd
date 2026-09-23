@@ -9,6 +9,33 @@ var legacy_rhythm_enabled: bool = false
 var continue_vitality_restore_ratio := 0.18
 var continue_action_distance := 4.0
 var continue_near_distance := 260.0
+var motion_profile := "current"
+var continue_launch_speed := 290.0
+var bumper_normal_speed := 380.0
+var sling_normal_speed := 440.0
+var spring_release_speed := 500.0
+var spring_capture_speed := 35.0
+var trail_reference_speed := 520.0
+
+func apply_motion_profile(profile: String) -> bool:
+	if profile != "current" and profile != "fast":
+		return false
+	motion_profile = profile
+	var speed_scale := 2.0 if profile == "fast" else 1.0
+	initial_speed = 360.0 * speed_scale
+	max_speed = 520.0 * speed_scale
+	gravity_acceleration = 260.0 * speed_scale * speed_scale
+	wake_launch_speed = 350.0 * speed_scale
+	continue_launch_speed = 290.0 * speed_scale
+	paddle_impulse = 160.0 * speed_scale
+	bumper_normal_speed = 380.0 * speed_scale
+	sling_normal_speed = 440.0 * speed_scale
+	spring_release_speed = 500.0 * speed_scale
+	# Physical speed cutoffs scale; human time windows and cooldowns stay fixed.
+	rest_settle_speed = 45.0 * speed_scale
+	spring_capture_speed = 35.0 * speed_scale
+	trail_reference_speed = 520.0 * speed_scale
+	return true
 
 @export_group("Vitality")
 @export_range(0.001, 100.0, 0.001) var max_vitality: float = 1.0

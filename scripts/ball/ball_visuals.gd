@@ -77,7 +77,7 @@ func trail_color() -> Color:
 
 
 func _speed_ratio() -> float:
-	return clampf(motion_velocity.length() / maxf(tuning.max_speed, 0.001), 0.0, 1.0)
+	return clampf(motion_velocity.length() / maxf(tuning.trail_reference_speed, 0.001), 0.0, 1.0)
 
 
 func trail_spacing() -> float:

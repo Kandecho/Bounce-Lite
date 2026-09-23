@@ -1,6 +1,6 @@
 # Bounce Lite Visual Specification
 
-> 2026-09-23 当前说明：F09球—挡板碰撞反馈偏弱已纳入[正式问题登记](exploration/toybox-playtest.md)，F03速度调参还涉及上限兼作拖影标尺的耦合，证据见[第一批调查](exploration/geometry-harvest-batch1.md#motion-investigation-20260923)。这些是准备处理的问题；尚未选择新形变、挡板反馈或拖影方案，本轮没有视觉代码变更。下方历史冻结／验收不等于当前反馈问题已解决。
+> 2026-09-23 当前说明：F09球—挡板碰撞反馈偏弱已纳入[正式问题登记](exploration/toybox-playtest.md)，F03速度调参还涉及上限兼作拖影标尺的耦合，证据见[第一批调查](exploration/geometry-harvest-batch1.md#motion-investigation-20260923)。本轮第一运动A/B停点分离拖影标尺与限速；独立亮边／局部形变、力度球压缩与声音层次方向已授权，但留待之后的反馈refinement，不混入当前A/B。下方历史冻结／验收不等于当前反馈问题已解决。
 
 > 2026-09-11 当前分支说明：本文件保留 V0.1 规格及历史验收。当前依据为 [V0.2.0 Design Note](design/v0.2.0-design-note.md)，实际已实现方案 B、挡板传能变暗和全客户区场地，见[共享小世界记录](exploration/v0.2-shared-world.md)。Wake／Continue 表现交换仍在[后续计划](exploration/v0.2.0-follow-up-plan.md)中；下文冻结规格不覆盖当前决定。
 

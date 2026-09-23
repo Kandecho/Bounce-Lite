@@ -20,7 +20,15 @@ var geometry_enabled := true
 
 
 func _ready() -> void:
-	DisplayServer.window_set_title("Bouncing Ball")
+	var selected_profile := "current"
+	for argument in OS.get_cmdline_user_args():
+		if argument.begins_with("--motion-profile="):
+			selected_profile = argument.trim_prefix("--motion-profile=")
+	if not tuning.apply_motion_profile(selected_profile):
+		push_error("Unknown motion profile: " + selected_profile)
+		get_tree().quit(2)
+		return
+	print("MOTION profile=", tuning.motion_profile)
 	geometry_enabled = not (OS.get_cmdline_user_args().has("--geometry-baseline") or OS.get_cmdline_user_args().has("--v02-baseline"))
 	_set_e01_enabled(not OS.get_cmdline_user_args().has("--e01-baseline"))
 	tuning.legacy_rhythm_enabled = OS.get_cmdline_user_args().has("--v02-legacy-rhythm")
@@ -125,7 +133,7 @@ func _set_e01_enabled(enabled: bool) -> void:
 
 
 func _update_title() -> void:
-	DisplayServer.window_set_title("Bouncing Ball | v0.2.0 " + ("geometry harvest" if geometry_enabled else ("shared world" if tuning.shared_world_enabled else "baseline")) + " | E01 " + ("contact" if tuning.e01_contact_enabled else "off"))
+	DisplayServer.window_set_title("Bouncing Ball | motion " + tuning.motion_profile + " | v0.2.0 " + ("geometry harvest" if geometry_enabled else ("shared world" if tuning.shared_world_enabled else "baseline")) + " | E01 " + ("contact" if tuning.e01_contact_enabled else "off"))
 
 
 func _unhandled_key_input(event: InputEvent) -> void:

@@ -14,6 +14,7 @@ func _run() -> void:
 		var game = main.geometry_playground
 		suite.expect_equal(game.world_seed, 184, "CLI snapshot restores the recorded seed")
 		suite.expect_true(main.ball.visible and game.spawn_point_clear(main.ball.position), "CLI restores with a safe single-ball start")
+		suite.expect_true(game.save_combination(), "entry test owns a snapshot for its active motion profile")
 		var key := InputEventKey.new()
 		key.keycode = KEY_N
 		key.pressed = true

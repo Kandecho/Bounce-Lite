@@ -39,6 +39,8 @@ var _wake_sample_elapsed := 0.0
 var _interaction_distance := 0.0
 var arena_bounds := Rect2()
 var bounds_recovery_count: int = 0
+var collision_budget_exhaustions: int = 0
+var collision_budget_samples: Array[Dictionary] = []
 # Godot contact recovery can stop within its 0.08 px safe margin. Do not turn
 # subpixel contact tolerance into a second normal collision response.
 const BOUNDS_TOLERANCE := 0.12
@@ -76,6 +78,7 @@ func _physics_process(delta: float) -> void:
 	advance_air_motion(delta)
 	_record_motion(0.0)
 	var remaining_motion := velocity * delta
+	var collision_path: Array[String] = []
 	for collision_index in range(MAX_COLLISIONS_PER_FRAME):
 		if remaining_motion.length_squared() <= MOTION_EPSILON * MOTION_EPSILON:
 			break
@@ -84,6 +87,7 @@ func _physics_process(delta: float) -> void:
 			break
 		var normal := collision.get_normal()
 		var collider := collision.get_collider()
+		collision_path.append(str(collider.name) if collider is Node else "unknown")
 		var kind: int = SurfaceResponseModelScript.SurfaceKind.WALL
 		if collider != null and collider.has_meta("surface_kind"):
 			kind = int(collider.get_meta("surface_kind"))
@@ -106,6 +110,10 @@ func _physics_process(delta: float) -> void:
 			collision.get_remainder().length()
 			/ maxf(motion_before, MOTION_EPSILON)
 		)
+		if collision_index == MAX_COLLISIONS_PER_FRAME - 1 and remaining_fraction > 0.01:
+			collision_budget_exhaustions += 1
+			if collision_budget_samples.size() < 8:
+				collision_budget_samples.append({"position": [global_position.x, global_position.y], "velocity": [velocity.x, velocity.y], "path": collision_path.duplicate(), "remainder_fraction": remaining_fraction})
 		remaining_motion = velocity * delta * remaining_fraction
 	_resolve_shallow_ground_contact()
 	recover_out_of_bounds()
@@ -291,7 +299,7 @@ func advance_play_rhythm(delta: float) -> void:
 	if not play_rhythm.advance(delta, settled):
 		return
 	# Physics explicitly accepts the request, commits motion, then publishes Activity.
-	velocity = Vector2(0.0, -290.0).limit_length(tuning.max_speed)
+	velocity = Vector2(0.0, -tuning.continue_launch_speed).limit_length(tuning.max_speed)
 	support_kind = SupportKind.NONE
 	wake_consumed = true
 	vitality_model.wake(vitality_model.current_vitality + vitality_model.max_vitality * tuning.continue_vitality_restore_ratio)
@@ -342,7 +350,7 @@ func resolve_surface_collision(kind: int, normal: Vector2, valid_paddle_hit: boo
 		if not geometry_contacts.begin_spring_hold(capture):
 			spring_hold = null
 			_spring_elapsed = 0.0
-			velocity = Vector2(0, -500).limit_length(tuning.max_speed)
+			velocity = Vector2(0, -tuning.spring_release_speed).limit_length(tuning.max_speed)
 			result.velocity_after = velocity
 	vitality_model.apply_delta(result.vitality_delta)
 	result.vitality_after = vitality_model.current_vitality
@@ -553,9 +561,9 @@ func _advance_spring_hold(delta: float) -> void:
 			move_and_collide(target - global_position)
 	velocity = Vector2.ZERO
 	if release:
-		var launch: Vector2 = request.get("velocity", Vector2(0, -500))
+		var launch: Vector2 = request.get("velocity", Vector2(0, -tuning.spring_release_speed))
 		if not launch.is_finite() or launch.y >= 0.0:
-			launch = Vector2(0, -500)
+			launch = Vector2(0, -tuning.spring_release_speed)
 		velocity = launch.limit_length(tuning.max_speed)
 		var released := spring_hold
 		spring_hold = null

@@ -4,13 +4,12 @@ signal event_emitted(kind: String, position: Vector2, intensity: float)
 
 # Lifecycle and JSON reproducibility adapted from the random playground 4947b67.
 # This module contains only the first harvest geometry/mechanical family.
-const MAX_SPEED := 520.0
+const Tuning = preload("res://scripts/config/prototype_tuning.gd")
 const FADE_TIME := 0.65
 const KINDS := ["bumper", "sling", "ramp", "platform", "spring", "seesaw"]
 const PALETTE := {"bumper": Color("efba69"), "sling": Color("e68a83"), "ramp": Color("85bcb2"), "platform": Color("9cbbcc"), "spring": Color("72c9e8"), "seesaw": Color("d6b284")}
 const SNAPSHOT_PROFILE := "geometry-refinement-v2"
 @export var spring_hold_seconds := 0.32
-@export var spring_release_speed := 500.0
 @export var spring_recapture_delay := 1.0
 @export var spring_compression_travel := 14.0
 @export var seesaw_max_angle := 0.34
@@ -34,6 +33,10 @@ var _spawn_timer := 0.1
 var _paddle_position := Vector2.INF
 var _paddle_size := Vector2.ZERO
 var _supported_colliders: Array = []
+var tuning: Resource = Tuning.new()
+
+func configure_tuning(source: Resource) -> void:
+	tuning = source if source != null else Tuning.new()
 
 func set_supported_colliders(colliders: Array) -> void:
 	_supported_colliders = colliders.duplicate()
@@ -48,9 +51,9 @@ func begin_spring_hold(collider: Object) -> bool:
 
 func spring_hold_request(collider: Object, ball_radius: float) -> Dictionary:
 	if not _owned(collider) or not collider.get_meta("holding", false):
-		return {"release": true, "velocity": Vector2(0, -spring_release_speed)}
+		return {"release": true, "velocity": Vector2(0, -tuning.spring_release_speed)}
 	var top := -12.0 + float(collider.get_meta("compression")) * spring_compression_travel
-	return {"position": collider.global_position + Vector2(0, top - ball_radius - 0.6), "release": float(collider.get_meta("hold_elapsed")) >= spring_hold_seconds, "velocity": Vector2(0, -spring_release_speed)}
+	return {"position": collider.global_position + Vector2(0, top - ball_radius - 0.6), "release": float(collider.get_meta("hold_elapsed")) >= spring_hold_seconds, "velocity": Vector2(0, -tuning.spring_release_speed)}
 
 func end_spring_hold(collider: Object) -> void:
 	if not is_instance_valid(collider) or collider not in _toys:
@@ -78,7 +81,10 @@ func _engaged(body: StaticBody2D) -> bool:
 func _bottom_limit() -> float:
 	var limit := _arena.end.y - bottom_geometry_clearance
 	if _paddle_size.y > 0.0:
-		limit = minf(limit, _paddle_position.y - _paddle_size.y * 0.5 - paddle_path_clearance)
+		# The gap is a Ball passage, so geometry's full envelope must clear
+		# the Paddle path by at least a Ball diameter plus contact tolerance.
+		var ball_passage: float = tuning.ball_radius * 2.0 + 2.0
+		limit = minf(limit, _paddle_position.y - _paddle_size.y * 0.5 - maxf(paddle_path_clearance, ball_passage))
 	return limit
 func set_paddle_context(position: Vector2, size: Vector2) -> void:
 	_paddle_position = position
@@ -223,10 +229,10 @@ func contact_request(result: RefCounted, collider: Object, ball_position: Vector
 	var ready: bool = collider.get_meta("cooldown") <= 0.0
 	if ready and kind == "bumper":
 		# Preserve the tangent; the circular contact normal explains the extra rebound.
-		output += normal * maxf(0.0, 380.0 - output.dot(normal))
+		output += normal * maxf(0.0, tuning.bumper_normal_speed - output.dot(normal))
 	elif ready and kind == "sling" and normal.y < -0.3 and absf(normal.x) > 0.3:
-		output += normal * maxf(0.0, 440.0 - output.dot(normal))
-	elif ready and kind == "spring" and normal.y < -0.8 and incoming.dot(normal) < -35.0 and not collider.get_meta("holding"):
+		output += normal * maxf(0.0, tuning.sling_normal_speed - output.dot(normal))
+	elif ready and kind == "spring" and normal.y < -0.8 and incoming.dot(normal) < -tuning.spring_capture_speed and not collider.get_meta("holding"):
 		return {"velocity": Vector2.ZERO, "vitality_delta": 0.0, "spring_capture": collider}
 	elif kind == "seesaw":
 		# Moving surface response comes from the same angular motion drawn on screen.
@@ -234,7 +240,9 @@ func contact_request(result: RefCounted, collider: Object, ball_position: Vector
 		var offset: Vector2 = ball_position - collider.global_position
 		var surface_velocity := Vector2(-offset.y, offset.x) * omega
 		output = (incoming - surface_velocity).bounce(normal) + surface_velocity
-	return {"velocity": output.limit_length(MAX_SPEED), "vitality_delta": 0.0}
+		# The normal exchange is physical contact; later global speed clipping is not.
+		result.set_meta("seesaw_normal_exchange", (incoming - output).dot(normal))
+	return {"velocity": output, "vitality_delta": 0.0}
 
 func on_contact_committed(collider: Object, result: RefCounted, ball_position: Vector2) -> void:
 	if not _owned(collider) or collider.get_meta("cooldown") > 0.0:
@@ -242,7 +250,7 @@ func on_contact_committed(collider: Object, result: RefCounted, ball_position: V
 	collider.set_meta("cooldown", 0.12)
 	if collider.get_meta("toy_kind") == "seesaw":
 		var lever: Vector2 = ball_position - collider.global_position
-		var impulse: Vector2 = result.velocity_before - result.velocity_after
+		var impulse: Vector2 = result.normal.normalized() * float(result.get_meta("seesaw_normal_exchange", 0.0))
 		collider.set_meta("angular_velocity", clampf(float(collider.get_meta("angular_velocity")) + lever.cross(impulse) / seesaw_impulse_inertia, -seesaw_max_angular_velocity, seesaw_max_angular_velocity))
 	collider.set_meta("flash", clampf(result.velocity_before.length() / 450.0, 0.2, 1.0))
 	if not collider.get_meta("holding"):

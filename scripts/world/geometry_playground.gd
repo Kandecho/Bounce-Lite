@@ -21,6 +21,7 @@ func configure(host: Node2D) -> void:
 	main = host
 	toys = load("res://scripts/world/geometry_toys.gd").new()
 	add_child(toys)
+	toys.configure_tuning(main.tuning)
 	toys.configure(main.ball.arena_bounds)
 	toys.set_ball_context(main.ball.global_position, main.tuning.ball_radius)
 	toys.set_paddle_context(main.paddle.global_position, main.tuning.paddle_size)
@@ -43,7 +44,7 @@ func configure(host: Node2D) -> void:
 	for argument in OS.get_cmdline_user_args():
 		if argument.begins_with("--geometry-snapshot="):
 			restore_combination(argument.trim_prefix("--geometry-snapshot="))
-	print("GEOMETRY seed=", world_seed, " fixed=", fixed_layout)
+	print("GEOMETRY seed=", world_seed, " fixed=", fixed_layout, " motion=", main.tuning.motion_profile)
 
 func restart_world(seed_value: int) -> void:
 	main.ball.clear_geometry_relationships()
@@ -105,7 +106,7 @@ func save_combination() -> bool:
 	if DirAccess.make_dir_recursive_absolute(directory) != OK:
 		show_notice("记录失败：无法创建目录")
 		return false
-	var data := {"profile": PROFILE, "version": 2, "seed": world_seed, "time": elapsed,
+	var data := {"profile": PROFILE, "version": 2, "motion_profile": main.tuning.motion_profile, "seed": world_seed, "time": elapsed,
 		"fixed": fixed_layout, "geometry": toys.export_snapshot(), "journal": toys.lifecycle_events,
 		"ball_observation": {"position": [main.ball.position.x, main.ball.position.y], "velocity": [main.ball.velocity.x, main.ball.velocity.y]}}
 	last_saved_path = directory + "/geometry-%d-%d.json" % [world_seed, Time.get_ticks_msec()]
@@ -127,6 +128,9 @@ func restore_combination(source_path: String = "") -> bool:
 	var data = JSON.parse_string(FileAccess.get_file_as_string(path))
 	if not data is Dictionary or data.get("profile") != PROFILE or data.get("version") != 2 or not data.get("geometry") is Dictionary:
 		show_notice("不是本批几何组合记录")
+		return false
+	if data.get("motion_profile", "") != main.tuning.motion_profile:
+		show_notice("运动配置不匹配；旧记录需在原版打开")
 		return false
 	if not toys.restore_snapshot(data.geometry):
 		show_notice("组合恢复失败")

@@ -16,7 +16,7 @@ func _run() -> void:
 	result.velocity_before = Vector2(120, 300)
 	for body in toys.get_children():
 		var response: Dictionary = toys.contact_request(result, body, body.position + Vector2(0, -30))
-		suite.expect_true(response.velocity.length() <= Toys.MAX_SPEED, "response bounded")
+		suite.expect_true(response.velocity.is_finite(), "geometry response is finite before Ball's global cap")
 		suite.expect_equal(response.vitality_delta, 0.0, "no geometry contact grants vitality")
 		if body.get_meta("toy_kind") in ["platform", "ramp"]:
 			suite.expect_equal(response.velocity, Vector2(120, -300), "ordinary geometry only reflects")
