@@ -21,7 +21,7 @@ func apply_motion_profile(profile: String) -> bool:
 	if profile != "current" and profile != "fast":
 		return false
 	motion_profile = profile
-	var speed_scale := 2.0 if profile == "fast" else 1.0
+	var speed_scale := 1.5 if profile == "fast" else 1.0
 	initial_speed = 360.0 * speed_scale
 	max_speed = 520.0 * speed_scale
 	gravity_acceleration = 260.0 * speed_scale * speed_scale

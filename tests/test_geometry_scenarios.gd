@@ -34,7 +34,7 @@ func _run() -> void:
 		await physics_frame
 	suite.expect_equal(ball.position, still, "supported platform remains physically still")
 	suite.expect_true(ball.apply_resting_interaction(20, Vector2(ball.position.x, 570)), "baseline Wake works from geometry support")
-	suite.expect_float(ball.velocity.y, -350, 0.001, "geometry Wake retains original upward speed")
+	suite.expect_float(ball.velocity.y, -main.tuning.wake_launch_speed, 0.001, "geometry Wake uses selected profile speed")
 	# Separate high-speed real platform contact verifies dedicated audio routing.
 	ball.start_active(Vector2.DOWN)
 	ball.position = platform.position + Vector2(0, -55)

@@ -8,7 +8,7 @@ Bounce Lite 是一个物理电子玩具。移动鼠标控制挡板，让球与�
 
 **当前按 [harvest + refinement](docs/exploration/harvest-refinement-plan.md) 逐批集成**：每批完成后更新文档、停止并等待人工检查。第一批记录见[几何／机械集成](docs/exploration/geometry-harvest-batch1.md)。第二批传送门、第三批普通砖／反向砖尚未启动；结构由长期试玩后决定，场力、多球与抓球保留原实验成果。
 
-**2026-09-23状态**：本轮从 `b370756`（代码安全停点 `d761c98`）完成[第一运动A/B停点](docs/exploration/geometry-harvest-batch1.md#motion-ab-checkpoint)：技术清理与当前／提速对照，验证更密集的球路过程是否更有趣。挡板保持y=570；弹簧衔接与挡板反馈的新方向留待后续，移速传递和命中后加快消失仍为候选。现已停下供人工检查；main仍为 `f792d3b`，初版对照为 `ee6b25b`。
+**2026-09-23状态**：第一运动A/B已保存为 `60e3516`；本轮已按用户选择改为默认速度1.5×／重力2.25×，完成[弹簧refinement](docs/exploration/geometry-harvest-batch1.md#spring-refinement-15x)。机器验证通过，现停下供人工试玩；挡板保持y570，独立挡板反馈仍待后续；main仍为 `f792d3b`。
 
 ## 核心体验
 
@@ -38,10 +38,10 @@ F1 打开开发调参与 `DEV ELAPSED` 观察计数器；计数器持续累计�
 
 ## 运动A/B直接试玩
 
-- [A：当前运动尺度](run-motion-current.bat)
-- [B：速度×2、重力×4](run-motion-fast.bat)
+- [1×运动对照](run-motion-current.bat)
+- [默认试玩：速度×1.5、重力×2.25](run-motion-fast.bat)
 
-两个入口默认同一随机种子184；窗口标题与日志标明profile。B压缩球路过程，机械动作、生命周期与生成时钟保持独立；这是体验试验，不是最终速度。A/B共同包含技术清理，严格历史对照仍需 `d761c98`。挡板均保持y=570；先比较单纯弹动是否更有趣，以及停下后能否重新接入。详细生效参数和证据见[第一停点记录](docs/exploration/geometry-harvest-batch1.md#motion-ab-checkpoint)。
+两个入口默认同一随机种子184；窗口标题与日志标明profile。两档都使用本轮弹簧动作，1.5×也是无参数启动的默认尺度，挡板均保持y570。寿命、生成与机械时间不机械倍乘。2×强对照保留在 `60e3516`；本轮生效参数、快照兼容和证据见[弹簧停点记录](docs/exploration/geometry-harvest-batch1.md#spring-refinement-15x)。
 
 ## 运行第一批试玩
 
@@ -60,7 +60,7 @@ F1 打开开发调参与 `DEV ELAPSED` 观察计数器；计数器持续累计�
 .\run-geometry.bat --geometry-seed=184
 ```
 
-仓库附带[初版自然演化30秒的几何快照](docs/exploration/snapshots/geometry-batch1-184-30s.json)，仅适用于 `ee6b25b` 的version1对照。refinement更改机械与生成规则，旧快照不能静默作为新版组合加载；当前version2组合还必须包含匹配的motion_profile；缺少档位的旧记录或另一档记录会被拒绝，需回原版本打开。F8可保存本档新组合，快照不是输入或F1设置的完整重播。main尚未更新。
+仓库附带[初版自然演化30秒的几何快照](docs/exploration/snapshots/geometry-batch1-184-30s.json)，仅适用于 `ee6b25b` 的version1对照。refinement更改机械与生成规则，旧快照不能静默作为新版组合加载；当前version2组合还必须包含匹配的motion_profile和 `rules=spring-200ms-lateral50-motion150`；旧规则或另一档记录会被拒绝，需回原版本打开。F8可保存本档新组合，快照不是输入或F1设置的完整重播。main尚未更新。
 
 ### 使用 Godot 编辑器
 

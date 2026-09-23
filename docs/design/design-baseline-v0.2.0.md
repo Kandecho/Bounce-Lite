@@ -1,6 +1,6 @@
 # Bounce Lite V0.2.0 实现基线
 
-> 2026-09-23说明：本文继续描述main `f792d3b`（代码 `e905580`）的历史底座，不改写其已实现参数。候选分支 `d761c98` 的实际行为及新发现见[第一批调查](../exploration/geometry-harvest-batch1.md#motion-investigation-20260923)，待处理问题与方案见[反馈登记](../exploration/toybox-playtest.md)、[harvest方案](../exploration/harvest-refinement-plan.md#feedback-refinement-20260923)。候选分支已授权第一运动A/B停点，速度×2／重力×4作强对照；新接触反馈留待后续，main未合入。
+> 2026-09-23 当前入口：第一运动A/B已保存为 `60e3516`；用户随后选择速度1.5×／重力2.25×并继续弹簧refinement，实际范围与证据见[最新停点](../exploration/geometry-harvest-batch1.md#spring-refinement-15x)。挡板保持y570，独立接触反馈未进入本轮，main仍为 `f792d3b`。下方历史参数、实施时点与验收不覆盖当前记录。
 
 日期：2026-09-13。整理：Codex；运行时与测试由 low 推理实现代理完成，主代理复核。
 

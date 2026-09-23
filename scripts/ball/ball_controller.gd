@@ -19,6 +19,7 @@ var support_geometry: CollisionObject2D
 var spring_hold: CollisionObject2D
 var _spring_elapsed := 0.0
 var _spring_offset_x := 0.0
+var _spring_incoming_x := 0.0
 var play_world: Object
 var _related_motion_distance := 0.0
 
@@ -310,6 +311,7 @@ func advance_play_rhythm(delta: float) -> void:
 func resolve_surface_collision(kind: int, normal: Vector2, valid_paddle_hit: bool, contact_offset: float = 0.0, collider: Object = null) -> void:
 	if vitality_model == null or surface_response_model == null:
 		return
+	var incoming_x := velocity.x
 	# Low-energy top contact is support, not a repeatedly rewarded hit.
 	if kind == SurfaceResponseModelScript.SurfaceKind.PADDLE and normal.y < -0.5 \
 		and velocity.y >= 0.0 and velocity.length() <= tuning.rest_settle_speed \
@@ -343,6 +345,7 @@ func resolve_surface_collision(kind: int, normal: Vector2, valid_paddle_hit: boo
 	velocity = result.velocity_after.limit_length(tuning.max_speed)
 	result.velocity_after = velocity
 	if is_instance_valid(capture):
+		_spring_incoming_x = incoming_x
 		spring_hold = capture
 		_spring_elapsed = 0.000001
 		_spring_offset_x = global_position.x - capture.global_position.x
@@ -350,7 +353,8 @@ func resolve_surface_collision(kind: int, normal: Vector2, valid_paddle_hit: boo
 		if not geometry_contacts.begin_spring_hold(capture):
 			spring_hold = null
 			_spring_elapsed = 0.0
-			velocity = Vector2(0, -tuning.spring_release_speed).limit_length(tuning.max_speed)
+			velocity = _spring_release_velocity()
+			_spring_incoming_x = 0.0
 			result.velocity_after = velocity
 	vitality_model.apply_delta(result.vitality_delta)
 	result.vitality_after = vitality_model.current_vitality
@@ -535,6 +539,7 @@ func clear_geometry_relationships() -> void:
 		geometry_contacts.cancel_spring_hold(spring_hold)
 	spring_hold = null
 	_spring_elapsed = 0.0
+	_spring_incoming_x = 0.0
 	support_geometry = null
 	support_kind = SupportKind.NONE
 
@@ -561,10 +566,8 @@ func _advance_spring_hold(delta: float) -> void:
 			move_and_collide(target - global_position)
 	velocity = Vector2.ZERO
 	if release:
-		var launch: Vector2 = request.get("velocity", Vector2(0, -tuning.spring_release_speed))
-		if not launch.is_finite() or launch.y >= 0.0:
-			launch = Vector2(0, -tuning.spring_release_speed)
-		velocity = launch.limit_length(tuning.max_speed)
+		velocity = _spring_release_velocity()
+		_spring_incoming_x = 0.0
 		var released := spring_hold
 		spring_hold = null
 		_spring_elapsed = 0.0
@@ -574,3 +577,10 @@ func _advance_spring_hold(delta: float) -> void:
 	_update_visuals()
 	if not release:
 		_record_motion(delta)
+
+
+func _spring_release_velocity() -> Vector2:
+	var up_speed: float = tuning.spring_release_speed
+	var max_lateral := sqrt(maxf(0.0, tuning.max_speed * tuning.max_speed - up_speed * up_speed))
+	var lateral := clampf(_spring_incoming_x * 0.5, -max_lateral, max_lateral)
+	return Vector2(lateral, -up_speed).limit_length(tuning.max_speed)

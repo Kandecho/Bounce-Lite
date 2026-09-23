@@ -9,7 +9,7 @@ const FADE_TIME := 0.65
 const KINDS := ["bumper", "sling", "ramp", "platform", "spring", "seesaw"]
 const PALETTE := {"bumper": Color("efba69"), "sling": Color("e68a83"), "ramp": Color("85bcb2"), "platform": Color("9cbbcc"), "spring": Color("72c9e8"), "seesaw": Color("d6b284")}
 const SNAPSHOT_PROFILE := "geometry-refinement-v2"
-@export var spring_hold_seconds := 0.32
+@export var spring_hold_seconds := 0.20
 @export var spring_recapture_delay := 1.0
 @export var spring_compression_travel := 14.0
 @export var seesaw_max_angle := 0.34
@@ -51,9 +51,9 @@ func begin_spring_hold(collider: Object) -> bool:
 
 func spring_hold_request(collider: Object, ball_radius: float) -> Dictionary:
 	if not _owned(collider) or not collider.get_meta("holding", false):
-		return {"release": true, "velocity": Vector2(0, -tuning.spring_release_speed)}
+		return {"release": true}
 	var top := -12.0 + float(collider.get_meta("compression")) * spring_compression_travel
-	return {"position": collider.global_position + Vector2(0, top - ball_radius - 0.6), "release": float(collider.get_meta("hold_elapsed")) >= spring_hold_seconds, "velocity": Vector2(0, -tuning.spring_release_speed)}
+	return {"position": collider.global_position + Vector2(0, top - ball_radius - 0.6), "release": float(collider.get_meta("hold_elapsed")) >= spring_hold_seconds}
 
 func end_spring_hold(collider: Object) -> void:
 	if not is_instance_valid(collider) or collider not in _toys:

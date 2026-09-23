@@ -111,7 +111,7 @@ func _run() -> void:
 		elif scenario == "restart":
 			game.restart_world(184)
 			await frames(6)
-			suite.expect_true(ball.spring_hold == null and ball.visible, "restart cancels held Ball before replacing world")
+			suite.expect_true(ball.spring_hold == null and ball.visible and ball._spring_incoming_x == 0.0, "restart cancels held Ball and incidence memory before replacing world")
 		else:
 			suite.expect_true(game.save_combination(), "held mechanical combination saves")
 			suite.expect_true(game.restore_combination(), "held mechanical combination restores")
@@ -119,7 +119,7 @@ func _run() -> void:
 			var orphan := false
 			for toy in game.toys.export_snapshot().toys:
 				if toy.holding: orphan = true
-			suite.expect_true(ball.spring_hold == null and not orphan and ball.visible, "snapshot clears orphaned mechanical holds before safe serve")
+			suite.expect_true(ball.spring_hold == null and not orphan and ball.visible and ball._spring_incoming_x == 0.0, "snapshot clears orphaned holds and incidence memory before safe serve")
 	game.toys.set_layout(1)
 	await frames(2)
 	var platform = body_of("platform")

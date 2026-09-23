@@ -1,6 +1,7 @@
 extends Node2D
 ## First harvest batch: one Ball, six contact shapes, reproducible local combinations.
 const PROFILE := "geometry-refinement-v2"
+const RULES := "spring-200ms-lateral50-motion150"
 var main: Node2D
 var toys: Node2D
 var feedback: Node
@@ -106,7 +107,7 @@ func save_combination() -> bool:
 	if DirAccess.make_dir_recursive_absolute(directory) != OK:
 		show_notice("记录失败：无法创建目录")
 		return false
-	var data := {"profile": PROFILE, "version": 2, "motion_profile": main.tuning.motion_profile, "seed": world_seed, "time": elapsed,
+	var data := {"profile": PROFILE, "version": 2, "rules": RULES, "motion_profile": main.tuning.motion_profile, "seed": world_seed, "time": elapsed,
 		"fixed": fixed_layout, "geometry": toys.export_snapshot(), "journal": toys.lifecycle_events,
 		"ball_observation": {"position": [main.ball.position.x, main.ball.position.y], "velocity": [main.ball.velocity.x, main.ball.velocity.y]}}
 	last_saved_path = directory + "/geometry-%d-%d.json" % [world_seed, Time.get_ticks_msec()]
@@ -131,6 +132,9 @@ func restore_combination(source_path: String = "") -> bool:
 		return false
 	if data.get("motion_profile", "") != main.tuning.motion_profile:
 		show_notice("运动配置不匹配；旧记录需在原版打开")
+		return false
+	if data.get("rules", "") != RULES:
+		show_notice("机关规则不匹配；旧记录需在原版打开")
 		return false
 	if not toys.restore_snapshot(data.geometry):
 		show_notice("组合恢复失败")

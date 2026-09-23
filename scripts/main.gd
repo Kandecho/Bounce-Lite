@@ -20,7 +20,7 @@ var geometry_enabled := true
 
 
 func _ready() -> void:
-	var selected_profile := "current"
+	var selected_profile := "fast"
 	for argument in OS.get_cmdline_user_args():
 		if argument.begins_with("--motion-profile="):
 			selected_profile = argument.trim_prefix("--motion-profile=")
