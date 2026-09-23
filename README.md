@@ -8,7 +8,7 @@ Bounce Lite 是一个物理电子玩具。移动鼠标控制挡板，让球与�
 
 **当前按 [harvest + refinement](docs/exploration/harvest-refinement-plan.md) 逐批集成**：每批完成后更新文档、停止并等待人工检查。第一批记录见[几何／机械集成](docs/exploration/geometry-harvest-batch1.md)。第二批传送门、第三批普通砖／反向砖尚未启动；结构由长期试玩后决定，场力、多球与抓球保留原实验成果。
 
-**2026-09-22状态**：第一批refinement按用户要求收口到本地安全停点，包含弹簧自动持球／压缩／释放、撞击驱动跷跷板、底部生成包络、平台支撑期间延迟离场和移除机关补能。验证与已知问题见[收口记录](docs/exploration/geometry-harvest-batch1.md)。提交后停止，等待人工检查；手感与长期试玩仍待判断，main仍为 `f792d3b`，初版对照为 `ee6b25b`。
+**2026-09-23状态**：代码停在 `d761c98`，已完成两轮基础手感／速度耦合调查，本次仅综合文档并提交。[问题登记](docs/exploration/toybox-playtest.md)已吸收重新接入、整体节奏、弹簧衔接与挡板反馈等明确问题；[第一批记录](docs/exploration/geometry-harvest-batch1.md#motion-investigation-20260923)区分当前实现、探针结果及待解决项。速度翻倍、挡板移速传递和命中后加快消失尚不是已实施方案。提交后停止；main仍为 `f792d3b`，初版对照为 `ee6b25b`。
 
 ## 核心体验
 

@@ -1,6 +1,6 @@
 # Bounce Lite Project Overview
 
-> 2026-09-22 当前状态：广度游乐场与[第一批初版](exploration/geometry-harvest-batch1.md)已完成实际试玩，普通几何成立。9月16日暂停的refinement现按用户授权收口到本地安全停点：弹簧动作、撞击驱动跷跷板、底部实体区域、平台支撑离场与移除额外Vitality；机器证据、已知问题及待体验项见第一批记录。分支为 `codex/harvest-geometry`，初版对照为 `ee6b25b`，main仍为 `f792d3b`。本地提交后停止等待人工检查，第二、三批未启动；下方广度探索及更早状态保留为历史。
+> 2026-09-23 当前状态：分支 `codex/harvest-geometry` 的代码安全停点为 `d761c98`，初版对照 `ee6b25b`，main仍为 `f792d3b`。两轮定向调查已汇入[第一批记录](exploration/geometry-harvest-batch1.md#motion-investigation-20260923)；[反馈登记](exploration/toybox-playtest.md)明确重新接入、整体节奏、弹簧衔接和挡板反馈等后续问题，[方案](exploration/harvest-refinement-plan.md#feedback-refinement-20260923)记录准备方向与候选边界。本次仅文档工作并提交，后续代码未启动；第二、三批及main合入仍等待相应检查。下方为历史现场。
 
 > 2026-09-13 当前状态：V0.2.0 随机对象、有效挡板动作资格、Wake/Continue 收尾已实现并完成本轮机器与渲染检查，按用户授权合入 main 后连续进入广泛物理玩具探索。当前入口为[新方向](exploration/physical-toy-exploration.md)、[实现基线](design/design-baseline-v0.2.0.md)、[收口记录](reviews/v0.2.0-consolidation.md)。以下2026-09-11及更早状态为历史，不能覆盖本轮授权或作为新玩法的提前筛选门槛。
 

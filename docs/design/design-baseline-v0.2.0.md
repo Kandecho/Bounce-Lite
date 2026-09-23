@@ -1,5 +1,7 @@
 # Bounce Lite V0.2.0 实现基线
 
+> 2026-09-23说明：本文继续描述main `f792d3b`（代码 `e905580`）的历史底座，不改写其已实现参数。候选分支 `d761c98` 的实际行为及新发现见[第一批调查](../exploration/geometry-harvest-batch1.md#motion-investigation-20260923)，待处理问题与方案见[反馈登记](../exploration/toybox-playtest.md)、[harvest方案](../exploration/harvest-refinement-plan.md#feedback-refinement-20260923)。速度和反馈准备方向尚未实施或合入main。
+
 日期：2026-09-13。整理：Codex；运行时与测试由 low 推理实现代理完成，主代理复核。
 
 本文件描述 V0.2.0 收尾的实际行为。合入与检验证据见[收口记录](../reviews/v0.2.0-consolidation.md)。新探索方向见[物理电子玩具探索](../exploration/physical-toy-exploration.md)；本基线提供可返回对照，不用作新玩法的事前筛选规则。
