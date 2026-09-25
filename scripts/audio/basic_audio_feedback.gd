@@ -86,7 +86,8 @@ func on_surface_resolved(result: RefCounted) -> void:
 	var approach_speed: float = -result.velocity_before.dot(result.normal)
 	if result.surface_kind == Surface.SurfaceKind.PADDLE and (result.valid_paddle_hit or approach_speed >= 45.0):
 		# Physical Paddle contact can sound without being a valid vitality-restoring hit.
-		request_sound(Event.PADDLE)
+		var strength := clampf((approach_speed - 45.0) / 375.0, 0.0, 1.0)
+		request_sound(Event.PADDLE, lerpf(-2.0, 2.0, strength), lerpf(0.96, 1.08, strength))
 	elif result.effective_surface_kind == Surface.SurfaceKind.GROUND:
 		# Ignore tiny normal motion at settle/rolling; tangential speed is irrelevant.
 		if -result.velocity_before.dot(result.normal) >= 45.0:
@@ -102,16 +103,20 @@ func on_wake_committed(_strength: float, activated: bool, _position: Vector2) ->
 		request_sound(Event.WAKE)
 
 
-func request_sound(event: int, gain_db: float = 0.0) -> bool:
+func request_sound(event: int, gain_db: float = 0.0, pitch: float = -1.0) -> bool:
 	if muted or event < 0 or event >= FILES.size():
 		return false
 	if _elapsed - _last_event[event] + 0.000001 < COOLDOWN[event]:
 		return false
 	if _elapsed - _last_any + 0.000001 < BURST_GAP:
-		if _last_kind != Event.WALL or event == Event.WALL:
+		if not ((_last_kind == Event.WALL and event != Event.WALL) or (_last_kind == Event.GROUND and event == Event.PADDLE)):
 			return false
-		# Quiet boundary accents cannot suppress a primary interaction.
-		players[Event.WALL].stop()
+		# A Ground voice may finish under one prioritized Paddle cue. Cooldowns
+		# and the burst gate still bound the overlap.
+		if _last_kind == Event.WALL:
+			players[Event.WALL].stop()
+		elif _last_kind == Event.GROUND and event == Event.PADDLE:
+			players[Event.GROUND].volume_db = VOLUME_DB[Event.GROUND] - 8.0
 	_last_event[event] = _elapsed
 	_last_any = _elapsed
 	_last_kind = event
@@ -119,6 +124,7 @@ func request_sound(event: int, gain_db: float = 0.0) -> bool:
 	var player := players[event]
 	player.stream = candidates[event][selected[event]]
 	player.volume_db = VOLUME_DB[event] + gain_db
+	player.pitch_scale = PITCH_SCALE[event] if pitch <= 0.0 else pitch
 	if is_inside_tree():
 		player.play(START_SECONDS[event][selected[event]])
 	return true

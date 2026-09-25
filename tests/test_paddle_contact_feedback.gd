@@ -1,0 +1,87 @@
+extends RefCounted
+
+const Ball = preload("res://scripts/ball/ball_controller.gd")
+const Visuals = preload("res://scripts/ball/ball_visuals.gd")
+const Paddle = preload("res://scripts/paddle/paddle_controller.gd")
+const Audio = preload("res://scripts/audio/basic_audio_feedback.gd")
+const Surface = preload("res://scripts/physics/surface_response_model.gd")
+const Tuning = preload("res://scripts/config/prototype_tuning.gd")
+
+func run(suite: RefCounted) -> void:
+	var tuning: Resource = Tuning.new()
+	var paddle: CharacterBody2D = Paddle.new()
+	paddle.configure(tuning, 175, 786, 570)
+	var ball: CharacterBody2D = Ball.new()
+	var visuals: Node2D = Visuals.new()
+	visuals.name = "Visuals"
+	ball.add_child(visuals)
+	ball.configure(tuning)
+	var events: Array[RefCounted] = []
+	ball.surface_resolved.connect(func(result: RefCounted): events.append(result))
+	ball.surface_resolved.connect(func(result: RefCounted): paddle.on_surface_resolved(result, Vector2(480, 550)))
+	if not paddle.has_method("contact_strength") or not paddle.has_method("on_surface_resolved"):
+		suite.expect_true(false, "Paddle lacks independent resolved-contact feedback")
+		ball.free()
+		paddle.free()
+		return
+	paddle.set_target_x(510)
+	paddle.advance_motion(1.0 / 60.0)
+	suite.expect_float(paddle.contact_strength(), 0.0, 0.0001, "mouse-only motion cannot create contact accent")
+	for speed in [60.0, 220.0, 900.0]:
+		paddle.advance_feedback(1.0)
+		visuals.advance_feedback(1.0)
+		ball.vitality_model.set_vitality(1.0)
+		ball.velocity = Vector2(900, speed)
+		ball.resolve_surface_collision(Surface.SurfaceKind.PADDLE, Vector2.UP, true)
+		suite.expect_true(paddle.contact_strength() > 0.0, "real top impact is visible at full Vitality")
+		suite.expect_true(visuals.deformation.y < 1.0, "real top impact compresses Ball")
+		if speed == 60.0:
+			var weak: float = paddle.contact_strength()
+			var weak_squash: float = visuals.deformation.y
+			suite.expect_true(weak < 0.5 and weak_squash > 0.82, "weak impact stays restrained despite high tangential speed")
+		if speed == 220.0:
+			suite.expect_true(paddle.contact_strength() > 0.5, "medium normal impact exceeds weak")
+		if speed == 900.0:
+			suite.expect_true(paddle.contact_strength() <= 1.0 and visuals.deformation.y >= 0.78, "large normal impact is capped")
+	paddle.advance_feedback(1.0)
+	visuals.advance_feedback(1.0)
+	ball.vitality_model.set_vitality(0.05)
+	ball.velocity = Vector2(0, 180)
+	ball.resolve_surface_collision(Surface.SurfaceKind.PADDLE, Vector2.UP, true)
+	suite.expect_true(paddle.contact_strength() > 0.0, "low Vitality top hit still has independent contact accent")
+	paddle.advance_feedback(1.0)
+	ball.velocity = Vector2(180, 0)
+	ball.resolve_surface_collision(Surface.SurfaceKind.PADDLE, Vector2.LEFT, false)
+	suite.expect_true(paddle.contact_strength() > 0.0 and paddle.contact_normal().x < -0.5, "real side impact accents side without restoration")
+	paddle.advance_feedback(1.0)
+	ball.velocity = Vector2(0, -180)
+	ball.resolve_surface_collision(Surface.SurfaceKind.PADDLE, Vector2.DOWN, false)
+	suite.expect_true(paddle.contact_strength() > 0.0 and paddle.contact_normal().y > 0.5, "real underside impact accents bottom")
+	paddle.advance_feedback(1.0)
+	suite.expect_float(paddle.contact_strength(), 0.0, 0.0001, "contact accent fully recovers")
+	suite.expect_equal(events.size(), 6, "only six resolved contacts emitted")
+	var audio: Node = Audio.new()
+	audio.initialize()
+	audio.on_surface_resolved(events[0])
+	var weak_volume: float = audio.players[0].volume_db
+	var weak_pitch: float = audio.players[0].pitch_scale
+	audio.advance_time(0.2)
+	audio.on_surface_resolved(events[2])
+	suite.expect_true(audio.players[0].volume_db > weak_volume and audio.players[0].pitch_scale > weak_pitch, "strong normal hit sounds distinct from weak")
+	audio.advance_time(0.2)
+	audio.request_sound(audio.Event.GROUND)
+	var ground_volume: float = audio.players[audio.Event.GROUND].volume_db
+	audio.advance_time(0.02)
+	suite.expect_true(audio.request_sound(audio.Event.PADDLE), "Paddle wins within 40 ms of Ground")
+	suite.expect_true(audio.players[audio.Event.GROUND].volume_db < ground_volume, "prior Ground voice yields to Paddle without a hard stop")
+	suite.expect_false(audio.request_sound(audio.Event.PADDLE), "priority does not bypass Paddle cooldown")
+	suite.expect_float(audio.players[audio.Event.GROUND].volume_db, ground_volume - 8.0, 0.0001, "priority ducks Ground once by a bounded amount")
+	audio.advance_time(0.2)
+	suite.expect_true(audio.request_sound(audio.Event.GROUND), "later Ground may sound independently")
+	suite.expect_float(audio.players[audio.Event.GROUND].volume_db, ground_volume, 0.0001, "new Ground voice restores its base level")
+	audio.advance_time(0.02)
+	suite.expect_true(audio.request_sound(audio.Event.PADDLE), "later Ground to Paddle pair remains eligible")
+	suite.expect_float(audio.players[audio.Event.GROUND].volume_db, ground_volume - 8.0, 0.0001, "repeated priority does not accumulate ducking")
+	audio.free()
+	ball.free()
+	paddle.free()

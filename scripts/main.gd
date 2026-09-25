@@ -71,6 +71,7 @@ func _ready() -> void:
 
 	paddle.interaction_sampled.connect(_on_paddle_interaction_sampled)
 	ball.paddle_energy_transferred.connect(paddle.play_energy_transfer)
+	ball.surface_resolved.connect(_on_paddle_surface_resolved)
 	ball.surface_resolved.connect(_on_surface_audio)
 	ball.wake_committed.connect($BasicAudio.on_wake_committed)
 
@@ -140,6 +141,10 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_F7:
 		_set_e01_enabled(not tuning.e01_contact_enabled)
 		get_viewport().set_input_as_handled()
+
+
+func _on_paddle_surface_resolved(result: RefCounted) -> void:
+	paddle.on_surface_resolved(result, ball.global_position)
 
 
 func _on_surface_audio(result: RefCounted) -> void:

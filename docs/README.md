@@ -1,10 +1,10 @@
 # 文档导航与生命周期
 
-## 当前入口（2026-09-23）
+## 当前入口（2026-09-25）
 
 - [代理模型与执行纪律](../AGENTS.md#agent-execution-policy)：唯一维护入口；Astra主代理（强度由用户控制）、Sol medium普通实现、Luna medium明确小活；定义审查触发条件、集成责任与可审计交付格式。历史low代理记录按当时事实保留。
-- [第一批几何／机械集成记录](exploration/geometry-harvest-batch1.md)：当前1.5×与弹簧停点，保留 `60e3516` 第一运动A/B、`d761c98` 安全停点及两轮调查的证据边界。
-- [分批集成与打磨方案](exploration/harvest-refinement-plan.md)：最新方向；先处理已登记的基础手感问题，再依人工检查推进机制族，长期试玩决定结构。本轮推进1.5×尺度与弹簧衔接，完成后人工检查。
+- [第一批几何／机械集成记录](exploration/geometry-harvest-batch1.md)：当前F09接触反馈停点；1.5×与弹簧已获试玩通过，保留 `60e3516` 第一运动A/B、`d761c98` 安全停点及两轮调查的证据边界。
+- [分批集成与打磨方案](exploration/harvest-refinement-plan.md)：最新方向；先处理已登记的基础手感问题，再依人工检查推进机制族，长期试玩决定结构。本轮推进独立挡板接触反馈，完成后人工检查。
 - [物理电子玩具探索](exploration/physical-toy-exploration.md)：广度探索收获、实际试玩后的筛选决定及历史来源。
 - [游乐场试玩记录](exploration/toybox-playtest.md)：正式反馈登记F01–F09及T01，区分准备解决、持续跟踪、已实施待验收与候选方案；原始反馈文件保持原文且未跟踪。
 - [V0.2.0 实现基线](design/design-baseline-v0.2.0.md)：随机对象、真实动作资格、Wake/Continue 与现有底座。

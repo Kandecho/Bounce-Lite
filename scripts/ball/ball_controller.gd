@@ -385,7 +385,7 @@ func resolve_surface_collision(kind: int, normal: Vector2, valid_paddle_hit: boo
 		geometry_contacts.on_contact_committed(collider, result, global_position)
 	if result.valid_paddle_hit and transferred > 0.0:
 		paddle_energy_transferred.emit(transferred)
-	_play_collision_feedback(result.effective_surface_kind, normal)
+	_play_collision_feedback(result.surface_kind, normal, maxf(0.0, -result.velocity_before.dot(normal.normalized())))
 
 
 func advance_resting_time(delta: float) -> void:
@@ -496,10 +496,10 @@ func _record_motion(delta: float) -> void:
 		visuals.advance_motion_history(global_position, delta)
 
 
-func _play_collision_feedback(kind: int, normal: Vector2) -> void:
+func _play_collision_feedback(kind: int, normal: Vector2, approach_speed: float) -> void:
 	var visuals := get_node_or_null("Visuals")
 	if visuals != null and visuals.has_method("play_collision_feedback"):
-		visuals.play_collision_feedback(kind, normal)
+		visuals.play_collision_feedback(kind, normal, approach_speed)
 
 
 func configure_support(paddle: Node2D) -> void:

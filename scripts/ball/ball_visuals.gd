@@ -133,13 +133,14 @@ func trail_ghosts() -> Array[Vector2]:
 	return ghosts
 
 
-func play_collision_feedback(kind: int, normal: Vector2) -> void:
+func play_collision_feedback(kind: int, normal: Vector2, approach_speed: float = 250.0) -> void:
 	# Instant decoration is geometric only. Core/Glow never read event pulses.
 	var squash: float = tuning.wall_hit_squash
 	var stretch := 1.08
 	if kind == SurfaceResponseModelScript.SurfaceKind.PADDLE:
-		squash = tuning.paddle_hit_squash
-		stretch = 1.24
+		var strength := clampf((maxf(approach_speed, 0.0) - 30.0) / 390.0, 0.0, 1.0)
+		squash = lerpf(0.96, 0.80, strength)
+		stretch = lerpf(1.04, 1.18, strength)
 	elif kind == SurfaceResponseModelScript.SurfaceKind.GROUND:
 		squash = tuning.ground_hit_squash
 		stretch = 1.16

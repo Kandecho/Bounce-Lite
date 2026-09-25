@@ -1,6 +1,6 @@
 # Bounce Lite Visual Specification
 
-> 2026-09-23 当前入口：第一运动A/B已保存为 `60e3516`；用户随后选择速度1.5×／重力2.25×并继续弹簧refinement，实际范围与证据见[最新停点](exploration/geometry-harvest-batch1.md#spring-refinement-15x)。挡板保持y570，独立接触反馈未进入本轮，main仍为 `f792d3b`。下方历史参数、实施时点与验收不覆盖当前记录。
+> 2026-09-25 当前入口：本轮处理F09球—挡板独立接触反馈，有限法向力度视觉响应、声音层次及地面音优先级见[本轮记录](exploration/geometry-harvest-batch1.md#paddle-feedback-20260925)。保留Vitality传递变暗、已通过的1.5×运动与弹簧动作；下方旧冻结说明不覆盖此次明确授权。
 
 > 2026-09-11 当前分支说明：本文件保留 V0.1 规格及历史验收。当前依据为 [V0.2.0 Design Note](design/v0.2.0-design-note.md)，实际已实现方案 B、挡板传能变暗和全客户区场地，见[共享小世界记录](exploration/v0.2-shared-world.md)。Wake／Continue 表现交换仍在[后续计划](exploration/v0.2.0-follow-up-plan.md)中；下文冻结规格不覆盖当前决定。
 
