@@ -4,6 +4,7 @@ const SAMPLE_RATE := 22050
 const MAX_VOICES := 3
 # frequency, length, pitch sweep, overtone ratio, overtone weight, noise weight
 const TONES := {
+	"toy_portal": [620.0, 0.16, -360.0, 2.0, 0.20, 0.025],
 	"toy_bumper": [210.0, 0.23, -95.0, 2.0, 0.20, 0.01],
 	"toy_sling": [510.0, 0.105, -160.0, 2.7, 0.16, 0.16],
 	"toy_ramp": [760.0, 0.075, -30.0, 3.1, 0.22, 0.10],
@@ -14,7 +15,7 @@ const TONES := {
 	"toy_spring_release": [310.0, 0.22, 220.0, 2.02, 0.30, 0.025],
 	"toy_seesaw": [285.0, 0.13, -40.0, 3.7, 0.32, 0.19],
 }
-const COOLDOWNS := {"toy_bumper": 0.12, "toy_sling": 0.12, "toy_ramp": 0.09, "toy_platform": 0.10, "toy_spring": 0.18, "toy_spring_seat": 0.18, "toy_spring_compress": 0.20, "toy_spring_release": 0.18, "toy_seesaw": 0.14}
+const COOLDOWNS := {"toy_portal": 0.12, "toy_bumper": 0.12, "toy_sling": 0.12, "toy_ramp": 0.09, "toy_platform": 0.10, "toy_spring": 0.18, "toy_spring_seat": 0.18, "toy_spring_compress": 0.20, "toy_spring_release": 0.18, "toy_seesaw": 0.14}
 var muted := false
 var streams: Dictionary = {}
 var players: Array[AudioStreamPlayer] = []

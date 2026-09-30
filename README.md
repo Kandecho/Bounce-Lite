@@ -6,9 +6,9 @@ Bounce Lite 是一个物理电子玩具。移动鼠标控制挡板，让球与�
 
 main已集成第一批几何／机械，后续在 `codex/harvest-geometry` 开发：单球、圆形弹跳器、三角侧踢、斜面、平台、弹簧、摆板。机关随机出现、停留和离场，允许同类并存，由实际物理产生组合。
 
-**当前按 [harvest + refinement](docs/exploration/harvest-refinement-plan.md) 逐批集成**：每批完成后更新文档、停止并等待人工检查。第一批记录见[几何／机械集成](docs/exploration/geometry-harvest-batch1.md)。第二批传送门已按10月1日用户授权在实验分支启动，第三批普通砖／反向砖尚未启动；结构由长期试玩后决定，场力、多球与抓球保留原实验成果。
+**当前按 [harvest + refinement](docs/exploration/harvest-refinement-plan.md) 逐批集成**：每批完成后更新文档、停止并等待人工检查。第一批记录见[几何／机械集成](docs/exploration/geometry-harvest-batch1.md)。第二批传送门已按10月1日用户授权在实验分支完成实现与必要验证，待人工试玩，第三批普通砖／反向砖尚未启动；结构由长期试玩后决定，场力、多球与抓球保留原实验成果。
 
-**当前进度**：2026-10-01 当前状态：第一批几何与原有转子／能量块共存已在 `fa099e4` 实现并本地快进合入main；旧main `f792d3b` 和纯几何停点 `287ac0c` 保留可返回。默认单球六类几何与转子／能量块共同运行，纯几何及底座对照仍可用。1.5×速度／2.25×重力与弹簧0.20秒／50%有上限横速此前已获用户试玩通过；独立亮边已撤下，其余球形变、声音层次及Vitality变暗保留。2026-10-01用户已反馈共存版“集成后体验良好”；现按原计划在 `codex/harvest-geometry` 启动第二批传送门，main保持 `79b9de0`，砖块未启动。 [集成范围与证据边界](docs/exploration/harvest-refinement-plan.md#portal-harvest-20261001)。
+**当前进度**：2026-10-01 当前状态：第一批几何与原有转子／能量块共存已在 `fa099e4` 实现并本地快进合入main；旧main `f792d3b` 和纯几何停点 `287ac0c` 保留可返回。默认单球六类几何与转子／能量块共同运行，纯几何及底座对照仍可用。1.5×速度／2.25×重力与弹簧0.20秒／50%有上限横速此前已获用户试玩通过；独立亮边已撤下，其余球形变、声音层次及Vitality变暗保留。2026-10-01用户已反馈共存版“集成后体验良好”；第二批传送门已在 `codex/harvest-geometry` 实现并通过必要机器验证，现停在人工试玩点；main保持 `79b9de0`，砖块未启动。 [集成范围与证据边界](docs/exploration/harvest-refinement-plan.md#portal-harvest-20261001)。
 
 ## 核心体验
 
@@ -43,24 +43,25 @@ F1 打开开发调参与 `DEV ELAPSED` 观察计数器；计数器持续累计�
 
 两个入口均为纯几何对照，默认同一随机种子184；窗口标题与日志标明profile。两档都使用本轮弹簧动作，1.5×也是无参数启动的默认尺度，挡板均保持y570。寿命、生成与机械时间不机械倍乘。2×强对照保留在 `60e3516`；本轮生效参数、快照兼容和证据见[弹簧停点记录](docs/exploration/geometry-harvest-batch1.md#spring-refinement-15x)。
 
-## 运行第一批试玩
+## 运行第二批门户试玩与对照
 
-配置下述Godot路径后，双击 [run-playtest.bat](run-playtest.bat) 或在编辑器按F5，进入单球几何／机械与原有转子、能量块的默认共存场景。[run-geometry.bat](run-geometry.bat) 显式使用 `--geometry-only`，保留原单球纯几何对照。
+配置下述Godot路径后，双击 [run-playtest.bat](run-playtest.bat) 或在编辑器按F5，进入单球几何／机械、原有转子／能量块与成对门户的默认实验场景。门户首次在8–14秒后淡入，最多一对，规则与本轮证据见[第二批记录](docs/exploration/portal-harvest-batch2.md)。[run-geometry.bat](run-geometry.bat) 显式使用 `--geometry-only`，保留原单球纯几何对照。
 
 - 鼠标移动挡板，接球或在休息球附近拨动挡板。
 - R按当前种子重开场景，N换种子。
 - F8保存机关组合，F9恢复组合后安全重新发单球。
 - H显示开发快捷键；F1调参、F5静音、F7切换E01沿用。
 
-启动参数 `--geometry-only` 选择纯几何，`--geometry-baseline` 返回V0.2.0底座，`--geometry-fixed` 使用六类机关的固定开发对照，`--geometry-seed=184` 使用指定种子。直接调用 Godot 时，把这些参数放在 `--` 之后。同种子仍受输入与合法生成重试影响，快照更适合保存已经出现的组合；新的几何快照与旧游乐场快照区分类型。
+启动参数 `--no-portals` 返回已通过试玩的第一批共存对照；`--geometry-only` 选择纯几何，`--geometry-baseline` 返回V0.2.0底座，`--geometry-fixed` 使用六类机关的固定开发对照，`--geometry-seed=184` 使用指定种子。直接调用 Godot 时，把这些参数放在 `--` 之后。同种子仍受输入与合法生成重试影响，快照更适合保存已经出现的组合；新的几何快照与旧游乐场快照区分类型。
 
-指定几何种子开始试玩：
+指定种子试玩门户，或打开无门户对照（启动器现可转发游戏参数）：
 
 ```powershell
-.\run-geometry.bat --geometry-seed=184
+.\run-playtest.bat --geometry-seed=184
+.\run-playtest.bat --no-portals --geometry-seed=184
 ```
 
-仓库附带[初版自然演化30秒的几何快照](docs/exploration/snapshots/geometry-batch1-184-30s.json)，仅适用于 `ee6b25b` 的version1对照。refinement更改机械与生成规则，旧快照不能静默作为新版组合加载；当前version2组合还必须包含匹配的motion_profile和 `rules=spring-200ms-lateral50-motion150`；旧规则或另一档记录会被拒绝，需回原版本打开。共存快照另含 `world_mode=coexistence` 及原世界对象、随机源和计时状态；纯几何为 `geometry-only`，缺少模式的旧version2按纯几何处理，仅纯几何入口接受。共存最近快照保存在 `.godot/geometry-snapshots/latest-coexistence.json`，纯几何仍为 `latest.json`，两个入口不覆盖彼此。R／N在共存模式同步重开两族对象；F9恢复组合后安全发球，快照不是球轨迹、输入或F1设置的完整重播。
+仓库附带[初版自然演化30秒的几何快照](docs/exploration/snapshots/geometry-batch1-184-30s.json)，仅适用于 `ee6b25b` 的version1对照。refinement更改机械与生成规则，旧快照不能静默作为新版组合加载；无门户version2组合还必须包含匹配的motion_profile和 `rules=spring-200ms-lateral50-motion150`；旧规则或另一档记录会被拒绝，需回原版本打开。共存快照另含 `world_mode=coexistence` 及原世界对象、随机源和计时状态；纯几何为 `geometry-only`，缺少模式的旧version2按纯几何处理，仅纯几何入口接受。共存最近快照保存在 `.godot/geometry-snapshots/latest-coexistence.json`，纯几何仍为 `latest.json`，两个入口不覆盖彼此。默认门户组合为version3／`world_mode=coexistence-portals`，最新文件为 `.godot/geometry-snapshots/latest-portals.json`；包含门户双口、阶段、计时与随机进度。默认v3拒绝旧v2，旧共存用 `--no-portals` 打开，三类最近组合互不覆盖。R／N同步重开当前模式的对象与门户；F9恢复组合后安全发球，快照不是球轨迹、输入或F1设置的完整重播。
 
 ### 使用 Godot 编辑器
 

@@ -12,6 +12,7 @@ var tuning: Resource = PrototypeTuningScript.new()
 var play_world: Node2D
 var world_feedback: Node2D
 var geometry_playground: Node2D
+var portals: Node2D
 var geometry_enabled := true
 
 @onready var ball: CharacterBody2D = $GameArea/Ball
@@ -85,6 +86,11 @@ func _ready() -> void:
 		geometry_playground = load("res://scripts/world/geometry_playground.gd").new()
 		geometry_playground.name = "GeometryPlayground"
 		$GameArea.add_child(geometry_playground)
+		if is_instance_valid(play_world) and not OS.get_cmdline_user_args().has("--no-portals"):
+			portals = load("res://scripts/world/portal_toys.gd").new()
+			portals.name = "Portals"
+			$GameArea.add_child(portals)
+			ball.portal_contacts = portals
 		geometry_playground.configure(self)
 
 

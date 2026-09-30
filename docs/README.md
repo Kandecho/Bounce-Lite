@@ -4,13 +4,13 @@
 
 - [代理模型与执行纪律](../AGENTS.md#agent-execution-policy)：子代理统一6.1 Sol（`gpt-6.1-sol`），medium为执行选择，主代理保持当前配置；职责、审查触发、集成责任与可审计交付规则继续适用，历史配置保留真实归属。
 - [第一批几何／机械集成记录](exploration/geometry-harvest-batch1.md#coexistence-result-20260930)：`fa099e4`已集成main，共存机器验证及动态证据通过，10月1日用户反馈体验良好。
-- [分批集成与打磨方案](exploration/harvest-refinement-plan.md#portal-harvest-20261001)：第一批已通过用户试玩，第二批传送门在实验分支启动；main保持79b9de0，砖块未启动。
+- [分批集成与打磨方案](exploration/harvest-refinement-plan.md#portal-harvest-20261001)：第一批已通过用户试玩，第二批传送门已在实验分支实现并通过必要机器验证，待试玩；main保持79b9de0，砖块未启动。
 - [物理电子玩具探索](exploration/physical-toy-exploration.md)：广度探索收获、实际试玩后的筛选决定及历史来源。
 - [游乐场试玩记录](exploration/toybox-playtest.md)：正式反馈登记F01–F09及T01，区分准备解决、持续跟踪、已实施待验收与候选方案；原始反馈文件保持原文且未跟踪。
 - [V0.2.0 实现基线](design/design-baseline-v0.2.0.md)：随机对象、真实动作资格、Wake/Continue 与现有底座。
 - [V0.2.0 收口记录](reviews/v0.2.0-consolidation.md)：本轮验证、Git 状态和体验边界。
 
-- [第二批传送门记录](exploration/portal-harvest-batch2.md)：低数量／低频率／高存在感的成对门户迁移与验证。
+- [第二批传送门记录](exploration/portal-harvest-batch2.md)：已实现的成对门户、临时参数、模式／快照、机器验证及自然传送画面；待用户试玩。
 
 下方保留旧版文档导航的历史状态描述；是否已实现以对应提交与实现记录为准，当前工作范围以最新方案和用户请求为准，历史停止要求不覆盖最新明确授权；新组合体验仍待人工判断。
 

@@ -35,6 +35,10 @@ func configure(host: Node2D) -> void:
 	add_child(feedback)
 	toys.event_emitted.connect(feedback.on_geometry_event)
 	toys.event_emitted.connect(_on_event)
+	if is_instance_valid(main.portals):
+		main.portals.event_emitted.connect(feedback.on_geometry_event)
+		main.portals.event_emitted.connect(_on_event)
+		latest_path = "res://.godot/geometry-snapshots/latest-portals.json"
 	_create_hint()
 	world_seed = maxi(1, randi() & 0x7fffffff)
 	fixed_layout = OS.get_cmdline_user_args().has("--geometry-fixed")
@@ -51,6 +55,7 @@ func configure(host: Node2D) -> void:
 		_queue_restart()
 	else:
 		toys.set_random_mode(true, world_seed)
+	if is_instance_valid(main.portals): main.portals.configure(main,world_seed)
 	for argument in OS.get_cmdline_user_args():
 		if argument.begins_with("--geometry-snapshot="):
 			restore_combination(argument.trim_prefix("--geometry-snapshot="))
@@ -62,6 +67,7 @@ func restart_world(seed_value: int) -> void:
 	elapsed = 0.0
 	events.clear()
 	if is_instance_valid(main.play_world): main.play_world.restart(world_seed)
+	if is_instance_valid(main.portals): main.portals.restart(world_seed)
 	if fixed_layout:
 		toys.set_layout(1)
 		if is_instance_valid(main.play_world): main.play_world.reconcile_fixed_geometry()
@@ -71,6 +77,7 @@ func restart_world(seed_value: int) -> void:
 
 func _queue_restart() -> void:
 	main.ball.clear_geometry_relationships()
+	if is_instance_valid(main.portals): main.portals.cooldowns.clear()
 	_restart_pending = true
 	_restart_wait = 2
 	main.ball.visible = false
@@ -118,10 +125,14 @@ func save_combination() -> bool:
 	if DirAccess.make_dir_recursive_absolute(directory) != OK:
 		show_notice("记录失败：无法创建目录")
 		return false
-	var data := {"profile": PROFILE, "version": 2, "rules": RULES, "motion_profile": main.tuning.motion_profile, "seed": world_seed, "time": elapsed,
+	var has_portals := is_instance_valid(main.portals)
+	var data := {"profile": PROFILE, "version": 3 if has_portals else 2, "rules": RULES, "motion_profile": main.tuning.motion_profile, "seed": world_seed, "time": elapsed,
 		"fixed": fixed_layout, "geometry": toys.export_snapshot(), "journal": toys.lifecycle_events,
 		"ball_observation": {"position": [main.ball.position.x, main.ball.position.y], "velocity": [main.ball.velocity.x, main.ball.velocity.y]}}
 	data.world_mode = "coexistence" if is_instance_valid(main.play_world) else "geometry-only"
+	if has_portals:
+		data.world_mode = "coexistence-portals"
+		data.portals = main.portals.export_snapshot()
 	if is_instance_valid(main.play_world): data.world = main.play_world.export_snapshot()
 	last_saved_path = directory + "/%s-%d-%d.json" % [data.world_mode, world_seed, Time.get_ticks_msec()]
 	for path in [last_saved_path, latest_path]:
@@ -140,7 +151,8 @@ func restore_combination(source_path: String = "") -> bool:
 		show_notice("先按 F8 记录本批组合")
 		return false
 	var data = JSON.parse_string(FileAccess.get_file_as_string(path))
-	if not data is Dictionary or data.get("profile") != PROFILE or data.get("version") != 2 or not data.get("geometry") is Dictionary:
+	var has_portals := is_instance_valid(main.portals)
+	if not data is Dictionary or data.get("profile") != PROFILE or data.get("version") != (3 if has_portals else 2) or not data.get("geometry") is Dictionary:
 		show_notice("不是本批几何组合记录")
 		return false
 	if data.get("motion_profile", "") != main.tuning.motion_profile:
@@ -150,16 +162,21 @@ func restore_combination(source_path: String = "") -> bool:
 		show_notice("机关规则不匹配；旧记录需在原版打开")
 		return false
 	var mode := "coexistence" if is_instance_valid(main.play_world) else "geometry-only"
+	if has_portals: mode = "coexistence-portals"
 	if data.get("world_mode", "geometry-only") != mode:
 		show_notice("组合模式不匹配；请使用对应入口")
 		return false
-	if mode == "coexistence" and (not data.get("world") is Dictionary or not main.play_world.snapshot_valid(data.world)):
+	if mode != "geometry-only" and (not data.get("world") is Dictionary or not main.play_world.snapshot_valid(data.world)):
 		show_notice("共存状态缺失或无效")
+		return false
+	if has_portals and (not data.get("portals") is Dictionary or not main.portals.snapshot_valid(data.portals)):
+		show_notice("门户组合状态缺失或无效")
 		return false
 	if not toys.restore_snapshot(data.geometry):
 		show_notice("组合恢复失败")
 		return false
-	if mode == "coexistence": main.play_world.restore_snapshot(data.world)
+	if mode != "geometry-only": main.play_world.restore_snapshot(data.world)
+	if has_portals: main.portals.restore_snapshot(data.portals)
 	toys.clear_spring_holds()
 	world_seed = int(data.seed)
 	elapsed = float(data.time)

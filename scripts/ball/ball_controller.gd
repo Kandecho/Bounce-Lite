@@ -15,6 +15,7 @@ signal paddle_energy_transferred(amount: float)
 
 var play_rhythm: RefCounted = PlayRhythm.new()
 var geometry_contacts: Node
+var portal_contacts: Node
 var support_geometry: CollisionObject2D
 var spring_hold: CollisionObject2D
 var _spring_elapsed := 0.0
@@ -83,7 +84,17 @@ func _physics_process(delta: float) -> void:
 	for collision_index in range(MAX_COLLISIONS_PER_FRAME):
 		if remaining_motion.length_squared() <= MOTION_EPSILON * MOTION_EPSILON:
 			break
+		var start_point := global_position
+		var attempted_motion := remaining_motion
 		var collision := move_and_collide(remaining_motion)
+		# Scan only actual unobstructed travel, before resolving its end contact.
+		if is_instance_valid(portal_contacts) and not is_resting() and not is_instance_valid(spring_hold):
+			var request: Dictionary = portal_contacts.motion_request(start_point,global_position,velocity,tuning.ball_radius,self)
+			if not request.is_empty() and commit_portal(request):
+				var travel_length := collision.get_travel().length() if collision != null else attempted_motion.length()
+				var consumed := travel_length * float(request.fraction)
+				remaining_motion = velocity.normalized() * maxf(0.0,attempted_motion.length()-consumed)
+				continue
 		if collision == null:
 			break
 		var normal := collision.get_normal()
@@ -124,6 +135,18 @@ func _physics_process(delta: float) -> void:
 
 func configure_arena(inner_faces: Rect2) -> void:
 	arena_bounds = inner_faces
+
+func commit_portal(request: Dictionary) -> bool:
+	if not is_instance_valid(portal_contacts) or not portal_contacts.can_commit(request,self): return false
+	global_position=request.position
+	velocity=request.velocity
+	support_kind=SupportKind.NONE
+	support_geometry=null
+	var visuals:=get_node_or_null("Visuals")
+	if visuals!=null and visuals.has_method("clear_motion_history"): visuals.clear_motion_history()
+	portal_contacts.on_motion_committed(request,self)
+	_update_visuals()
+	return true
 
 
 func _resolve_shallow_ground_contact() -> void:

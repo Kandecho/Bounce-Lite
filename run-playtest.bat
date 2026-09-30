@@ -14,14 +14,14 @@ if "%~1"=="" goto :play
 if /I "%~1"=="--editor" goto :editor
 if /I "%~1"=="--test" goto :test
 if /I "%~1"=="--check" goto :check
-goto :usage
+goto :play
 
 :play
 pushd "%PROJECT_DIR%"
 echo Starting Bounce Lite from:
 echo   %PROJECT_DIR%
 echo.
-"%GODOT_CONSOLE%" --log-file "%PROJECT_DIR%\.godot\playtest.log" --path "%PROJECT_DIR%"
+"%GODOT_CONSOLE%" --log-file "%PROJECT_DIR%\.godot\playtest.log" --path "%PROJECT_DIR%" -- %*
 set "RESULT=%ERRORLEVEL%"
 popd
 echo.
@@ -74,6 +74,8 @@ exit /b 1
 :usage
 echo Usage:
 echo   run-playtest.bat           Run the game and keep the console log.
+echo   run-playtest.bat --no-portals  Run the accepted world without portals.
+echo   Game arguments such as --geometry-seed=184 are passed to the game.
 echo   run-playtest.bat --editor  Open the project in the Godot editor.
 echo   run-playtest.bat --test    Run deterministic headless tests.
 echo   run-playtest.bat --check   Print resolved paths and Godot version.
