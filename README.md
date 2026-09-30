@@ -36,23 +36,23 @@ F1 打开开发调参与 `DEV ELAPSED` 观察计数器；计数器持续累计�
 
 详细进度与版本路线见[项目概览](docs/project_overview.md)。
 
-## 运动A/B直接试玩
+## 纯几何运动A/B对照
 
 - [1×运动对照](run-motion-current.bat)
-- [默认试玩：速度×1.5、重力×2.25](run-motion-fast.bat)
+- [1.5×运动对照（重力×2.25）](run-motion-fast.bat)
 
-两个入口默认同一随机种子184；窗口标题与日志标明profile。两档都使用本轮弹簧动作，1.5×也是无参数启动的默认尺度，挡板均保持y570。寿命、生成与机械时间不机械倍乘。2×强对照保留在 `60e3516`；本轮生效参数、快照兼容和证据见[弹簧停点记录](docs/exploration/geometry-harvest-batch1.md#spring-refinement-15x)。
+两个入口均为纯几何对照，默认同一随机种子184；窗口标题与日志标明profile。两档都使用本轮弹簧动作，1.5×也是无参数启动的默认尺度，挡板均保持y570。寿命、生成与机械时间不机械倍乘。2×强对照保留在 `60e3516`；本轮生效参数、快照兼容和证据见[弹簧停点记录](docs/exploration/geometry-harvest-batch1.md#spring-refinement-15x)。
 
 ## 运行第一批试玩
 
-配置下述 Godot 路径后，双击 [run-geometry.bat](run-geometry.bat) 进入单球随机几何场景；编辑器F5和原 [run-playtest.bat](run-playtest.bat) 也启动当前默认场景。
+配置下述Godot路径后，双击 [run-playtest.bat](run-playtest.bat) 或在编辑器按F5，进入单球几何／机械与原有转子、能量块的默认共存场景。[run-geometry.bat](run-geometry.bat) 显式使用 `--geometry-only`，保留原单球纯几何对照。
 
 - 鼠标移动挡板，接球或在休息球附近拨动挡板。
 - R按当前种子重开场景，N换种子。
 - F8保存机关组合，F9恢复组合后安全重新发单球。
 - H显示开发快捷键；F1调参、F5静音、F7切换E01沿用。
 
-启动参数 `--geometry-baseline` 返回V0.2.0底座，`--geometry-fixed` 使用六类机关的固定开发对照，`--geometry-seed=184` 使用指定种子。直接调用 Godot 时，把这些参数放在 `--` 之后。同种子仍受输入与合法生成重试影响，快照更适合保存已经出现的组合；新的几何快照与旧游乐场快照区分类型。
+启动参数 `--geometry-only` 选择纯几何，`--geometry-baseline` 返回V0.2.0底座，`--geometry-fixed` 使用六类机关的固定开发对照，`--geometry-seed=184` 使用指定种子。直接调用 Godot 时，把这些参数放在 `--` 之后。同种子仍受输入与合法生成重试影响，快照更适合保存已经出现的组合；新的几何快照与旧游乐场快照区分类型。
 
 指定几何种子开始试玩：
 
@@ -60,7 +60,7 @@ F1 打开开发调参与 `DEV ELAPSED` 观察计数器；计数器持续累计�
 .\run-geometry.bat --geometry-seed=184
 ```
 
-仓库附带[初版自然演化30秒的几何快照](docs/exploration/snapshots/geometry-batch1-184-30s.json)，仅适用于 `ee6b25b` 的version1对照。refinement更改机械与生成规则，旧快照不能静默作为新版组合加载；当前version2组合还必须包含匹配的motion_profile和 `rules=spring-200ms-lateral50-motion150`；旧规则或另一档记录会被拒绝，需回原版本打开。F8可保存本档新组合，快照不是输入或F1设置的完整重播。main尚未更新。
+仓库附带[初版自然演化30秒的几何快照](docs/exploration/snapshots/geometry-batch1-184-30s.json)，仅适用于 `ee6b25b` 的version1对照。refinement更改机械与生成规则，旧快照不能静默作为新版组合加载；当前version2组合还必须包含匹配的motion_profile和 `rules=spring-200ms-lateral50-motion150`；旧规则或另一档记录会被拒绝，需回原版本打开。共存快照另含 `world_mode=coexistence` 及原世界对象、随机源和计时状态；纯几何为 `geometry-only`，缺少模式的旧version2按纯几何处理，仅纯几何入口接受。共存最近快照保存在 `.godot/geometry-snapshots/latest-coexistence.json`，纯几何仍为 `latest.json`，两个入口不覆盖彼此。R／N在共存模式同步重开两族对象；F9恢复组合后安全发球，快照不是球轨迹、输入或F1设置的完整重播。
 
 ### 使用 Godot 编辑器
 

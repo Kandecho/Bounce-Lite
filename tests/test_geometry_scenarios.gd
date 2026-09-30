@@ -11,7 +11,7 @@ func _run() -> void:
 	var game = main.geometry_playground
 	var ball = main.ball
 	main.paddle.set_physics_process(false)
-	suite.expect_true(game != null and main.play_world == null, "default has geometry and no old world objects")
+	suite.expect_true(OS.get_cmdline_user_args().has("--geometry-only") and game != null and main.play_world == null, "explicit geometry-only control has geometry and no old world objects")
 	suite.expect_equal(main.get_node("GameArea").find_children("Ball", "CharacterBody2D", false).size(), 1, "one Ball is the only attention center")
 	game.toys.set_layout(1)
 	game.toys.set_process(false)

@@ -49,7 +49,7 @@ func _ready() -> void:
 	ball.configure(tuning)
 	ball.configure_support(paddle)
 	ball.configure_arena(Rect2(Vector2(left, top), Vector2(right - left, bottom - top)))
-	if tuning.shared_world_enabled and not geometry_enabled:
+	if tuning.shared_world_enabled and not OS.get_cmdline_user_args().has("--geometry-only"):
 		play_world = load("res://scripts/world/play_world.gd").new()
 		play_world.name = "PlayWorld"
 		$GameArea.add_child(play_world)
@@ -76,11 +76,12 @@ func _ready() -> void:
 
 	ball.start_active(Vector2(0.62, 1.0))
 	if geometry_enabled:
-		# Keep the baseline's committed launch feedback, without its world objects.
-		world_feedback = load("res://scripts/world/world_feedback.gd").new()
-		$GameArea.add_child(world_feedback)
-		ball.resume_committed.connect(_on_resume_committed)
-		ball.wake_committed.connect(_on_wake_committed)
+		if world_feedback == null:
+			world_feedback = load("res://scripts/world/world_feedback.gd").new()
+			world_feedback.name = "WorldFeedback"
+			$GameArea.add_child(world_feedback)
+			ball.resume_committed.connect(_on_resume_committed)
+			ball.wake_committed.connect(_on_wake_committed)
 		geometry_playground = load("res://scripts/world/geometry_playground.gd").new()
 		geometry_playground.name = "GeometryPlayground"
 		$GameArea.add_child(geometry_playground)
@@ -133,7 +134,8 @@ func _set_e01_enabled(enabled: bool) -> void:
 
 
 func _update_title() -> void:
-	DisplayServer.window_set_title("Bouncing Ball | motion " + tuning.motion_profile + " | v0.2.0 " + ("geometry harvest" if geometry_enabled else ("shared world" if tuning.shared_world_enabled else "baseline")) + " | E01 " + ("contact" if tuning.e01_contact_enabled else "off"))
+	var world_mode := "geometry only" if OS.get_cmdline_user_args().has("--geometry-only") else "geometry + shared world"
+	DisplayServer.window_set_title("Bouncing Ball | motion " + tuning.motion_profile + " | v0.2.0 " + (world_mode if geometry_enabled else ("shared world" if tuning.shared_world_enabled else "baseline")) + " | E01 " + ("contact" if tuning.e01_contact_enabled else "off"))
 
 
 func _unhandled_key_input(event: InputEvent) -> void:

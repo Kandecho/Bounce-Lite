@@ -34,6 +34,15 @@ var _paddle_position := Vector2.INF
 var _paddle_size := Vector2.ZERO
 var _supported_colliders: Array = []
 var tuning: Resource = Tuning.new()
+var play_world: Node
+
+func entity_envelopes() -> Array[Rect2]:
+	var result: Array[Rect2] = []
+	for body in _toys:
+		if body.get_meta("phase", "active") == "fading": continue
+		var bounds := _spawn_shape(body.get_meta("toy_kind"), body.get_meta("kick")).get_rect()
+		result.append(Rect2(body.global_position + bounds.position, bounds.size))
+	return result
 
 func configure_tuning(source: Resource) -> void:
 	tuning = source if source != null else Tuning.new()
@@ -126,6 +135,9 @@ func _legal_point(kind: String, point: Vector2, kick: Vector2, ignore: StaticBod
 	allowed.size.y = maxf(0.0, _bottom_limit() - allowed.position.y)
 	if not allowed.encloses(Rect2(point + envelope.position, envelope.size)):
 		return false
+	if is_instance_valid(play_world):
+		for bounds in play_world.entity_envelopes():
+			if Rect2(point + envelope.position, envelope.size).intersects(bounds): return false
 	var transform := Transform2D(0.0, point)
 	for ball in _balls:
 		var circle := CircleShape2D.new()

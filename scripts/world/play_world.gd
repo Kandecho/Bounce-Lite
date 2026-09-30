@@ -38,6 +38,106 @@ var _ball_radius := 16.0
 var _states := {"rotor": "absent", "charge": "absent"}
 var _timers := {"rotor": 0.2, "charge": 1.3}
 var _alpha := {"rotor": 0.0, "charge": 0.0}
+var geometry_toys: Node
+
+func entity_envelopes() -> Array[Rect2]:
+	var result: Array[Rect2] = []
+	for kind in ["rotor", "charge"]:
+		if _states[kind] in ["absent", "fading"]: continue
+		var radius := ROTOR_RADIUS if kind == "rotor" else CHARGE_RADIUS
+		var point := rotor_position if kind == "rotor" else charge_position
+		result.append(Rect2(point - Vector2.ONE * radius, Vector2.ONE * radius * 2.0))
+	return result
+
+func _geometry_clear(point: Vector2, radius: float) -> bool:
+	if is_instance_valid(geometry_toys):
+		var bounds := Rect2(point - Vector2.ONE * radius, Vector2.ONE * radius * 2.0)
+		for envelope in geometry_toys.entity_envelopes():
+			if bounds.intersects(envelope): return false
+	return true
+
+func reconcile_fixed_geometry() -> void:
+	# Existing fixed controls keep their placements. Only the combined control
+	# relocates a core whose old placement crosses a full geometry envelope.
+	if random_spawns_enabled or not is_instance_valid(geometry_toys): return
+	for kind in ["rotor", "charge"]:
+		var radius := ROTOR_RADIUS if kind == "rotor" else CHARGE_RADIUS
+		var point := rotor_position if kind == "rotor" else charge_position
+		if _geometry_clear(point, radius): continue
+		point = _candidate(kind)
+		if point == Vector2.INF:
+			push_error("No legal fixed coexistence placement for " + kind)
+			continue
+		if kind == "rotor":
+			rotor_position = point
+			_rotor.position = to_local(point)
+		else:
+			charge_position = point
+			_charge.position = to_local(point)
+
+func restart(seed_value: int) -> void:
+	set_seed(seed_value)
+	_time = 0.0
+	angular_velocity = 0.0
+	rotor_angle = 0.0
+	charge_remaining = 0.0
+	_impact = 0.0
+	_charge_flash = 0.0
+	lifecycle_events.clear()
+	for kind in ["rotor", "charge"]:
+		_set_state(kind, "absent" if random_spawns_enabled else "active")
+		_alpha[kind] = 0.0 if random_spawns_enabled else 1.0
+	_sync_interaction()
+
+func export_snapshot() -> Dictionary:
+	var journal: Array[Dictionary] = []
+	for event in lifecycle_events:
+		var entry: Dictionary = event.duplicate()
+		if entry.position is Vector2: entry.position = [entry.position.x, entry.position.y]
+		journal.append(entry)
+	return {"rng_state": str(_rng.state), "rng_seed": str(_rng.seed), "time": _time,
+		"random": random_spawns_enabled, "states": _states.duplicate(), "timers": _timers.duplicate(), "alpha": _alpha.duplicate(),
+		"rotor": [rotor_position.x, rotor_position.y], "charge": [charge_position.x, charge_position.y],
+		"spin": angular_velocity, "angle": rotor_angle, "cooldown": charge_remaining, "impact": _impact, "flash": _charge_flash,
+		"journal": journal}
+
+func restore_snapshot(data: Dictionary) -> bool:
+	if not snapshot_valid(data): return false
+	_rng.seed = int(data.rng_seed)
+	_rng.state = int(data.rng_state)
+	_time = float(data.time)
+	random_spawns_enabled = bool(data.random)
+	_states = data.states.duplicate()
+	_timers = data.timers.duplicate()
+	_alpha = data.alpha.duplicate()
+	rotor_state = _states.rotor
+	charge_state = _states.charge
+	rotor_position = Vector2(data.rotor[0], data.rotor[1])
+	charge_position = Vector2(data.charge[0], data.charge[1])
+	angular_velocity = float(data.spin)
+	rotor_angle = float(data.angle)
+	charge_remaining = float(data.cooldown)
+	_impact = float(data.impact)
+	_charge_flash = float(data.flash)
+	lifecycle_events.assign(data.journal)
+	_rotor.position = to_local(rotor_position)
+	_charge.position = to_local(charge_position)
+	_sync_interaction()
+	queue_redraw()
+	return true
+
+func snapshot_valid(data: Dictionary) -> bool:
+	for key in ["rng_state", "rng_seed", "time", "random", "states", "timers", "alpha", "rotor", "charge", "spin", "angle", "cooldown", "impact", "flash", "journal"]:
+		if not data.has(key): return false
+	for kind in ["rotor", "charge"]:
+		if not data.states is Dictionary or not data.timers is Dictionary or not data.alpha is Dictionary: return false
+		if data.states.get(kind, "") not in ["absent", "appearing", "active", "waiting", "fading"]: return false
+		if not data.timers.has(kind) or not data.alpha.has(kind): return false
+		if not data[kind] is Array or data[kind].size() != 2: return false
+		var point := Vector2(float(data[kind][0]), float(data[kind][1]))
+		var radius := ROTOR_RADIUS if kind == "rotor" else CHARGE_RADIUS
+		if not point.is_finite() or not spawn_region.encloses(Rect2(point - Vector2.ONE * radius, Vector2.ONE * radius * 2)): return false
+	return data.journal is Array
 
 func _init() -> void:
 	_rng.randomize()
@@ -94,6 +194,7 @@ func _candidate(kind: String) -> Vector2:
 			continue
 		if _states[other] != "absent" and point.distance_to(other_position) < ROTOR_RADIUS + CHARGE_RADIUS + SPAWN_MARGIN:
 			continue
+		if not _geometry_clear(point, radius): continue
 		return point
 	return Vector2.INF
 
@@ -124,7 +225,7 @@ func _advance_objects(delta: float) -> void:
 				# Recheck the ball before making an appearing solid interactive.
 				var point := rotor_position if kind == "rotor" else charge_position
 				var radius := ROTOR_RADIUS if kind == "rotor" else CHARGE_RADIUS
-				if point.distance_to(_ball_position) < radius + _ball_radius + SPAWN_MARGIN:
+				if point.distance_to(_ball_position) < radius + _ball_radius + SPAWN_MARGIN or not _geometry_clear(point, radius):
 					continue
 				_set_state(kind, "active")
 				_alpha[kind] = 1.0

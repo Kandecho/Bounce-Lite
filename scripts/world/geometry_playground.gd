@@ -26,6 +26,10 @@ func configure(host: Node2D) -> void:
 	toys.configure(main.ball.arena_bounds)
 	toys.set_ball_context(main.ball.global_position, main.tuning.ball_radius)
 	toys.set_paddle_context(main.paddle.global_position, main.tuning.paddle_size)
+	if is_instance_valid(main.play_world):
+		toys.play_world = main.play_world
+		main.play_world.geometry_toys = toys
+		latest_path = "res://.godot/geometry-snapshots/latest-coexistence.json"
 	main.ball.configure_geometry(toys)
 	feedback = load("res://scripts/world/geometry_feedback.gd").new()
 	add_child(feedback)
@@ -37,8 +41,13 @@ func configure(host: Node2D) -> void:
 	for argument in OS.get_cmdline_user_args():
 		if argument.begins_with("--geometry-seed="):
 			world_seed = clampi(int(argument.trim_prefix("--geometry-seed=")), 1, 0x7fffffff)
+	if is_instance_valid(main.play_world):
+		main.play_world.restart(world_seed)
+		for argument in OS.get_cmdline_user_args():
+			if argument.begins_with("--world-seed="): main.play_world.set_seed(int(argument.trim_prefix("--world-seed=")))
 	if fixed_layout:
 		toys.set_layout(1)
+		if is_instance_valid(main.play_world): main.play_world.reconcile_fixed_geometry()
 		_queue_restart()
 	else:
 		toys.set_random_mode(true, world_seed)
@@ -52,8 +61,10 @@ func restart_world(seed_value: int) -> void:
 	world_seed = clampi(seed_value, 1, 0x7fffffff)
 	elapsed = 0.0
 	events.clear()
+	if is_instance_valid(main.play_world): main.play_world.restart(world_seed)
 	if fixed_layout:
 		toys.set_layout(1)
+		if is_instance_valid(main.play_world): main.play_world.reconcile_fixed_geometry()
 	else:
 		toys.set_random_mode(true, world_seed)
 	_queue_restart()
@@ -110,7 +121,9 @@ func save_combination() -> bool:
 	var data := {"profile": PROFILE, "version": 2, "rules": RULES, "motion_profile": main.tuning.motion_profile, "seed": world_seed, "time": elapsed,
 		"fixed": fixed_layout, "geometry": toys.export_snapshot(), "journal": toys.lifecycle_events,
 		"ball_observation": {"position": [main.ball.position.x, main.ball.position.y], "velocity": [main.ball.velocity.x, main.ball.velocity.y]}}
-	last_saved_path = directory + "/geometry-%d-%d.json" % [world_seed, Time.get_ticks_msec()]
+	data.world_mode = "coexistence" if is_instance_valid(main.play_world) else "geometry-only"
+	if is_instance_valid(main.play_world): data.world = main.play_world.export_snapshot()
+	last_saved_path = directory + "/%s-%d-%d.json" % [data.world_mode, world_seed, Time.get_ticks_msec()]
 	for path in [last_saved_path, latest_path]:
 		var file := FileAccess.open(path, FileAccess.WRITE)
 		if file == null:
@@ -136,9 +149,17 @@ func restore_combination(source_path: String = "") -> bool:
 	if data.get("rules", "") != RULES:
 		show_notice("机关规则不匹配；旧记录需在原版打开")
 		return false
+	var mode := "coexistence" if is_instance_valid(main.play_world) else "geometry-only"
+	if data.get("world_mode", "geometry-only") != mode:
+		show_notice("组合模式不匹配；请使用对应入口")
+		return false
+	if mode == "coexistence" and (not data.get("world") is Dictionary or not main.play_world.snapshot_valid(data.world)):
+		show_notice("共存状态缺失或无效")
+		return false
 	if not toys.restore_snapshot(data.geometry):
 		show_notice("组合恢复失败")
 		return false
+	if mode == "coexistence": main.play_world.restore_snapshot(data.world)
 	toys.clear_spring_holds()
 	world_seed = int(data.seed)
 	elapsed = float(data.time)
