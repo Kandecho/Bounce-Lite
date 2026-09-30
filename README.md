@@ -6,9 +6,9 @@ Bounce Lite 是一个物理电子玩具。移动鼠标控制挡板，让球与�
 
 main已集成第一批几何／机械，后续在 `codex/harvest-geometry` 开发：单球、圆形弹跳器、三角侧踢、斜面、平台、弹簧、摆板。机关随机出现、停留和离场，允许同类并存，由实际物理产生组合。
 
-**当前按 [harvest + refinement](docs/exploration/harvest-refinement-plan.md) 逐批集成**：每批完成后更新文档、停止并等待人工检查。第一批记录见[几何／机械集成](docs/exploration/geometry-harvest-batch1.md)。第二批传送门、第三批普通砖／反向砖尚未启动；结构由长期试玩后决定，场力、多球与抓球保留原实验成果。
+**当前按 [harvest + refinement](docs/exploration/harvest-refinement-plan.md) 逐批集成**：每批完成后更新文档、停止并等待人工检查。第一批记录见[几何／机械集成](docs/exploration/geometry-harvest-batch1.md)。第二批传送门已按10月1日用户授权在实验分支启动，第三批普通砖／反向砖尚未启动；结构由长期试玩后决定，场力、多球与抓球保留原实验成果。
 
-**当前进度**：2026-09-30 当前状态：第一批几何与原有转子／能量块共存已在 `fa099e4` 实现并本地快进合入main；旧main `f792d3b` 和纯几何停点 `287ac0c` 保留可返回。默认单球六类几何与转子／能量块共同运行，纯几何及底座对照仍可用。1.5×速度／2.25×重力与弹簧0.20秒／50%有上限横速此前已获用户试玩通过；独立亮边已撤下，其余球形变、声音层次及Vitality变暗保留。本轮共存机器验证通过，新组合体验待用户判断。后续继续在 `codex/harvest-geometry` 开发，门户、砖块未启动。 [集成范围与证据边界](docs/exploration/harvest-refinement-plan.md#main-integration-20260930)。
+**当前进度**：2026-10-01 当前状态：第一批几何与原有转子／能量块共存已在 `fa099e4` 实现并本地快进合入main；旧main `f792d3b` 和纯几何停点 `287ac0c` 保留可返回。默认单球六类几何与转子／能量块共同运行，纯几何及底座对照仍可用。1.5×速度／2.25×重力与弹簧0.20秒／50%有上限横速此前已获用户试玩通过；独立亮边已撤下，其余球形变、声音层次及Vitality变暗保留。2026-10-01用户已反馈共存版“集成后体验良好”；现按原计划在 `codex/harvest-geometry` 启动第二批传送门，main保持 `79b9de0`，砖块未启动。 [集成范围与证据边界](docs/exploration/harvest-refinement-plan.md#portal-harvest-20261001)。
 
 ## 核心体验
 
