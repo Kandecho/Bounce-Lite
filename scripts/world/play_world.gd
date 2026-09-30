@@ -38,28 +38,36 @@ var _ball_radius := 16.0
 var _states := {"rotor": "absent", "charge": "absent"}
 var _timers := {"rotor": 0.2, "charge": 1.3}
 var _alpha := {"rotor": 0.0, "charge": 0.0}
-var geometry_toys: Node
+var spawn_occupancy: RefCounted
+
+func _exit_tree() -> void:
+	if spawn_occupancy != null: spawn_occupancy.unregister(self)
 
 func entity_envelopes() -> Array[Rect2]:
 	var result: Array[Rect2] = []
 	for kind in ["rotor", "charge"]:
-		if _states[kind] in ["absent", "fading"]: continue
+		if _states[kind] == "absent": continue
 		var radius := ROTOR_RADIUS if kind == "rotor" else CHARGE_RADIUS
 		var point := rotor_position if kind == "rotor" else charge_position
 		result.append(Rect2(point - Vector2.ONE * radius, Vector2.ONE * radius * 2.0))
 	return result
 
+func snapshot_envelopes(data: Dictionary) -> Array[Rect2]:
+	var result: Array[Rect2] = []
+	for kind in ["rotor", "charge"]:
+		if data.states[kind] == "absent": continue
+		var radius := ROTOR_RADIUS if kind == "rotor" else CHARGE_RADIUS
+		var point := Vector2(data[kind][0],data[kind][1])
+		result.append(Rect2(point-Vector2.ONE*radius,Vector2.ONE*radius*2.0))
+	return result
+
 func _geometry_clear(point: Vector2, radius: float) -> bool:
-	if is_instance_valid(geometry_toys):
-		var bounds := Rect2(point - Vector2.ONE * radius, Vector2.ONE * radius * 2.0)
-		for envelope in geometry_toys.entity_envelopes():
-			if bounds.intersects(envelope): return false
-	return true
+	return spawn_occupancy == null or spawn_occupancy.is_clear(Rect2(point-Vector2.ONE*radius,Vector2.ONE*radius*2.0),self)
 
 func reconcile_fixed_geometry() -> void:
 	# Existing fixed controls keep their placements. Only the combined control
 	# relocates a core whose old placement crosses a full geometry envelope.
-	if random_spawns_enabled or not is_instance_valid(geometry_toys): return
+	if random_spawns_enabled or spawn_occupancy == null: return
 	for kind in ["rotor", "charge"]:
 		var radius := ROTOR_RADIUS if kind == "rotor" else CHARGE_RADIUS
 		var point := rotor_position if kind == "rotor" else charge_position

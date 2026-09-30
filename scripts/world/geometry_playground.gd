@@ -22,13 +22,13 @@ func configure(host: Node2D) -> void:
 	main = host
 	toys = load("res://scripts/world/geometry_toys.gd").new()
 	add_child(toys)
+	toys.spawn_occupancy = main.spawn_occupancy
+	main.spawn_occupancy.register(toys)
 	toys.configure_tuning(main.tuning)
 	toys.configure(main.ball.arena_bounds)
 	toys.set_ball_context(main.ball.global_position, main.tuning.ball_radius)
 	toys.set_paddle_context(main.paddle.global_position, main.tuning.paddle_size)
 	if is_instance_valid(main.play_world):
-		toys.play_world = main.play_world
-		main.play_world.geometry_toys = toys
 		latest_path = "res://.godot/geometry-snapshots/latest-coexistence.json"
 	main.ball.configure_geometry(toys)
 	feedback = load("res://scripts/world/geometry_feedback.gd").new()
@@ -171,6 +171,15 @@ func restore_combination(source_path: String = "") -> bool:
 		return false
 	if has_portals and (not data.get("portals") is Dictionary or not main.portals.snapshot_valid(data.portals)):
 		show_notice("门户组合状态缺失或无效")
+		return false
+	if not toys.snapshot_valid(data.geometry):
+		show_notice("组合恢复失败")
+		return false
+	var snapshots := {toys: data.geometry}
+	if mode != "geometry-only": snapshots[main.play_world] = data.world
+	if has_portals: snapshots[main.portals] = data.portals
+	if not main.spawn_occupancy.snapshots_clear(snapshots):
+		show_notice("组合实体重叠；保留当前状态")
 		return false
 	if not toys.restore_snapshot(data.geometry):
 		show_notice("组合恢复失败")

@@ -6,6 +6,24 @@ const RADIUS := 27.0
 const FADE_SECONDS := 0.65
 const COOLDOWN := 0.65
 var main: Node2D
+var spawn_occupancy: RefCounted
+
+func _exit_tree() -> void:
+	if spawn_occupancy != null: spawn_occupancy.unregister(self)
+
+func entity_envelopes() -> Array[Rect2]:
+	var result: Array[Rect2] = []
+	if phase != "absent":
+		for point in mouths: result.append(Rect2(point-Vector2.ONE*RADIUS,Vector2.ONE*RADIUS*2.0))
+	return result
+
+func snapshot_envelopes(data: Dictionary) -> Array[Rect2]:
+	var result: Array[Rect2] = []
+	if data.phase != "absent":
+		for value in data.mouths:
+			var point := Vector2(value[0],value[1])
+			result.append(Rect2(point-Vector2.ONE*RADIUS,Vector2.ONE*RADIUS*2.0))
+	return result
 var mouths: Array[Vector2] = []
 var phase := "absent"
 var timer := 10.0
@@ -87,9 +105,7 @@ func _spawn_pair() -> bool:
 
 func outlet_clear(point: Vector2, radius: float, ball: CharacterBody2D) -> bool:
 	if not point.is_finite() or not main.ball.arena_bounds.grow(-radius-2).has_point(point): return false
-	if is_instance_valid(main.geometry_playground):
-		for envelope in main.geometry_playground.toys.entity_envelopes():
-			if envelope.grow(radius+2).has_point(point): return false
+	if spawn_occupancy != null and not spawn_occupancy.is_clear(Rect2(point-Vector2.ONE*(radius+2),Vector2.ONE*(radius+2)*2.0),self): return false
 	var shape:=CircleShape2D.new()
 	shape.radius=radius+2.0
 	var query:=PhysicsShapeQueryParameters2D.new()

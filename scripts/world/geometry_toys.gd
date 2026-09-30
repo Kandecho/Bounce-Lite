@@ -34,12 +34,14 @@ var _paddle_position := Vector2.INF
 var _paddle_size := Vector2.ZERO
 var _supported_colliders: Array = []
 var tuning: Resource = Tuning.new()
-var play_world: Node
+var spawn_occupancy: RefCounted
+
+func _exit_tree() -> void:
+	if spawn_occupancy != null: spawn_occupancy.unregister(self)
 
 func entity_envelopes() -> Array[Rect2]:
 	var result: Array[Rect2] = []
 	for body in _toys:
-		if body.get_meta("phase", "active") == "fading": continue
 		var bounds := _spawn_shape(body.get_meta("toy_kind"), body.get_meta("kick")).get_rect()
 		result.append(Rect2(body.global_position + bounds.position, bounds.size))
 	return result
@@ -135,9 +137,7 @@ func _legal_point(kind: String, point: Vector2, kick: Vector2, ignore: StaticBod
 	allowed.size.y = maxf(0.0, _bottom_limit() - allowed.position.y)
 	if not allowed.encloses(Rect2(point + envelope.position, envelope.size)):
 		return false
-	if is_instance_valid(play_world):
-		for bounds in play_world.entity_envelopes():
-			if Rect2(point + envelope.position, envelope.size).intersects(bounds): return false
+	if spawn_occupancy != null and not spawn_occupancy.is_clear(Rect2(point + envelope.position,envelope.size),self): return false
 	var transform := Transform2D(0.0, point)
 	for ball in _balls:
 		var circle := CircleShape2D.new()
@@ -150,7 +150,7 @@ func _legal_point(kind: String, point: Vector2, kick: Vector2, ignore: StaticBod
 		if shape.collide(transform, paddle, Transform2D(0.0, _paddle_position)):
 			return false
 	for other in _toys:
-		if other == ignore or other.get_meta("phase", "active") == "fading":
+		if other == ignore:
 			continue
 		var other_shape := _spawn_shape(other.get_meta("toy_kind"), other.get_meta("kick"))
 		if shape.collide(transform, other_shape, Transform2D(0.0, other.global_position)):
@@ -429,7 +429,7 @@ func export_snapshot() -> Dictionary:
 		entries.append(entry)
 	return {"version": 2, "profile": SNAPSHOT_PROFILE, "random_mode": random_mode, "layout": layout, "clock": _clock, "spawn_timer": _spawn_timer, "next_id": _next_id, "rng_seed": str(_rng.seed), "rng_state": str(_rng.state), "toys": entries}
 
-func restore_snapshot(data: Dictionary) -> bool:
+func snapshot_valid(data: Dictionary) -> bool:
 	if data.get("version") != 2 or data.get("profile") != SNAPSHOT_PROFILE or not data.get("toys") is Array or data.toys.size() > 24:
 		return false
 	for entry in data.toys:
@@ -450,6 +450,17 @@ func restore_snapshot(data: Dictionary) -> bool:
 			return false
 	if bool(data.get("random_mode", false)) and data.toys.size() > 6:
 		return false
+	return true
+
+func snapshot_envelopes(data: Dictionary) -> Array[Rect2]:
+	var result: Array[Rect2] = []
+	for entry in data.toys:
+		var bounds := _spawn_shape(entry.kind,Vector2(entry.kick[0],entry.kick[1])).get_rect()
+		result.append(Rect2(Vector2(entry.position[0],entry.position[1])+bounds.position,bounds.size))
+	return result
+
+func restore_snapshot(data: Dictionary) -> bool:
+	if not snapshot_valid(data): return false
 	set_layout(0)
 	random_mode = bool(data.get("random_mode", false))
 	layout = int(data.get("layout", 0))

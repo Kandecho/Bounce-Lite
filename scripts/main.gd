@@ -13,6 +13,7 @@ var play_world: Node2D
 var world_feedback: Node2D
 var geometry_playground: Node2D
 var portals: Node2D
+var spawn_occupancy = preload("res://scripts/world/spawn_occupancy.gd").new()
 var geometry_enabled := true
 
 @onready var ball: CharacterBody2D = $GameArea/Ball
@@ -53,6 +54,8 @@ func _ready() -> void:
 	if tuning.shared_world_enabled and not OS.get_cmdline_user_args().has("--geometry-only"):
 		play_world = load("res://scripts/world/play_world.gd").new()
 		play_world.name = "PlayWorld"
+		play_world.spawn_occupancy = spawn_occupancy
+		spawn_occupancy.register(play_world)
 		$GameArea.add_child(play_world)
 		play_world.set_ball_context(ball.global_position, tuning.ball_radius)
 		play_world.set_random_spawns_enabled(not OS.get_cmdline_user_args().has("--v02-fixed-world"))
@@ -89,6 +92,8 @@ func _ready() -> void:
 		if is_instance_valid(play_world) and not OS.get_cmdline_user_args().has("--no-portals"):
 			portals = load("res://scripts/world/portal_toys.gd").new()
 			portals.name = "Portals"
+			portals.spawn_occupancy = spawn_occupancy
+			spawn_occupancy.register(portals)
 			$GameArea.add_child(portals)
 			ball.portal_contacts = portals
 		geometry_playground.configure(self)
