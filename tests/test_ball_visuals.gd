@@ -84,7 +84,6 @@ func run(suite: RefCounted) -> void:
 func _test_paddle_feedback(suite: RefCounted) -> void:
 	var paddle: CharacterBody2D = Paddle.new()
 	paddle.configure(Tuning.new(), 175, 786, 537)
-	suite.expect_true(paddle.has_method("contact_strength"), "Paddle exposes resolved contact accent")
 	suite.expect_equal(paddle.feedback_color().to_html(false), "80a2a8", "Paddle idle uses the Ball's center hue")
 	paddle.play_energy_transfer(0.2)
 	suite.expect_float(paddle.dim_strength(), 1.0, 0.0001, "large transfer dims fully")

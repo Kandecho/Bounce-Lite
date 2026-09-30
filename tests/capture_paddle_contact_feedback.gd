@@ -2,7 +2,7 @@ extends SceneTree
 
 const MainScene = preload("res://scenes/main.tscn")
 const Surface = preload("res://scripts/physics/surface_response_model.gd")
-const OUT := "res://.godot/paddle-feedback-20260925/"
+const OUT := "res://.godot/remove-paddle-accent-20260930/"
 var viewport: SubViewport
 var main: Node2D
 var ball: CharacterBody2D
@@ -32,19 +32,7 @@ func _run() -> void:
 		main.geometry_playground.visible = false
 	paddle.position.x = 480.0
 	paddle.configure(main.tuning, 0.0, 960.0, 570.0)
-	for item in [{"label": "weak", "speed": 65.0}, {"label": "strong", "speed": 430.0}]:
-		paddle.advance_feedback(1.0)
-		ball.get_node("Visuals").advance_feedback(1.0)
-		ball.position = Vector2(480.0, 570.0 - main.tuning.paddle_size.y * 0.5 - main.tuning.ball_radius)
-		ball.velocity = Vector2(650.0, item.speed)
-		ball.resolve_surface_collision(Surface.SurfaceKind.PADDLE, Vector2.UP, true)
-		await _save(item.label)
-		evidence.append({"kind": "controlled_response", "label": item.label, "normal_speed": item.speed, "accent": paddle.contact_strength(), "ball_deformation": ball.get_node("Visuals").deformation, "paddle_volume_db": main.get_node("BasicAudio").players[0].volume_db, "paddle_pitch": main.get_node("BasicAudio").players[0].pitch_scale})
-	paddle.advance_feedback(0.2)
-	ball.get_node("Visuals").advance_feedback(0.2)
-	await _save("recovered")
 	# A short engine sweep, starting above the Paddle; no direct resolve call.
-	paddle.advance_feedback(1.0)
 	ball.position = Vector2(480.0, 500.0)
 	ball.velocity = Vector2(0.0, 240.0)
 	var actual_contacts: Array[RefCounted] = []

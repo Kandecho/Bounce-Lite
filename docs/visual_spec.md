@@ -1,6 +1,6 @@
 # Bounce Lite Visual Specification
 
-> 2026-09-25 当前入口：本轮处理F09球—挡板独立接触反馈，有限法向力度视觉响应、声音层次及地面音优先级见[本轮记录](exploration/geometry-harvest-batch1.md#paddle-feedback-20260925)。保留Vitality传递变暗、已通过的1.5×运动与弹簧动作；下方旧冻结说明不覆盖此次明确授权。
+> 2026-09-30 当前说明：用户认为新增挡板独立受击亮边效果不佳，本轮撤下实现与专属测试，之后进一步优化UI/UX时再考虑该方案。球法向形变、声音分层及Vitality变暗保留；见[撤下记录](exploration/geometry-harvest-batch1.md#paddle-accent-removal-20260930)。下方历史亮边描述不表示此次碰撞亮边仍在使用。
 
 > 2026-09-11 当前分支说明：本文件保留 V0.1 规格及历史验收。当前依据为 [V0.2.0 Design Note](design/v0.2.0-design-note.md)，实际已实现方案 B、挡板传能变暗和全客户区场地，见[共享小世界记录](exploration/v0.2-shared-world.md)。Wake／Continue 表现交换仍在[后续计划](exploration/v0.2.0-follow-up-plan.md)中；下文冻结规格不覆盖当前决定。
 
