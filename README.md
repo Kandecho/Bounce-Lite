@@ -8,7 +8,7 @@ Bounce Lite 是一个物理电子玩具。移动鼠标控制挡板，让球与�
 
 **当前按 [harvest + refinement](docs/exploration/harvest-refinement-plan.md) 逐批集成**：每批完成后更新文档、停止并等待人工检查。第一批记录见[几何／机械集成](docs/exploration/geometry-harvest-batch1.md)。第二批传送门、第三批普通砖／反向砖尚未启动；结构由长期试玩后决定，场力、多球与抓球保留原实验成果。
 
-**2026-09-30状态**：按用户反馈撤下效果不佳的挡板独立受击亮边及专属测试，待以后UI/UX优化时再考虑。保留球形变、声音层次和Vitality变暗；已通过的1.5×运动与弹簧动作不变。[本轮记录](docs/exploration/geometry-harvest-batch1.md#paddle-accent-removal-20260930)。main仍为 `f792d3b`。
+**当前进度**：2026-09-30 当前状态：`codex/harvest-geometry` 的代码停点为 `287ac0c`，main仍为 `f792d3b`。1.5×速度／2.25×重力与弹簧0.20秒持球／50%有上限横速保留已获用户试玩通过；挡板独立亮边已撤下，保留球形变、声音层次与Vitality变暗。先统一文档，再按用户授权集成到main并定向验证原有转子、能量块与几何的共存交互；当前几何默认未启用这两项，共存尚未验证。完成后继续在实验分支开发，门户、砖块未启动。 [集成范围与证据边界](docs/exploration/harvest-refinement-plan.md#main-integration-20260930)。
 
 ## 核心体验
 
@@ -22,7 +22,7 @@ Bounce Lite 希望让屏幕中的互动拥有真实玩具的触感：操作简�
 
 ## 当前状态
 
-协作规则见[代理模型与执行纪律](AGENTS.md#agent-execution-policy)：Astra主代理的思考强度由用户控制，Sol medium负责普通实现，Luna medium负责明确小活；子代理提交可审计证据，主代理按约束、风险与需求审查，默认不重复实现者的完整验证。
+协作规则见[代理模型与执行纪律](AGENTS.md#agent-execution-policy)：用户指定子代理统一6.1 Sol（`gpt-6.1-sol`），主代理保持当前方案；子代理medium为本轮执行选择。实现代理负责验证闭环，主代理审查约束、风险与需求。
 
 **main 已建立 V0.2.0 基线**：代码提交 `e905580`，合入记录 `f792d3b`。球、挡板、Vitality、随机转子和能量块、Wake/Continue 已完成收尾。
 

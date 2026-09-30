@@ -1,8 +1,8 @@
 # Bounce Lite Project Overview
 
-> 当前协作方式：主代理Astra的思考强度由用户手动控制，普通实现Sol medium，明确小活Luna medium。实现／集成代理负责完整验证闭环及可审计证据，主代理审查约束、遗漏风险和需求偏差，默认不复跑测试或重读完整实现。分派、升级、检查触发与交付格式统一见[治理规则](../AGENTS.md#agent-execution-policy)。
+> 当前协作方式：用户指定子代理6.1 Sol（`gpt-6.1-sol`），主代理保持当前配置；子代理medium为执行选择；职责、检查触发条件与交付证据仍按[治理规则](../AGENTS.md#agent-execution-policy)，不将旧配置写成新决定。
 
-> 2026-09-25 当前入口：`b118a5d` 的1.5×运动与弹簧refinement已获用户试玩通过，现继续[球—挡板接触反馈](exploration/geometry-harvest-batch1.md#paddle-feedback-20260925)。默认运动、弹簧和挡板y570保持，完成后停下人工检查；main仍为 `f792d3b`。下方历史状态与参数按原时点理解。
+> 2026-09-30 当前状态：`codex/harvest-geometry` 的代码停点为 `287ac0c`，main仍为 `f792d3b`。1.5×速度／2.25×重力与弹簧0.20秒持球／50%有上限横速保留已获用户试玩通过；挡板独立亮边已撤下，保留球形变、声音层次与Vitality变暗。先统一文档，再按用户授权集成到main并定向验证原有转子、能量块与几何的共存交互；当前几何默认未启用这两项，共存尚未验证。完成后继续在实验分支开发，门户、砖块未启动。 详见[当前集成范围](exploration/harvest-refinement-plan.md#main-integration-20260930)。下方历史状态与参数按原时点理解。
 
 > 2026-09-13 当前状态：V0.2.0 随机对象、有效挡板动作资格、Wake/Continue 收尾已实现并完成本轮机器与渲染检查，按用户授权合入 main 后连续进入广泛物理玩具探索。当前入口为[新方向](exploration/physical-toy-exploration.md)、[实现基线](design/design-baseline-v0.2.0.md)、[收口记录](reviews/v0.2.0-consolidation.md)。以下2026-09-11及更早状态为历史，不能覆盖本轮授权或作为新玩法的提前筛选门槛。
 
