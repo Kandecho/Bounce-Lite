@@ -3,8 +3,8 @@
 ## 当前入口（2026-09-30）
 
 - [代理模型与执行纪律](../AGENTS.md#agent-execution-policy)：子代理统一6.1 Sol（`gpt-6.1-sol`），medium为执行选择，主代理保持当前配置；职责、审查触发、集成责任与可审计交付规则继续适用，历史配置保留真实归属。
-- [第一批几何／机械集成记录](exploration/geometry-harvest-batch1.md)：代码停点 `287ac0c`；1.5×运动与弹簧已获试玩通过，亮边已撤下，其他反馈保留；572项为9月30日既有验证。
-- [分批集成与打磨方案](exploration/harvest-refinement-plan.md#main-integration-20260930)：先统一文档，再按授权集成main并验证转子／能量块共存；完成后继续在实验分支开发。main目前仍为 `f792d3b`，第二、三批未启动。
+- [第一批几何／机械集成记录](exploration/geometry-harvest-batch1.md#coexistence-result-20260930)：`fa099e4`已集成main，共存机器验证及动态证据通过，新组合体验待试玩。
+- [分批集成与打磨方案](exploration/harvest-refinement-plan.md#main-integration-20260930)：文档统一与main共存集成已完成，后续回到实验分支；门户、砖块未启动。
 - [物理电子玩具探索](exploration/physical-toy-exploration.md)：广度探索收获、实际试玩后的筛选决定及历史来源。
 - [游乐场试玩记录](exploration/toybox-playtest.md)：正式反馈登记F01–F09及T01，区分准备解决、持续跟踪、已实施待验收与候选方案；原始反馈文件保持原文且未跟踪。
 - [V0.2.0 实现基线](design/design-baseline-v0.2.0.md)：随机对象、真实动作资格、Wake/Continue 与现有底座。

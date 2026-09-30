@@ -4,11 +4,11 @@
 
 Bounce Lite 是一个物理电子玩具。移动鼠标控制挡板，让球与机关碰撞、停下、再次活动。一个玩的动作，不需要积分、奖励、任务或长期收益来证明它值得发生。
 
-当前候选分支 `codex/harvest-geometry` 集成第一批几何／机械机关：单球、圆形弹跳器、三角侧踢、斜面、平台、弹簧、摆板。机关随机出现、停留和离场，允许同类并存，由实际物理产生组合。
+main已集成第一批几何／机械，后续在 `codex/harvest-geometry` 开发：单球、圆形弹跳器、三角侧踢、斜面、平台、弹簧、摆板。机关随机出现、停留和离场，允许同类并存，由实际物理产生组合。
 
 **当前按 [harvest + refinement](docs/exploration/harvest-refinement-plan.md) 逐批集成**：每批完成后更新文档、停止并等待人工检查。第一批记录见[几何／机械集成](docs/exploration/geometry-harvest-batch1.md)。第二批传送门、第三批普通砖／反向砖尚未启动；结构由长期试玩后决定，场力、多球与抓球保留原实验成果。
 
-**当前进度**：2026-09-30 当前状态：`codex/harvest-geometry` 的代码停点为 `287ac0c`，main仍为 `f792d3b`。1.5×速度／2.25×重力与弹簧0.20秒持球／50%有上限横速保留已获用户试玩通过；挡板独立亮边已撤下，保留球形变、声音层次与Vitality变暗。先统一文档，再按用户授权集成到main并定向验证原有转子、能量块与几何的共存交互；当前几何默认未启用这两项，共存尚未验证。完成后继续在实验分支开发，门户、砖块未启动。 [集成范围与证据边界](docs/exploration/harvest-refinement-plan.md#main-integration-20260930)。
+**当前进度**：2026-09-30 当前状态：第一批几何与原有转子／能量块共存已在 `fa099e4` 实现并本地快进合入main；旧main `f792d3b` 和纯几何停点 `287ac0c` 保留可返回。默认单球六类几何与转子／能量块共同运行，纯几何及底座对照仍可用。1.5×速度／2.25×重力与弹簧0.20秒／50%有上限横速此前已获用户试玩通过；独立亮边已撤下，其余球形变、声音层次及Vitality变暗保留。本轮共存机器验证通过，新组合体验待用户判断。后续继续在 `codex/harvest-geometry` 开发，门户、砖块未启动。 [集成范围与证据边界](docs/exploration/harvest-refinement-plan.md#main-integration-20260930)。
 
 ## 核心体验
 
@@ -24,9 +24,9 @@ Bounce Lite 希望让屏幕中的互动拥有真实玩具的触感：操作简�
 
 协作规则见[代理模型与执行纪律](AGENTS.md#agent-execution-policy)：用户指定子代理统一6.1 Sol（`gpt-6.1-sol`），主代理保持当前方案；子代理medium为本轮执行选择。实现代理负责验证闭环，主代理审查约束、风险与需求。
 
-**main 已建立 V0.2.0 基线**：代码提交 `e905580`，合入记录 `f792d3b`。球、挡板、Vitality、随机转子和能量块、Wake/Continue 已完成收尾。
+**可返回的 V0.2.0 原main基线**：代码提交 `e905580`，合入记录 `f792d3b`。球、挡板、Vitality、随机转子和能量块、Wake/Continue 已完成收尾。
 
-**第一批候选 `codex/harvest-geometry`** 从main选择性迁入几何／机械、随机生命周期、专用碰撞声音及种子／快照入口。原游乐场留在 `codex/exp-physical-toybox`：固定代码 `6f31ea7`、随机代码 `4947b67`。它仍可用于多球、抓球和场力实验，操作与旧验证见[游乐场试玩记录](docs/exploration/toybox-playtest.md)。
+**第一批 `codex/harvest-geometry` 已以 `fa099e4` 集成main**，从原main选择性迁入几何／机械、随机生命周期、专用碰撞声音及种子／快照入口。原游乐场留在 `codex/exp-physical-toybox`：固定代码 `6f31ea7`、随机代码 `4947b67`。它仍可用于多球、抓球和场力实验，操作与旧验证见[游乐场试玩记录](docs/exploration/toybox-playtest.md)。
 
 从已获用户实测认可的 E01 展开，中心色 UI、全客户区场地、随机对象、真实动作资格及 Wake／Continue 强弱与表现均已实现。默认窗口640×480。底座行为见[V0.2.0 基线](docs/design/design-baseline-v0.2.0.md)，其验证见[收口记录](docs/reviews/v0.2.0-consolidation.md)。已发生的用户试玩结论见[试玩记录](docs/exploration/toybox-playtest.md)，当前refinement安全停点与待体验项见第一批记录。
 
