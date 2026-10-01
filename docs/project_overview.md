@@ -1,5 +1,7 @@
 # Bounce Lite Project Overview
 
+当前发布版本：[0.2.1更新记录与已知问题](releases/v0.2.1.md)。
+
 > 当前协作方式：用户指定子代理6.1 Sol（`gpt-6.1-sol`），主代理保持当前配置；子代理medium为执行选择；职责、检查触发条件与交付证据仍按[治理规则](../AGENTS.md#agent-execution-policy)，不将旧配置写成新决定。
 
 > 2026-10-01 当前状态：三批harvest功能已获用户验收并本地合入main：单球几何／机械、原有转子／能量块、成对门户，以及普通／反向／脆砖；本体默认生成避让共用最小接口。最新运行时代码为 `027ebf7`，本次main快进至 `0d38ae1`，旧main `79b9de0`保留可返回。后续在 `codex/harvest-geometry` 进行长期试玩与定向打磨，出现概率和整体美术（尤其反向砖）仍有待改善，不提前扩展结构簇。 详见[当前集成范围](exploration/harvest-refinement-plan.md#harvest-main-20261001)。下方历史状态与参数按原时点理解。

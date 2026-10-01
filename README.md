@@ -1,5 +1,7 @@
 # Bounce Lite
 
+当前版本 **0.2.1** · [更新记录与已知问题](docs/releases/v0.2.1.md)
+
 > A video game with the tactile feel of a real toy.
 
 Bounce Lite 是一个物理电子玩具。移动鼠标控制挡板，让球与机关碰撞、停下、再次活动。一个玩的动作，不需要积分、奖励、任务或长期收益来证明它值得发生。
@@ -43,25 +45,28 @@ F1 打开开发调参与 `DEV ELAPSED` 观察计数器；计数器持续累计�
 
 两个入口均为纯几何对照，默认同一随机种子184；窗口标题与日志标明profile。两档都使用本轮弹簧动作，1.5×也是无参数启动的默认尺度，挡板均保持y570。寿命、生成与机械时间不机械倍乘。2×强对照保留在 `60e3516`；本轮生效参数、快照兼容和证据见[弹簧停点记录](docs/exploration/geometry-harvest-batch1.md#spring-refinement-15x)。
 
-## 运行第二批门户试玩与对照
+## 运行0.2.1与对照
 
-配置下述Godot路径后，双击 [run-playtest.bat](run-playtest.bat) 或在编辑器按F5，进入单球几何／机械、原有转子／能量块与成对门户的默认实验场景。门户首次在8–14秒后淡入，最多一对，规则与本轮证据见[第二批记录](docs/exploration/portal-harvest-batch2.md)。[run-geometry.bat](run-geometry.bat) 显式使用 `--geometry-only`，保留原单球纯几何对照。
+配置下述Godot路径后，双击 [run-playtest.bat](run-playtest.bat) 或在编辑器按F5，进入单球几何／机械、转子／能量块、成对门户与三类砖块的默认场景。门户最多一对，砖块最多三块；规则与证据见[门户记录](docs/exploration/portal-harvest-batch2.md)和[砖块记录](docs/exploration/brick-harvest-batch3.md)。[run-geometry.bat](run-geometry.bat) 显式使用 `--geometry-only`，保留原单球纯几何对照。
 
 - 鼠标移动挡板，接球或在休息球附近拨动挡板。
 - R按当前种子重开场景，N换种子。
 - F8保存机关组合，F9恢复组合后安全重新发单球。
 - H显示开发快捷键；F1调参、F5静音、F7切换E01沿用。
 
-启动参数 `--no-portals` 返回已通过试玩的第一批共存对照；`--geometry-only` 选择纯几何，`--geometry-baseline` 返回V0.2.0底座，`--geometry-fixed` 使用六类机关的固定开发对照，`--geometry-seed=184` 使用指定种子。直接调用 Godot 时，把这些参数放在 `--` 之后。同种子仍受输入与合法生成重试影响，快照更适合保存已经出现的组合；新的几何快照与旧游乐场快照区分类型。
+启动参数 `--no-bricks` 返回门户版；`--no-portals` 返回已通过试玩的第一批共存对照，无门户也无砖；`--geometry-only` 选择纯几何，`--geometry-baseline` 返回V0.2.0底座，`--geometry-fixed` 使用六类机关的固定开发对照，`--geometry-seed=184` 使用指定种子。直接调用 Godot 时，把这些参数放在 `--` 之后。同种子仍受输入与合法生成重试影响，快照更适合保存已经出现的组合；新的几何快照与旧游乐场快照区分类型。
 
-指定种子试玩门户，或打开无门户对照（启动器现可转发游戏参数）：
+指定种子试玩完整世界，或打开门户／无门户对照（启动器现可转发游戏参数）：
 
 ```powershell
 .\run-playtest.bat --geometry-seed=184
+.\run-playtest.bat --no-bricks --geometry-seed=184
 .\run-playtest.bat --no-portals --geometry-seed=184
 ```
 
-仓库附带[初版自然演化30秒的几何快照](docs/exploration/snapshots/geometry-batch1-184-30s.json)，仅适用于 `ee6b25b` 的version1对照。refinement更改机械与生成规则，旧快照不能静默作为新版组合加载；无门户version2组合还必须包含匹配的motion_profile和 `rules=spring-200ms-lateral50-motion150`；旧规则或另一档记录会被拒绝，需回原版本打开。共存快照另含 `world_mode=coexistence` 及原世界对象、随机源和计时状态；纯几何为 `geometry-only`，缺少模式的旧version2按纯几何处理，仅纯几何入口接受。共存最近快照保存在 `.godot/geometry-snapshots/latest-coexistence.json`，纯几何仍为 `latest.json`，两个入口不覆盖彼此。默认门户组合为version3／`world_mode=coexistence-portals`，最新文件为 `.godot/geometry-snapshots/latest-portals.json`；包含门户双口、阶段、计时与随机进度。默认v3拒绝旧v2，旧共存用 `--no-portals` 打开，三类最近组合互不覆盖。R／N同步重开当前模式的对象与门户；F9恢复组合后安全发球，快照不是球轨迹、输入或F1设置的完整重播。
+默认砖块组合是外层version4／`world_mode=coexistence-bricks`，最近文件为 `.godot/geometry-snapshots/latest-bricks.json`；砖子格式v2保留种类、状态、剩余寿命、随机进度及生成规则。旧砖v1可恢复并延续原规则，R／N重开才采用当前60%／25%／15%比例。
+
+`--no-bricks`使用门户version3／`latest-portals.json`；`--no-portals`使用共存version2／`latest-coexistence.json`；纯几何version2使用`latest.json`。各模式最近文件互不覆盖，不匹配组合在修改场景前拒绝；旧组合在对应入口打开。F9安全重新发球，组合不是球轨迹、输入或F1设置的完整重播。仓库[初版几何快照](docs/exploration/snapshots/geometry-batch1-184-30s.json)仅适用于 `ee6b25b` 的version1历史对照。
 
 ### 使用 Godot 编辑器
 

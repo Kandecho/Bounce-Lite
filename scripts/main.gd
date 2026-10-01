@@ -154,7 +154,7 @@ func _set_e01_enabled(enabled: bool) -> void:
 
 func _update_title() -> void:
 	var world_mode := "geometry only" if OS.get_cmdline_user_args().has("--geometry-only") else "geometry + shared world"
-	DisplayServer.window_set_title("Bouncing Ball | motion " + tuning.motion_profile + " | v0.2.0 " + (world_mode if geometry_enabled else ("shared world" if tuning.shared_world_enabled else "baseline")) + " | E01 " + ("contact" if tuning.e01_contact_enabled else "off"))
+	DisplayServer.window_set_title("Bouncing Ball | motion " + tuning.motion_profile + " | v" + str(ProjectSettings.get_setting("application/config/version")) + " " + (world_mode if geometry_enabled else ("shared world" if tuning.shared_world_enabled else "baseline")) + " | E01 " + ("contact" if tuning.e01_contact_enabled else "off"))
 
 
 func _unhandled_key_input(event: InputEvent) -> void:
