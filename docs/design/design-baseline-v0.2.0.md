@@ -1,6 +1,6 @@
 # Bounce Lite V0.2.0 实现基线
 
-> 2026-10-01 当前状态：三批harvest功能已获用户验收并本地合入main：单球几何／机械、原有转子／能量块、成对门户，以及普通／反向／脆砖；本体默认生成避让共用最小接口。最新运行时代码为 `027ebf7`，本次main快进至 `0d38ae1`，旧main `79b9de0`保留可返回。后续在 `codex/harvest-geometry` 进行长期试玩与定向打磨，出现概率和整体美术（尤其反向砖）仍有待改善，不提前扩展结构簇。 详见[当前集成范围](../exploration/harvest-refinement-plan.md#harvest-main-20261001)。下方历史状态与参数按原时点理解。
+> V0.2.0历史实现基线：保留底座参数、规则及当时证据。当前持续约束见[产品概览](../project_overview.md)，后续变化见[当前计划](../exploration/harvest-refinement-plan.md)；本文不滚动维护当前发布状态。
 
 日期：2026-09-13。整理：Codex；运行时与测试由 low 推理实现代理完成，主代理复核。
 

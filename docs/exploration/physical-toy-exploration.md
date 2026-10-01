@@ -2,7 +2,7 @@
 
 起始：2026-09-12；广度阶段记录：2026-09-13；试玩结果与refinement更新：2026-09-16。来源：用户开发方向、实际试玩反馈与本轮修改要求；整理与复核：Codex。
 
-**当前按 [harvest + refinement：分批集成与打磨](harvest-refinement-plan.md) 收获成果。** 广度游乐场已提供足够机制候选；第一运动A/B停点为 `60e3516`，1.5×运动与[弹簧refinement](geometry-harvest-batch1.md#spring-refinement-15x)已获用户试玩通过，当前继续[独立挡板接触反馈](geometry-harvest-batch1.md#paddle-feedback-20260925)。完成后停下人工检查，第二、三批未启动。以下广度阶段方向与现场保留为历史，不作为继续扩张机制范围的指令。
+> 广度探索历史：保存候选来源及当时筛选，不继续同步后续实施状态。当前工作范围见[计划](harvest-refinement-plan.md)。
 
 ## 用户试玩后的收获与决定（2026-09-16记录）
 

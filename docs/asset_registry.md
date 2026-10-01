@@ -1,5 +1,7 @@
 # Bounce Lite Asset Registry
 
+> 历史制作登记：保留概念来源、资产编号和各版生产状态，不要求继续实现旧候选。当前媒体许可与来源由[许可边界](../ASSET_LICENSE.md)及[第三方登记](../THIRD_PARTY_ASSETS.md)维护；产品范围见[概览](project_overview.md)。
+
 ## V0.2 原型补充（2026-09-11）
 
 当前实验分支新增转子叶片与余转风迹、琥珀补能对象及耗尽／恢复外观、事件扩散环，均在 `scripts/world/` 运行时绘制；未生产或改写参考位图。世界声音为初始化时生成的原创 PCM，来源与检查见[反馈说明](exploration/world-feedback-notes.md)。均属于已实现、待整体体验的原型素材，不是正式美术风格验收。当前依据见 [V0.2.0 Design Note](design/v0.2.0-design-note.md)；下文冻结规格保留历史版本。

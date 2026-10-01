@@ -1,5 +1,7 @@
 # Bounce Lite Design Baseline — V0.1.6
 
+> V0.1.6历史基线；只用于该版本对照。当前持续约束见[产品概览](../project_overview.md)。
+
 日期：2026-09-10。状态：用户已确认的 Design Boundary Consolidation 决定；实现与验证见 [收口报告](../reviews/v0.1.6-consolidation.md)。本文是当前设计判断入口，V0.2.0 未授权。
 
 来源：[用户原始 V0.1.x 基线](design-baseline-v0.1.x.md)及本轮用户实施指令。原稿原曾以 `docs/design-baseline-v0.1.6.md` 暂存，与桌面提供的 V0.1.x 原稿 SHA-256 相同；现按内容版本归档，字节未改。原稿不覆盖，本文记录本轮明确决定。
