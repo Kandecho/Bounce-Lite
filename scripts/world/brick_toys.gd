@@ -3,6 +3,10 @@ extends Node2D
 ## No regrowth, local speed cap, vitality offering or physical fragments.
 signal event_emitted(kind: String, position: Vector2, intensity: float)
 const CORE := Vector2(72,28)
+const FRAGILE_CORE := Vector2(72,12)
+const GENERATION_RULE := "fragile60-ordinary25-reverse15"
+const LEGACY_RULE := "legacy-two-kind"
+var generation_rule := GENERATION_RULE
 const FOOTPRINT := Vector2(84,40)
 const FADE := 0.65
 const ASSEMBLY := 0.28
@@ -32,6 +36,7 @@ func clear() -> void:
 
 func restart(seed_value: int) -> void:
 	clear()
+	generation_rule = GENERATION_RULE
 	clock = 0.0
 	next_id = 0
 	events.clear()
@@ -64,13 +69,20 @@ func _legal(point: Vector2, ignore: StaticBody2D = null) -> bool:
 		if body != ignore and _bounds(point).intersects(_bounds(body.global_position)): return false
 	return true
 
+func core_size(kind: String) -> Vector2:
+	return FRAGILE_CORE if kind=="fragile" else CORE
+
+func kind_for_roll(roll: float) -> String:
+	if generation_rule==LEGACY_RULE: return "reverse" if roll<0.5 else "ordinary"
+	return "fragile" if roll<0.6 else ("ordinary" if roll<0.85 else "reverse")
+
 func _try_spawn() -> bool:
 	if bodies.size() >= MAX_BRICKS: return false
 	var region: Rect2 = main.spawn_region()
 	for attempt in range(24):
 		var point := region.position+Vector2(_rng.randf(),_rng.randf())*region.size
 		if not _legal(point): continue
-		var body := add_brick("reverse" if _rng.randf()<0.5 else "ordinary",point,_rng.randf_range(14,22))
+		var body := add_brick(kind_for_roll(_rng.randf()),point,_rng.randf_range(14,22))
 		body.set_meta("phase","appearing")
 		body.set_meta("phase_time",0.0)
 		body.collision_layer = 0
@@ -95,7 +107,7 @@ func add_brick(kind: String, point: Vector2, lifetime: float) -> StaticBody2D:
 	next_id += 1
 	var collider := CollisionShape2D.new()
 	var shape := RectangleShape2D.new()
-	shape.size = CORE
+	shape.size = core_size(kind)
 	collider.shape = shape
 	body.add_child(collider)
 	add_child(body)
@@ -181,17 +193,19 @@ func export_snapshot() -> Dictionary:
 		var entry := {"kind":body.get_meta("brick_kind"),"id":body.get_meta("brick_id"),"position":[body.global_position.x,body.global_position.y]}
 		for key in ["phase","stage","phase_time","assembly_time","remaining","flash","last_hit"]: entry[key]=body.get_meta(key)
 		entries.append(entry)
-	return {"version":1,"clock":clock,"spawn_timer":spawn_timer,"next_id":next_id,"rng_seed":str(_rng.seed),"rng_state":str(_rng.state),"bodies":entries,"journal":lifecycle_events.duplicate(true)}
+	return {"version":2,"generation_rule":generation_rule,"clock":clock,"spawn_timer":spawn_timer,"next_id":next_id,"rng_seed":str(_rng.seed),"rng_state":str(_rng.state),"bodies":entries,"journal":lifecycle_events.duplicate(true)}
 
 func snapshot_valid(data: Dictionary) -> bool:
-	if data.get("version")!=1 or not data.get("bodies") is Array or data.bodies.size()>MAX_BRICKS: return false
+	if not (data.get("version") is int or data.get("version") is float) or (data.version!=1 and data.version!=2) or not data.get("bodies") is Array or data.bodies.size()>MAX_BRICKS: return false
 	for key in ["clock","spawn_timer","next_id"]:
 		if not (data.get(key) is float or data.get(key) is int) or not is_finite(float(data[key])) or float(data[key])<0: return false
+	if data.version==2 and data.get("generation_rule") not in [GENERATION_RULE,LEGACY_RULE]: return false
 	var bounds: Array[Rect2] = []
 	var identities: Array[int] = []
 	for entry in data.bodies:
-		if not entry is Dictionary or entry.get("kind") not in ["ordinary","reverse"] or entry.get("phase") not in ["appearing","active","fading","shattering"]: return false
-		if entry.get("stage") not in (["whole","cracked"] if entry.kind=="ordinary" else ["scattered","assembling","assembled"]): return false
+		if not entry is Dictionary or entry.get("kind") not in (["ordinary","reverse"] if data.version==1 else ["fragile","ordinary","reverse"]) or entry.get("phase") not in ["appearing","active","fading","shattering"]: return false
+		if entry.get("stage") not in (["whole"] if entry.kind=="fragile" else (["whole","cracked"] if entry.kind=="ordinary" else ["scattered","assembling","assembled"])): return false
+		if data.get("generation_rule",LEGACY_RULE)==LEGACY_RULE and entry.kind=="fragile": return false
 		if not entry.get("position") is Array or entry.position.size()!=2: return false
 		for number in entry.position:
 			if not (number is float or number is int) or not is_finite(float(number)): return false
@@ -211,6 +225,7 @@ func snapshot_valid(data: Dictionary) -> bool:
 func restore_snapshot(data: Dictionary) -> bool:
 	if not snapshot_valid(data): return false
 	clear()
+	generation_rule=LEGACY_RULE if data.version==1 else str(data.generation_rule)
 	clock=float(data.clock)
 	spawn_timer=float(data.spawn_timer)
 	for entry in data.bodies:
@@ -226,6 +241,16 @@ func restore_snapshot(data: Dictionary) -> bool:
 	queue_redraw()
 	return true
 
+func _fragment_base(index: int) -> Vector2:
+	return [Vector2(-25,-4),Vector2(-17,7),Vector2(-6,-7),Vector2(5,5),Vector2(17,-3),Vector2(26,6)][index]
+
+func _fragment_angle(index: int) -> float:
+	return [-0.22,0.28,-0.14,0.4,-0.34,0.17][index]
+
+func _fragment_polygon(index: int) -> PackedVector2Array:
+	var scale := 0.8+float(index%3)*0.1
+	return PackedVector2Array([Vector2(-7,-3)*scale,Vector2(4,-4)*scale,Vector2(7,2)*scale,Vector2(-3,4)*scale])
+
 func _draw() -> void:
 	for body in bodies:
 		var kind: String = body.get_meta("brick_kind")
@@ -233,26 +258,33 @@ func _draw() -> void:
 		var phase: String = body.get_meta("phase")
 		var time: float = body.get_meta("phase_time")
 		var alpha := minf(0.65,time/FADE) if phase=="appearing" else (maxf(0,1-time/FADE) if phase in ["fading","shattering"] else 1.0)
-		var color := Color("d49feb") if kind=="reverse" else Color("73c3a4")
+		var color := Color("a9cabf") if kind=="reverse" else Color("73c3a4")
 		color.a=alpha
 		draw_set_transform(body.position)
 		var scatter := 1.0 if stage=="scattered" else (1-clampf(float(body.get_meta("assembly_time"))/ASSEMBLY,0,1) if stage=="assembling" else 0.0)
-		if phase=="shattering":
+		if kind=="reverse" and phase!="shattering":
+			# A quiet Ball-like halo; shard edges stay the clearest information.
+			for ring in range(5,0,-1):
+				draw_circle(Vector2.ZERO,27+ring*3,Color(Color("8bd5da"),alpha*0.009*(6-ring)))
+		if phase=="shattering" or scatter>0:
 			for shard in range(6):
-				var base := Vector2((shard%3-1)*24,(floori(shard/3.0)-0.5)*14)
-				var direction := base.normalized()
-				var travel := time*(90 if kind=="reverse" else 55)
-				draw_set_transform(body.position+base+direction*travel,time*(4 if shard%2 else -4))
-				draw_rect(Rect2(-8,-4,16,8),color)
-		elif scatter>0:
-			# Outline matches the real solid contact region, despite separated pieces.
-			draw_rect(Rect2(-CORE*0.5,CORE),Color(color,alpha*0.55),false,1.0)
-			for shard in range(6):
-				var base := Vector2((shard%3-1)*24,(floori(shard/3.0)-0.5)*14)
-				var direction := Vector2(signf(base.x),signf(base.y))
-				draw_rect(Rect2(base+direction*scatter*5-Vector2(10,5),Vector2(20,10)),Color(color,alpha*0.8))
-		else:
-			draw_rect(Rect2(-CORE*0.5,CORE),Color(color,alpha*0.3))
-			draw_rect(Rect2(-CORE*0.5,CORE),color,false,1.8)
+				var base := _fragment_base(shard)
+				if kind=="fragile": base.y*=FRAGILE_CORE.y/CORE.y
+				var point := base
+				var angle := _fragment_angle(shard)
+				if phase=="shattering":
+					point+=base.normalized()*time*(90 if kind=="reverse" else 55)
+					angle+=time*(4 if shard%2 else -4)
+				else:
+					var target := Vector2((shard%3-1)*24,(floori(shard/3.0)-0.5)*14)
+					point=target.lerp(base,scatter)
+					angle*=scatter
+				draw_set_transform(body.position+point,angle)
+				draw_colored_polygon(_fragment_polygon(shard),Color(color,alpha*(1.0 if phase=="shattering" else scatter)))
+			draw_set_transform(body.position)
+		if phase!="shattering" and scatter<1:
+			var face := Rect2(-core_size(kind)*0.5,core_size(kind))
+			draw_rect(face,Color(color,alpha*(1-scatter)*0.3))
+			draw_rect(face,Color(color,alpha*(1-scatter)),false,1.2)
 			if stage=="cracked": draw_polyline(PackedVector2Array([Vector2(-7,-14),Vector2(5,-2),Vector2(-5,4),Vector2(7,14)]),Color("192027"),2.4,true)
 		draw_set_transform(Vector2.ZERO)
