@@ -94,7 +94,7 @@ Concept Reference Resolution：
 候选安装位置：
 
 ```text
-D:\Apps\Godot_v4.7-stable_win64
+C:\Tools\Godot
 ```
 
 Phase 0 只能对该位置进行只读核验，不得启动项目初始化。需要记录：

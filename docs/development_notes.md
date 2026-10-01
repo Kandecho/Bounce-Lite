@@ -1,5 +1,7 @@
 # Bounce Lite Development Notes
 
+> 文档中的绝对路径已替换为通用示例；历史环境与执行记录中的路径同样经过脱敏。请按本机安装位置调整。
+
 > 2026-09-11 当前进度：现场核对至 `793c361`，中心色 UI 与全客户区场地已实现；随机出现及 Continue／Wake 后续调整尚未实施。设计依据为 [V0.2.0 Design Note](design/v0.2.0-design-note.md)，[后续计划](exploration/v0.2.0-follow-up-plan.md)已落盘；实施和分平台证据集中在[V0.2 共享小世界](exploration/v0.2-shared-world.md)。本轮仅同步文档，未新增游戏测试结果。下文历史结论按记录时点理解。
 
 ## 1. 记录范围
@@ -14,7 +16,7 @@
 
 | 项目 | 事实 |
 | --- | --- |
-| 项目路径 | `D:\hangk\Documents\Bounce Lite` |
+| 项目路径 | `C:\Projects\Bounce Lite` |
 | 初始文件 | `AGENTS.md`、`phase-0-plan.md`、`day-raw.png`、`night-raw.png` |
 | Git | 本地仓库；`main` 分支；不设置远端 |
 | Git 操作 | 用户已批准 `git init`；不创建 worktree、不推送 |
@@ -27,14 +29,14 @@
 候选目录存在：
 
 ```text
-D:\Apps\Godot_v4.7-stable_win64
+C:\Tools\Godot
 ```
 
 发现的可执行文件：
 
 ```text
-D:\Apps\Godot_v4.7-stable_win64\Godot_v4.7-stable_win64.exe
-D:\Apps\Godot_v4.7-stable_win64\Godot_v4.7-stable_win64_console.exe
+C:\Tools\Godot\Godot_v4.7-stable_win64.exe
+C:\Tools\Godot\Godot_v4.7-stable_win64_console.exe
 ```
 
 只读版本查询结果：
@@ -55,7 +57,7 @@ D:\Apps\Godot_v4.7-stable_win64\Godot_v4.7-stable_win64_console.exe
 | PowerShell | 7.6.5 |
 | Native Argument Passing | Windows |
 | Python | 3.14.5 |
-| Python Launcher | `C:\Users\hangk\AppData\Local\Programs\Python\Launcher\py.exe` |
+| Python Launcher | `C:\Users\<user>\AppData\Local\Programs\Python\Launcher\py.exe` |
 | Node | v24.15.0 |
 | Node Executable | `C:\Program Files\nodejs\node.exe` |
 

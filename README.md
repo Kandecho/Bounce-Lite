@@ -1,109 +1,65 @@
 # Bounce Lite
 
-当前版本 **0.2.1** · [更新记录与已知问题](docs/releases/v0.2.1.md)
-
 > A video game with the tactile feel of a real toy.
 
-Bounce Lite 是一个物理电子玩具。移动鼠标控制挡板，让球与机关碰撞、停下、再次活动。一个玩的动作，不需要积分、奖励、任务或长期收益来证明它值得发生。
+一个用鼠标就能玩的物理电子玩具。移动挡板接住球，看它被弹簧抛起、穿过传送门，或把碎片撞成一块完整的砖。
 
-main已集成三批harvest：单球几何／机械、成对门户与三类砖块，和转子／能量块自然共存。对象随机出现、停留和离场，默认本体避让。后续继续在 `codex/harvest-geometry` 打磨。
+没有分数、关卡或胜负。球会逐渐停下，也能被你再次拨动；想玩多久、想让它碰什么，由你决定。
 
-**当前按 [harvest + refinement](docs/exploration/harvest-refinement-plan.md) 进入累积试玩与打磨**：三批功能已验收并本地合入main。出现概率、美术及原有开放问题继续观察；结构由长期试玩后决定，场力、多球与抓球保留原实验成果。
+**当前版本：0.2.1** · [版本说明与已知问题](docs/releases/v0.2.1.md)
 
-**当前进度**：2026-10-01 当前状态：三批harvest功能已获用户验收并本地合入main：单球几何／机械、原有转子／能量块、成对门户，以及普通／反向／脆砖；本体默认生成避让共用最小接口。最新运行时代码为 `027ebf7`，本次main快进至 `0d38ae1`，旧main `79b9de0`保留可返回。后续在 `codex/harvest-geometry` 进行长期试玩与定向打磨，出现概率和整体美术（尤其反向砖）仍有待改善，不提前扩展结构簇。 [集成范围与证据边界](docs/exploration/harvest-refinement-plan.md#harvest-main-20261001)。
+## 里面有什么
 
-## 核心体验
+- **会变化的场地**：弹跳器、斜面、平台、弹簧和跷跷板等机关随机出现、停留和离场，每次都有不同的球路。
+- **意外的相遇**：转子改变运动，能量块补充活力，成对传送门把球送到另一处。
+- **三种砖块**：普通砖逐次破裂，脆砖一碰即碎，反向砖先拼合、再摔碎。
+- **碰得到的反馈**：球的形变、光晕、拖影和碰撞声音回应每次接触。
 
-Bounce Lite 希望让屏幕中的互动拥有真实玩具的触感：操作简单，反馈清楚；玩家决定何时介入，球的后续运动由物理世界决定。
+## 开始玩
 
-- **接球与改变球路**：鼠标移动挡板，真实接触保留E01的有限影响；静态表面自然反射，主动机关与机械运动提供不同的碰撞回应。
-- **停下与唤醒**：球会逐渐失去活力、进入休息；在附近移动挡板，可以让它重新活动。
-- **看见与听见反馈**：明亮球核心、青色光晕与残影呈现活力和运动；挡板在实际传递活力后变暗，简短音效回应碰撞与世界事件。
+目前提供源码版本，需要 **Godot 4.7 stable**，使用 Compatibility 渲染器；已在 Windows 上验证。
 
-它追求的是随手玩一会儿的轻松感，以及“再拨一下会怎样”的好奇心。
+1. 下载本仓库，或克隆：
 
-## 当前状态
+   ```sh
+   git clone https://github.com/Kandecho/Bounce-Lite.git
+   ```
 
-协作规则见[代理模型与执行纪律](AGENTS.md#agent-execution-policy)：用户指定子代理统一6.1 Sol（`gpt-6.1-sol`），主代理保持当前方案；子代理medium为本轮执行选择。实现代理负责验证闭环，主代理审查约束、风险与需求。
+2. 在 Godot 项目管理器中导入根目录的 `project.godot`。
+3. 打开工程，等待资源导入完成，按 **F5** 运行。
 
-**可返回的 V0.2.0 原main基线**：代码提交 `e905580`，合入记录 `f792d3b`。球、挡板、Vitality、随机转子和能量块、Wake/Continue 已完成收尾。
+### Windows 快速启动
 
-**第一批 `codex/harvest-geometry` 已以 `fa099e4` 集成main**，从原main选择性迁入几何／机械、随机生命周期、专用碰撞声音及种子／快照入口。原游乐场留在 `codex/exp-physical-toybox`：固定代码 `6f31ea7`、随机代码 `4947b67`。它仍可用于多球、抓球和场力实验，操作与旧验证见[游乐场试玩记录](docs/exploration/toybox-playtest.md)。
+也可以双击 [run-playtest.bat](run-playtest.bat)。首次运行前，任选一种方式指定 Godot：
 
-从已获用户实测认可的 E01 展开，中心色 UI、全客户区场地、随机对象、真实动作资格及 Wake／Continue 强弱与表现均已实现。默认窗口640×480。底座行为见[V0.2.0 基线](docs/design/design-baseline-v0.2.0.md)，其验证见[收口记录](docs/reviews/v0.2.0-consolidation.md)。已发生的用户试玩结论见[试玩记录](docs/exploration/toybox-playtest.md)，当前refinement安全停点与待体验项见第一批记录。
+- 将环境变量 `GODOT_CONSOLE` 设为 Godot 可执行文件的完整路径。
+- 创建 `.local/godot.local.txt`，第一行填写可执行文件的完整路径，不加引号。
+- 将名为 `godot_console.exe` 或 `godot.exe` 的程序加入 `PATH`。
 
-上一轮已主动借鉴弹球和物理游戏机制，制作可玩组合；来源与交付见[物理玩具探索](docs/exploration/physical-toy-exploration.md)。接下来按[分批集成与打磨方案](docs/exploration/harvest-refinement-plan.md)收获这些成果，玩法本身无需依赖积分、奖励、任务或长期收益。
+例如，路径配置文件可以填写 `C:\Tools\Godot\Godot_v4.7-stable_win64_console.exe`，请替换为实际安装位置。本地配置不会提交到 Git。
 
-F1 打开开发调参与 `DEV ELAPSED` 观察计数器；计数器持续累计，不因休息暂停或 Wake 归零，默认不显示在游戏画面。
+## 操作
 
-详细进度与版本路线见[项目概览](docs/project_overview.md)。
+| 操作 | 效果 |
+| --- | --- |
+| 左右移动鼠标 | 移动挡板接球；球休息时，在附近拨动挡板尝试唤醒 |
+| R | 按当前种子重新开始 |
+| N | 换一个随机种子重新开始 |
+| F5（游戏内） | 静音／恢复声音 |
+| H | 显示开发快捷键 |
 
-## 纯几何运动A/B对照
+默认窗口为 640×480，缩放时保持 4:3。
 
-- [1×运动对照](run-motion-current.bat)
-- [1.5×运动对照（重力×2.25）](run-motion-fast.bat)
+## 开发状态
 
-两个入口均为纯几何对照，默认同一随机种子184；窗口标题与日志标明profile。两档都使用本轮弹簧动作，1.5×也是无参数启动的默认尺度，挡板均保持y570。寿命、生成与机械时间不机械倍乘。2×强对照保留在 `60e3516`；本轮生效参数、快照兼容和证据见[弹簧停点记录](docs/exploration/geometry-harvest-batch1.md#spring-refinement-15x)。
+项目仍在持续试玩与打磨。实体出现概率、整体美术，尤其反向砖的外观，尚待改善；部分重新参与体验与挡板碰撞边界问题仍在跟踪。
 
-## 运行0.2.1与对照
+- [版本说明](docs/releases/v0.2.1.md)：本版变化、已知问题与对照启动方式。
+- [项目概览](docs/project_overview.md)：设计方向与后续计划。
+- [文档导航](docs/README.md)：开发、测试和历史记录。
 
-配置下述Godot路径后，双击 [run-playtest.bat](run-playtest.bat) 或在编辑器按F5，进入单球几何／机械、转子／能量块、成对门户与三类砖块的默认场景。门户最多一对，砖块最多三块；规则与证据见[门户记录](docs/exploration/portal-harvest-batch2.md)和[砖块记录](docs/exploration/brick-harvest-batch3.md)。[run-geometry.bat](run-geometry.bat) 显式使用 `--geometry-only`，保留原单球纯几何对照。
+使用 Godot / GDScript 开发，画面主要由程序绘制，声音包含 Kenney 素材和原创合成音。
 
-- 鼠标移动挡板，接球或在休息球附近拨动挡板。
-- R按当前种子重开场景，N换种子。
-- F8保存机关组合，F9恢复组合后安全重新发单球。
-- H显示开发快捷键；F1调参、F5静音、F7切换E01沿用。
+## 许可
 
-启动参数 `--no-bricks` 返回门户版；`--no-portals` 返回已通过试玩的第一批共存对照，无门户也无砖；`--geometry-only` 选择纯几何，`--geometry-baseline` 返回V0.2.0底座，`--geometry-fixed` 使用六类机关的固定开发对照，`--geometry-seed=184` 使用指定种子。直接调用 Godot 时，把这些参数放在 `--` 之后。同种子仍受输入与合法生成重试影响，快照更适合保存已经出现的组合；新的几何快照与旧游乐场快照区分类型。
-
-指定种子试玩完整世界，或打开门户／无门户对照（启动器现可转发游戏参数）：
-
-```powershell
-.\run-playtest.bat --geometry-seed=184
-.\run-playtest.bat --no-bricks --geometry-seed=184
-.\run-playtest.bat --no-portals --geometry-seed=184
-```
-
-默认砖块组合是外层version4／`world_mode=coexistence-bricks`，最近文件为 `.godot/geometry-snapshots/latest-bricks.json`；砖子格式v2保留种类、状态、剩余寿命、随机进度及生成规则。旧砖v1可恢复并延续原规则，R／N重开才采用当前60%／25%／15%比例。
-
-`--no-bricks`使用门户version3／`latest-portals.json`；`--no-portals`使用共存version2／`latest-coexistence.json`；纯几何version2使用`latest.json`。各模式最近文件互不覆盖，不匹配组合在修改场景前拒绝；旧组合在对应入口打开。F9安全重新发球，组合不是球轨迹、输入或F1设置的完整重播。仓库[初版几何快照](docs/exploration/snapshots/geometry-batch1-184-30s.json)仅适用于 `ee6b25b` 的version1历史对照。
-
-### 使用 Godot 编辑器
-
-1. 准备 Godot **4.7 stable**。
-2. 下载或克隆本仓库，在 Godot 中导入根目录的 `project.godot`。
-3. 打开工程，按 **F5** 启动游戏。
-
-游戏中左右移动鼠标控制挡板；球停下后，在附近拨动挡板尝试唤醒它。游戏内 **F5** 切换全部音效静音，**F7** 切换有限接触影响；F7 只改变之后的接触，不重置世界。
-
-### 使用 Windows 启动器
-
-配置好 Godot 路径后，可直接双击 [run-playtest.bat](run-playtest.bat)：
-
-- 设置 `GODOT_CONSOLE` 环境变量为 Godot 可执行文件的完整路径；或
-- 创建 `.local/godot.local.txt`，在第一行填写该完整路径（不加引号）；或
-- 将名为 `godot_console.exe` 或 `godot.exe` 的程序加入 PATH。
-
-本地路径配置不会提交到 Git。开发调参与音效对比操作见[音频试玩说明](docs/v0.1.4-basic-audio.md)。
-
-## 技术栈
-
-使用 **Godot 4.7 / GDScript / Compatibility 渲染器**。逻辑视口为 960×720，默认窗口为 640×480，窗口缩放时保持 4:3。画面由程序绘制；基础音效使用 Kenney 素材，世界事件使用原创合成音。
-
-## 文档
-
-- [V0.2.0 实现基线](docs/design/design-baseline-v0.2.0.md)：当前底座；[V0.1.6 基线](docs/design/design-baseline-v0.1.6.md)保留为历史对照。
-- [V0.2.0 当前设计](docs/design/v0.2.0-design-note.md)、[后续计划](docs/exploration/v0.2.0-follow-up-plan.md)与[原型记录](docs/exploration/v0.2-shared-world.md)：分别说明判断依据、待实施任务和实际验证。
-- [V0.1.6 收口报告](docs/reviews/v0.1.6-consolidation.md)：改动、验证与保留限制。
-- [文档导航](docs/README.md)：正式文档、审计与历史过程档案。
-- [项目概览](docs/project_overview.md)：产品方向、版本路线与当前状态。
-- [V0.1.5 Paddle 与 Wake](docs/v0.1.5-paddle-interaction.md)：历史交互基准，当前差异见原型记录。
-- [视觉规格](docs/visual_spec.md)：视觉语言与反馈设计。
-- [基础音频](docs/v0.1.4-basic-audio.md)：声音方向、试玩操作与验证入口。
-- [开发记录](docs/development_notes.md)：实现及验证历史。
-
-## License / Third-party assets
-
-代码及技术文档采用 [MIT License](LICENSE)。媒体资产的许可独立说明，见 [ASSET_LICENSE.md](ASSET_LICENSE.md)。
-
-Kenney 音频素材采用 **CC0**；素材包、原始来源及裁片记录见 [THIRD_PARTY_ASSETS.md](THIRD_PARTY_ASSETS.md)。概念参考图不包含在 MIT 授权中。
+代码及技术文档采用 [MIT License](LICENSE)。媒体资产的许可见 [ASSET_LICENSE.md](ASSET_LICENSE.md)；Kenney 音频采用 CC0，来源及使用记录见 [THIRD_PARTY_ASSETS.md](THIRD_PARTY_ASSETS.md)。概念参考图不包含在 MIT 授权中。
