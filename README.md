@@ -56,10 +56,10 @@
 
 - [版本说明](docs/releases/v0.2.1.md)：本版变化、已知问题与对照启动方式。
 - [项目概览](docs/project_overview.md)：产品定位与持续约束。
-- [文档导航](docs/README.md)：开发、测试和历史记录。
+- [文档导航](docs/README.md)：开发、验证和产物维护规则。
 
 使用 Godot / GDScript 开发，画面主要由程序绘制，声音包含 Kenney 素材和原创合成音。
 
 ## 许可
 
-代码及技术文档采用 [MIT License](LICENSE)。媒体资产的许可见 [ASSET_LICENSE.md](ASSET_LICENSE.md)；Kenney 音频采用 CC0，来源及使用记录见 [THIRD_PARTY_ASSETS.md](THIRD_PARTY_ASSETS.md)。概念参考图不包含在 MIT 授权中。
+代码及技术文档采用 [MIT License](LICENSE)。媒体资产的许可见 [ASSET_LICENSE.md](ASSET_LICENSE.md)；Kenney 音频采用 CC0，来源及使用记录见 [THIRD_PARTY_ASSETS.md](THIRD_PARTY_ASSETS.md)。

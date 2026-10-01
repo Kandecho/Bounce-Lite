@@ -1,6 +1,6 @@
 # Bounce Lite：产品概览
 
-本页维护当前产品定位与持续约束。当前发布事实见[0.2.1](releases/v0.2.1.md)，本阶段取舍及暂定实现见[当前计划](exploration/harvest-refinement-plan.md)，协作权限见[AGENTS](../AGENTS.md)。历史构建、概念规格与实施记录通过[文档导航](README.md)按需查阅。
+本页维护当前产品定位与持续约束。当前发布事实见[0.2.1](releases/v0.2.1.md)，本阶段取舍及暂定实现见[当前计划](exploration/harvest-refinement-plan.md)，协作权限见[AGENTS](../AGENTS.md)。实现与验证入口通过[文档导航](README.md)查阅。
 
 ## 产品目的
 
@@ -33,5 +33,3 @@
 ## 技术与运行环境
 
 当前采用Godot 4.7、GDScript、Compatibility，Windows为已验证平台；960×720逻辑视口、640×480默认窗口，缩放保持4:3，整个客户区是场地。启动与操作只在[根README](../README.md)维护，版本号以 `project.godot` 为源。重大底层技术路线变化按AGENTS处理。
-
-本页从历史概览中提取仍有效的契约；早期名称、HUD、阶段审批和冻结视觉不再承担当前规格职责。整理前完整概览可在提交 `4de0b52` 的同路径查阅，用户原始设计、审计与素材原件保持原位置。

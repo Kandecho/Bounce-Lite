@@ -27,3 +27,6 @@ godot.local.txt
 *.bak
 exports/
 build/
+
+# Private raw feedback; accepted issues live in the public register
+/docs/user-feedback.md
