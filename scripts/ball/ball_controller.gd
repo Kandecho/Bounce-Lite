@@ -15,6 +15,7 @@ signal paddle_energy_transferred(amount: float)
 
 var play_rhythm: RefCounted = PlayRhythm.new()
 var geometry_contacts: Node
+var brick_contacts: Node
 var portal_contacts: Node
 var support_geometry: CollisionObject2D
 var spring_hold: CollisionObject2D
@@ -383,6 +384,8 @@ func resolve_surface_collision(kind: int, normal: Vector2, valid_paddle_hit: boo
 	result.vitality_after = vitality_model.current_vitality
 	result.vitality_delta = result.vitality_after - result.vitality_before
 	result.set_meta("geometry_contact", geometry_contact)
+	var brick_contact := is_instance_valid(brick_contacts) and is_instance_valid(collider) and collider.has_meta("brick_kind")
+	result.set_meta("brick_contact",brick_contact)
 	var transferred: float = vitality_model.current_vitality - vitality_before
 	# Surface response grants physical settle permission; Activity is committed last.
 	if geometry_contact and collider.get_meta("toy_kind") == "platform" and normal.y < -0.98 \
@@ -406,6 +409,8 @@ func resolve_surface_collision(kind: int, normal: Vector2, valid_paddle_hit: boo
 	surface_resolved.emit(result)
 	if geometry_contact:
 		geometry_contacts.on_contact_committed(collider, result, global_position)
+	if brick_contact:
+		brick_contacts.on_contact_committed(collider,result,self)
 	if result.valid_paddle_hit and transferred > 0.0:
 		paddle_energy_transferred.emit(transferred)
 	_play_collision_feedback(result.surface_kind, normal, maxf(0.0, -result.velocity_before.dot(normal.normalized())))

@@ -13,6 +13,7 @@ var play_world: Node2D
 var world_feedback: Node2D
 var geometry_playground: Node2D
 var portals: Node2D
+var bricks: Node2D
 var spawn_occupancy = preload("res://scripts/world/spawn_occupancy.gd").new()
 var geometry_enabled := true
 
@@ -96,6 +97,13 @@ func _ready() -> void:
 			spawn_occupancy.register(portals)
 			$GameArea.add_child(portals)
 			ball.portal_contacts = portals
+		if is_instance_valid(portals) and not OS.get_cmdline_user_args().has("--no-bricks"):
+			bricks = load("res://scripts/world/brick_toys.gd").new()
+			bricks.name = "Bricks"
+			bricks.spawn_occupancy = spawn_occupancy
+			spawn_occupancy.register(bricks)
+			$GameArea.add_child(bricks)
+			ball.brick_contacts = bricks
 		geometry_playground.configure(self)
 
 
@@ -156,5 +164,5 @@ func _unhandled_key_input(event: InputEvent) -> void:
 
 
 func _on_surface_audio(result: RefCounted) -> void:
-	if not bool(result.get_meta("geometry_contact", false)):
+	if not bool(result.get_meta("geometry_contact", false)) and not bool(result.get_meta("brick_contact", false)):
 		$BasicAudio.on_surface_resolved(result)
