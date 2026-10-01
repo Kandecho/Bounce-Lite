@@ -4,7 +4,7 @@
 
 - [代理模型与执行纪律](../AGENTS.md#agent-execution-policy)：子代理统一6.1 Sol（`gpt-6.1-sol`），medium为执行选择，主代理保持当前配置；职责、审查触发、集成责任与可审计交付规则继续适用，历史配置保留真实归属。
 - [第一批几何／机械集成记录](exploration/geometry-harvest-batch1.md#coexistence-result-20260930)：`fa099e4`已集成main，共存机器验证及动态证据通过，10月1日用户反馈体验良好。
-- [分批集成与打磨方案](exploration/harvest-refinement-plan.md#brick-harvest-20261001)：第一批、第二批门户与本体避让均已通过用户试玩；第三批5287a91已获基本反馈通过，反向砖形象与脆砖微调已实现并通过必要机器验证，待试玩；main保持79b9de0。
+- [分批集成与打磨方案](exploration/harvest-refinement-plan.md#harvest-main-20261001)：三批功能已验收并本地合入main；进入累积试玩与定向打磨。
 - [物理电子玩具探索](exploration/physical-toy-exploration.md)：广度探索收获、实际试玩后的筛选决定及历史来源。
 - [游乐场试玩记录](exploration/toybox-playtest.md)：正式反馈登记F01–F09及T01，区分准备解决、持续跟踪、已实施待验收与候选方案；原始反馈文件保持原文且未跟踪。
 - [V0.2.0 实现基线](design/design-baseline-v0.2.0.md)：随机对象、真实动作资格、Wake/Continue 与现有底座。
